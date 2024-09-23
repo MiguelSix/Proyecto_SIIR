@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SIIR.Models;
 
 namespace SIIR.Data
 {
@@ -9,5 +10,12 @@ namespace SIIR.Data
             : base(options)
         {
         }
+
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Coach> Coaches { get; set; }
+        public DbSet<Student> Students { get; set; }
+
     }
 }
