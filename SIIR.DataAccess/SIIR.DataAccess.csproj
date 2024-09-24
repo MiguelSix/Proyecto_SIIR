@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Repository\IRepository\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
@@ -23,6 +19,10 @@
   <ItemGroup>
     <ProjectReference Include="..\SIIR.Models\SIIR.Models.csproj" />
     <ProjectReference Include="..\SIIR.Utilities\SIIR.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Repository\IRepository\" />
   </ItemGroup>
 
 </Project>
