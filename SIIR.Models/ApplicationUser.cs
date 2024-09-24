@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SIIR.Models
 {
-    internal class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         public string Nombre { get; set; }
 
