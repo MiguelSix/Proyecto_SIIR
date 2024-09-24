@@ -32,9 +32,19 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapRazorPages();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Student}/{controller=Information}/{action=Index}/{id?}");
-app.MapRazorPages();
+
+// Redirect to login page instead of any other page
+
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Identity/Account/Login");
+    return Task.CompletedTask;
+});
+
 
 app.Run();
