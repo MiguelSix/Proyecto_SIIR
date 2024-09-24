@@ -1,4 +1,6 @@
 ﻿using SIIR.Data;
+using SIIR.DataAccess.Data.Repository;
+using SIIR.DataAccess.Data.Repository.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,10 @@ namespace testBlog.AccesoDatos.Data.Repository
         public ContenedorTrabajo(ApplicationDbContext db)
         {
             _db = db;
+            User = new UserRepository(_db);
         }
+
+        public IUserRepository User { get; private set; }
 
         public void Dispose()
         {
