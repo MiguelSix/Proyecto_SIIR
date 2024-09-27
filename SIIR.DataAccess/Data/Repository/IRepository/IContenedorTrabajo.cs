@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace testBlog.AccesoDatos.Data.Repository.IRepository
+namespace SIIR.DataAccess.Data.Repository.IRepository
 {
     public interface IContenedorTrabajo : IDisposable
     {

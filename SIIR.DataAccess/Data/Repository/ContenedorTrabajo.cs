@@ -6,14 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using testBlog.AccesoDatos.Data.Repository.IRepository;
 
-namespace testBlog.AccesoDatos.Data.Repository
+namespace SIIR.DataAccess.Data.Repository
 {
     public class ContenedorTrabajo : IContenedorTrabajo
     {
         private readonly ApplicationDbContext _db;
-
         public ContenedorTrabajo(ApplicationDbContext db)
         {
             _db = db;
@@ -22,14 +20,11 @@ namespace testBlog.AccesoDatos.Data.Repository
         }
 
         public IUserRepository User { get; private set; }
-
         public ITeamRepository Team { get; private set; }
-
         public void Dispose()
         {
             _db.Dispose();
         }
-
         public void Save()
         {
             _db.SaveChanges();
