@@ -21,8 +21,4 @@
     <ProjectReference Include="..\SIIR.Utilities\SIIR.Utilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Repository\IRepository\" />
-  </ItemGroup>
-
 </Project>

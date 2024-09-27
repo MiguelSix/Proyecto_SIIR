@@ -11,9 +11,9 @@ namespace SIIR.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string Name { get; set; }
+        //public string Name { get; set; }
 
-        public string Surname { get; set; }
+        //public string Surname { get; set; }
 
         // Implementación de la relación con los roles (Admin, Student, Coach)
 

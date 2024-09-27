@@ -10,6 +10,7 @@ namespace testBlog.AccesoDatos.Data.Repository.IRepository
     public interface IContenedorTrabajo : IDisposable
     {
         IUserRepository User { get; }
+        ITeamRepository Team { get; }
         void Save();
 
     }

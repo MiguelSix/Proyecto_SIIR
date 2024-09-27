@@ -16,6 +16,8 @@ namespace SIIR.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Coach> Coaches { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Representative> Representatives { get; set; }
+        public DbSet<Team> Teams { get; set; }
 
     }
 }
