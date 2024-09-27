@@ -18,9 +18,12 @@ namespace testBlog.AccesoDatos.Data.Repository
         {
             _db = db;
             User = new UserRepository(_db);
+            Team = new TeamRepository(_db);
         }
 
         public IUserRepository User { get; private set; }
+
+        public ITeamRepository Team { get; private set; }
 
         public void Dispose()
         {
