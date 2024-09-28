@@ -2,6 +2,12 @@
 
 namespace SIIR.Models
 {
+    public enum CategoryType
+    {
+        Deportivo,
+        Cultural
+    }
+
     public class Representative
     {
         [Key]
@@ -11,5 +17,11 @@ namespace SIIR.Models
         [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
         [Display(Name = "Nombre del grupo Representativo.")]
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "La categoría del grupo Representativo es obligatoria.")]
+        [Display(Name = "Categoría del grupo Representativo.")]
+        public CategoryType Category { get; set; }
     }
+
+    
 }

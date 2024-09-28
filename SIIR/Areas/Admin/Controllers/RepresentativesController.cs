@@ -20,6 +20,12 @@ namespace SIIR.Areas.Admin.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
 
         #region
 
