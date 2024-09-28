@@ -1,0 +1,55 @@
+﻿@model SIIR.Models.Representative
+
+@{
+    ViewData["Title"] = "Crear Representativo";
+}
+
+<br/>
+<br/>
+<h3 class="text-center">Crear un nuevo grupo representativo</h3>
+<form method="POST" asp-action="Create">
+    <div class="row p-xl-2 offset-1 border">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-10 offset-1 mt-4">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="Name"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo"/>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <br/>
+
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="Category"></label>
+                </div>
+                <div class="col-8">
+                    <div class="form-check">
+                        <input asp-for="Category" class="form-check-input" type="radio" value="Deportivo" id="Deportivo" />
+                        <label class="form-check-label" for="Deportivo">Deportivo</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="Category" class="form-check-input" type="radio" value="Cultural" id="Cultural" />
+                        <label class="form-check-label" for="Cultural">Cultural</label>
+                    </div>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+            </div>
+
+            <br/>
+
+            <div class="form-group-row">
+                <div class="col-8">
+                    <partial name="_VistaCrearVolver"/>
+                </div>
+            </div>
+
+            <br/>
+        </div>
+    </div>
+</form>

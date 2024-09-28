@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using testBlog.AccesoDatos.Data.Repository.IRepository;
+using SIIR.DataAccess.Data.Repository.IRepository;
 
 namespace SIIR.Areas.Admin.Controllers
 {
