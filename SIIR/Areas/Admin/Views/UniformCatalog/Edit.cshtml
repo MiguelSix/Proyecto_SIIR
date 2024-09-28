@@ -1,0 +1,103 @@
+﻿@model SIIR.Models.ViewModels.UniformCatalogVM
+@{
+    ViewData["Title"] = "Editar uniforme";
+}
+
+<br />
+<br />
+<h3 class="text-center">Editar uniforme</h3>
+<form method="POST" asp-action="Edit" enctype="multipart/form-data">
+
+    <input type="hidden" asp-for="UniformCatalog.Id" />
+
+    <div class="row px-2 offset-1 border">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="col-8 offset-1 mt-4">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="UniformCatalog.Name"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="UniformCatalog.Name" class="form-control" placeholder="Ingresa el nombre del uniforme" />
+                    <span asp-validation-for="UniformCatalog.Name" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="form-group row">
+                <div class="col-4">
+                    <label>¿Tiene número?</label>
+                </div>
+                <div class="col-8">
+
+                    <button type="button" class="btn btn-danger d-none" id="toggleButton">
+                        <i class="fa-solid fa-x"></i>
+                    </button>
+                    <input type="hidden" asp-for="UniformCatalog.HasNumber" id="UniformCatalogHasNumber" value="@Model.UniformCatalog.HasNumber" />
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary form-control">Editar</button>
+                </div>
+                &nbsp;
+                <div class="col">
+                    <a asp-action="Index" class="btn btn-success form-control">Volver atrás</a>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            var hasNumberInput = $('#UniformCatalogHasNumber');
+            var toggleButton = $('#toggleButton');
+            var icon = toggleButton.find('i');
+
+            // Verificar el valor inicial y actualizar el botón
+            if (hasNumberInput.val() === 'True') {
+                // Si tiene número, mostrar check y botón verde
+                icon.removeClass('fa-x');
+                icon.addClass('fa-check');
+                toggleButton.removeClass('btn-danger');
+                toggleButton.addClass('btn-success');
+            } else {
+                // Si no tiene número, mostrar X y botón rojo
+                icon.removeClass('fa-check');
+                icon.addClass('fa-x');
+                toggleButton.removeClass('btn-success');
+                toggleButton.addClass('btn-danger');
+            }
+
+            // Mostrar el botón después de la configuración
+            toggleButton.removeClass('d-none');
+
+            // Manejar el evento de click para cambiar el estado del botón
+            toggleButton.click(function () {
+                if (icon.hasClass('fa-x')) {
+                    // Cambiar de 'x' a 'check'
+                    icon.removeClass('fa-x');
+                    icon.addClass('fa-check');
+                    toggleButton.removeClass('btn-danger');
+                    toggleButton.addClass('btn-success');
+
+                    // Actualizar el valor del campo oculto a true
+                    hasNumberInput.val(true);
+                } else {
+                    // Cambiar de 'check' a 'x'
+                    icon.removeClass('fa-check');
+                    icon.addClass('fa-x');
+                    toggleButton.removeClass('btn-success');
+                    toggleButton.addClass('btn-danger');
+
+                    // Actualizar el valor del campo oculto a false
+                    hasNumberInput.val(false);
+                }
+            });
+        });
+    </script>
+}

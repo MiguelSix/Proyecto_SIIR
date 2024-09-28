@@ -19,11 +19,13 @@ namespace SIIR.DataAccess.Data.Repository
             User = new UserRepository(_db);
             Team = new TeamRepository(_db);
             Representative = new RepresentativeRepository(_db);
+            UniformCatalog = new UniformCatalogRepository(_db);
         }
 
         public IUserRepository User { get; private set; }
         public ITeamRepository Team { get; private set; }
         public IRepresentativeRepository Representative { get; private set; }
+        public IUniformCatalogRepository UniformCatalog { get; private set; }
 
         public void Dispose()
         {

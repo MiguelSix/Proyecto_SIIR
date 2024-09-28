@@ -12,7 +12,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
         IUserRepository User { get; }
         ITeamRepository Team { get; }
         IRepresentativeRepository Representative { get; }
+        IUniformCatalogRepository UniformCatalog { get; }
         void Save();
-
     }
 }
