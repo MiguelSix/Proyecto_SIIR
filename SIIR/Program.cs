@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SIIR.Data;
 using SIIR.Models;
-using testBlog.AccesoDatos.Data.Repository;
-using testBlog.AccesoDatos.Data.Repository.IRepository;
+using SIIR.DataAccess.Data.Repository;
+using SIIR.DataAccess.Data.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 

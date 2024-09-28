@@ -7,7 +7,9 @@ namespace SIIR.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El nombre es del grupo Representativo es obligatorio.")]
+        [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+        [Display(Name = "Nombre del grupo Representativo.")]
         public string Name { get; set; }
     }
 }
