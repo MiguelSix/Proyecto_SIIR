@@ -11,6 +11,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
     {
         IUserRepository User { get; }
         ITeamRepository Team { get; }
+        IRepresentativeRepository Representative { get; }
         void Save();
 
     }
