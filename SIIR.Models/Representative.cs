@@ -2,12 +2,6 @@
 
 namespace SIIR.Models
 {
-    public enum CategoryType
-    {
-        Deportivo,
-        Cultural
-    }
-
     public class Representative
     {
         [Key]
@@ -20,7 +14,7 @@ namespace SIIR.Models
 
         [Required(ErrorMessage = "La categoría del grupo Representativo es obligatoria.")]
         [Display(Name = "Categoría del grupo Representativo.")]
-        public CategoryType Category { get; set; }
+        public string Category { get; set; }
     }
 
     
