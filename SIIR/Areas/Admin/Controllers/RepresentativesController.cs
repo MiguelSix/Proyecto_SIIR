@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
+using SIIR.Models;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -24,6 +25,44 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Representative representative)
+        {
+            if (ModelState.IsValid)
+            {
+                _contenedorTrabajo.Representative.Add(representative);
+                _contenedorTrabajo.Save();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(representative);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Representative representative = new Representative();
+            representative = _contenedorTrabajo.Representative.GetById(id);
+            if (representative == null)
+            {
+                return NotFound();
+            }
+            return View(representative);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Representative representative)
+        {
+            if (ModelState.IsValid)
+            {
+                _contenedorTrabajo.Representative.Update(representative);
+                _contenedorTrabajo.Save();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(representative);
         }
 
 
