@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SIIR.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace SIIR.DataAccess.Data.Repository.IRepository
 {
-    public interface IContenedorTrabajo : IDisposable
+    public interface IUniformCatalogRepository : IRepository<UniformCatalog>
     {
-        IUniformCatalogRepository UniformCatalog { get; }
-		void Save();
+        void Update(UniformCatalog uniformCatalog); 
+
     }
 }

@@ -19,8 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Controllers\" />
-    <Folder Include="Areas\Admin\Views\" />
     <Folder Include="Areas\Coach\Controllers\" />
     <Folder Include="Areas\Coach\Views\" />
   </ItemGroup>

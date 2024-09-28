@@ -1,0 +1,79 @@
+﻿@model SIIR.Models.ViewModels.UniformCatalogVM
+@{
+    ViewData["Title"] = "Crear uniforme";
+}
+
+<br />
+<br />
+<h3 class="text-center">Crear un nuevo uniforme</h3>
+<form method="POST" asp-action="Create" enctype="multipart/form-data">
+    <div class="row px-2 offset-1 border">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="col-10 offset-1 mt-4">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="UniformCatalog.Name"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="UniformCatalog.Name" class="form-control" placeholder="Ingresa el nombre del uniforme" />
+                    <span asp-validation-for="UniformCatalog.Name" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="form-group row">
+                <div class="col-4">
+                    <label>¿Tiene número?</label>
+                </div>
+                <div class="col-8">
+                    <button type="button" class="btn btn-danger" id="toggleButton">
+                        <i class="fa-solid fa-x"></i>
+                    </button>
+                    <input type="hidden" asp-for="UniformCatalog.HasNumber" id="UniformCatalogHasNumber" value="false" />
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary form-control">Crear</button>
+                </div>
+                &nbsp;
+                <div class="col">
+                    <a asp-action="Index" class="btn btn-success form-control">Volver atrás</a>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('#toggleButton').click(function () {
+                var icon = $(this).find('i');
+                var hasNumberInput = $('#UniformCatalogHasNumber'); 
+
+                if (icon.hasClass('fa-x')) {
+                    // Cambiar de 'x' a 'check'
+                    icon.removeClass('fa-x');
+                    icon.addClass('fa-check');
+                    $(this).removeClass('btn-danger');
+                    $(this).addClass('btn-success');
+
+                    // Actualizar el valor del campo oculto a true
+                    hasNumberInput.val(true);
+                } else {
+                    // Cambiar de 'check' a 'x'
+                    icon.removeClass('fa-check');
+                    icon.addClass('fa-x');
+                    $(this).removeClass('btn-success');
+                    $(this).addClass('btn-danger');
+
+                    // Actualizar el valor del campo oculto a false
+                    hasNumberInput.val(false);
+                }
+            });
+        });
+    </script>
+}

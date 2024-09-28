@@ -1,12 +1,13 @@
 ﻿using SIIR.Data;
+using SIIR.DataAccess.Data;
+using SIIR.DataAccess.Data.Repository.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using testBlog.AccesoDatos.Data.Repository.IRepository;
 
-namespace testBlog.AccesoDatos.Data.Repository
+namespace SIIR.DataAccess.Data.Repository.Repository
 {
     public class ContenedorTrabajo : IContenedorTrabajo
     {
@@ -15,9 +16,12 @@ namespace testBlog.AccesoDatos.Data.Repository
         public ContenedorTrabajo(ApplicationDbContext db)
         {
             _db = db;
-        }
+			UniformCatalog = new UniformCatalogRepository(_db);
+		}
 
-        public void Dispose()
+        public IUniformCatalogRepository UniformCatalog { get; private set; }
+
+		public void Dispose()
         {
             _db.Dispose();
         }
