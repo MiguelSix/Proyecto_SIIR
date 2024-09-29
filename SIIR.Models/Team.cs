@@ -14,10 +14,16 @@ namespace SIIR.Models
         public int Id { get; set; }
 
         [Required]
+        [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
         public string Name { get; set; }
 
         [Required]
+        [StringLength(20)]
         public string Category { get; set; }
+
+        [Display(Name = "Imagen")]
+        [DataType(DataType.ImageUrl)]
+        public string ImageUrl { get; set; }
 
         // Llaves foráneas
 

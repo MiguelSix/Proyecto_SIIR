@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace SIIR.DataAccess.Data.Repository.IRepository
 {
-    public interface IRepresentativeRepository : IRepository<Representative>
+    public interface ICoachRepository: IRepository<Coach>
     {
-        void Update(Representative representative);
-        IEnumerable<SelectListItem> GetRepresentativesList();
+        IEnumerable<SelectListItem> GetCoachesList();
     }
 }

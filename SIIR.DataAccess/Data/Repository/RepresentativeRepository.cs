@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -10,13 +11,22 @@ using System.Threading.Tasks;
 
 namespace SIIR.DataAccess.Data.Repository
 {
-    internal class RepresentativeRepository : Repository<Representative>, IRepresentativeRepository
+    public class RepresentativeRepository : Repository<Representative>, IRepresentativeRepository
     {
         private readonly ApplicationDbContext _db;
 
         public RepresentativeRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
+        }
+
+        public IEnumerable<SelectListItem> GetRepresentativesList()
+        {
+            return _db.Representatives.Select(i => new SelectListItem
+            {
+                Text = i.Name,
+                Value = i.Id.ToString()
+            });
         }
 
         public void Update(Representative representative)
