@@ -20,7 +20,7 @@ function cargarDatatable() {
                     return data ? "Sí" : "No"; // Renderiza 'Sí' o 'No' según el valor booleano
                 }
             },
-            // { "data": "grupoRepresentativo", "width": "30%" }, // Ajusta el nombre del campo según tu modelo
+            { "data": "representative.name", "width": "30%" }, 
             {
                 "data": "id",
                 "render": function (data) {

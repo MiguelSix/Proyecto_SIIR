@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIIR.Data;
 
@@ -11,9 +12,11 @@ using SIIR.Data;
 namespace SIIR.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240929171057_representativesInUniform")]
+    partial class representativesInUniform
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,7 +242,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("SIIR.Models.Coach", b =>
@@ -267,7 +270,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Coaches", (string)null);
+                    b.ToTable("Coaches");
                 });
 
             modelBuilder.Entity("SIIR.Models.Representative", b =>
@@ -289,7 +292,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Representatives", (string)null);
+                    b.ToTable("Representatives");
                 });
 
             modelBuilder.Entity("SIIR.Models.Student", b =>
@@ -367,7 +370,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("CoachId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("SIIR.Models.Team", b =>
@@ -411,7 +414,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
@@ -429,14 +432,14 @@ namespace SIIR.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RepresentativeId")
+                    b.Property<int?>("RepresentativesId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RepresentativeId");
+                    b.HasIndex("RepresentativesId");
 
-                    b.ToTable("UniformCatalog", (string)null);
+                    b.ToTable("UniformCatalog");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>
@@ -552,7 +555,7 @@ namespace SIIR.DataAccess.Migrations
                 {
                     b.HasOne("SIIR.Models.Representative", "Representative")
                         .WithMany()
-                        .HasForeignKey("RepresentativeId");
+                        .HasForeignKey("RepresentativesId");
 
                     b.Navigation("Representative");
                 });
