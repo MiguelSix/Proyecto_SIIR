@@ -21,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Areas\Coach\Controllers\" />
     <Folder Include="Areas\Coach\Views\" />
+    <Folder Include="wwwroot\images\teams\" />
   </ItemGroup>
 
   <ItemGroup>

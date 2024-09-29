@@ -12,14 +12,15 @@ function cargarDatatable() {
             "datatype": "json"
         },
         "columns": [
-            { "data": "id", "width": "5%" },
-            { "data": "nombre", "width": "15%" },
-            { "data": "categoria", "width": "10%" },
+            { "data": "id", "width": "3%" },
+            { "data": "name", "width": "10%" },
+            { "data": "category", "width": "8%" },
             {
-                "data": "urlImagen",
+                "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width = 150"/>`
-                }
+                    return `<img src="../${imagen}" width="100"/>`
+                },
+                "width": "10%"
             },
             { "data": "coach.name", "width": "10%" },
             { "data": "representative.name", "width": "10%" },
@@ -28,16 +29,21 @@ function cargarDatatable() {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer; width:140px;">
-                                <i class="far fa-edit"></i> Editar
+                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
+                                    <i class="far fa-edit"></i> Editar
                                 </a>
-                                &nbsp;
-                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer; width:140px;">
-                                <i class="far fa-trash-alt"></i> Borrar
+                             
+                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger btn-sm text-white" style="width:80px;">
+                                    <i class="far fa-trash-alt"></i> Borrar
                                 </a>
-                          </div>
-                         `;
-                }, "width": "25%"
+
+                                <a href="/Admin/Teams/Roster/${data}" class="btn btn-info btn-sm text-white" style="width:140px;">
+                                    <i class="fas fa-users"></i> Ver plantilla
+                                </a>
+
+                            </div>`;
+                },
+                "width": "29%"
             }
         ],
         "language": {

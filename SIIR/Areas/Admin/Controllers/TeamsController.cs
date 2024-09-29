@@ -41,20 +41,6 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Team team)
-        {
-            TeamVM teamVM = new()
-            {
-                Team = new(),
-                RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList(),
-                CoachList = _contenedorTrabajo.Coach.GetCoachesList(),
-                StudentList = _contenedorTrabajo.Student.GetStudentsList()
-            };
-            return View(teamVM);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Create(TeamVM teamVM)
         {
             if (!ModelState.IsValid)
