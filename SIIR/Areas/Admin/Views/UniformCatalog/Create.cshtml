@@ -31,6 +31,20 @@
                     <input type="hidden" asp-for="UniformCatalog.HasNumber" id="UniformCatalogHasNumber" value="false" />
                 </div>
             </div>
+
+            <br />
+
+            <div class="form-group row">
+                <div class="col-4">
+                    <label for="Representative">Grupo representativo</label>
+                </div>
+                <div class="col-8">
+                    @Html.DropDownListFor(m => m.UniformCatalog.RepresentativeId, Model.RepresentativeList,
+                             "-Por favor seleccione un grupo representativo-", new { @class = "form-control" })
+                    <span asp-validation-for="UniformCatalog.RepresentativeId" class="text-danger"></span>
+                </div>
+            </div>
+
             <br />
             <div class="row">
                 <div class="col">
@@ -75,5 +89,13 @@
                 }
             });
         });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" integrity="sha512-VCEWnpOl7PIhbYMcb64pqGZYez41C2uws/M/mDdGPy+vtEJHd9BqbShE4/VNnnZdr7YCPOjd+CBmYca/7WWWCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        tinymce.init({
+            select: 'textarea',
+            plugins: 'lists',
+            menubar: 'file edit format'
+        })
     </script>
 }

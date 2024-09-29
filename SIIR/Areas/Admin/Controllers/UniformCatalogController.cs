@@ -26,29 +26,30 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            UniformCatalogVM artiVM = new UniformCatalogVM()
+            UniformCatalogVM UniformVM = new UniformCatalogVM()
             {
-                UniformCatalog = new SIIR.Models.UniformCatalog(),
-                //ListaCategorias = _contenedorTrabajo.Categoria.GetListaCategorias()
+                UniformCatalog = new Models.UniformCatalog(),
+                RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList()
             };
 
-            return View(artiVM);
+            return View(UniformVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(UniformCatalogVM UniformVM)
+        public IActionResult Create(UniformCatalogVM uniformVM)
         {
             if (ModelState.IsValid)
             {
-                _contenedorTrabajo.UniformCatalog.Add(UniformVM.UniformCatalog);
+                _contenedorTrabajo.UniformCatalog.Add(uniformVM.UniformCatalog);
                 _contenedorTrabajo.Save();
 
                 return RedirectToAction(nameof(Index)); 
             }
 
-			//UniformVM.ListaCategorias = _contenedorTrabajo.Categoria.GetListaCategorias();
-            return View(UniformVM);
+            uniformVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
+
+            return View(uniformVM);
         }
 
         [HttpGet]
@@ -56,8 +57,8 @@ namespace SIIR.Areas.Admin.Controllers
         {
             UniformCatalogVM uniformVM = new UniformCatalogVM()
             {
-                UniformCatalog = new SIIR.Models.UniformCatalog(),
-                //ListaCategorias = _contenedorTrabajo.Categoria.GetListaCategorias()
+                UniformCatalog = new Models.UniformCatalog(),
+                RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList()
             };
 
             if (id != null)
@@ -80,23 +81,23 @@ namespace SIIR.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            //artiVM.ListaCategorias = _contenedorTrabajo.Categoria.GetListaCategorias();
+            uniformVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             return View(uniformVM);
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            var objDesdeDb = _contenedorTrabajo.UniformCatalog.GetById(id);
+            var objFromDb = _contenedorTrabajo.UniformCatalog.GetById(id);
 
-            _contenedorTrabajo.UniformCatalog.Remove(objDesdeDb);
+            _contenedorTrabajo.UniformCatalog.Remove(objFromDb);
             _contenedorTrabajo.Save();
             return Json(new { success = true, message = "Uniforme borrada exitosamente" });
         }
 
         public IActionResult GetAll()
         {
-            return Json(new { data = _contenedorTrabajo.UniformCatalog.GetAll(/*includeProperties: "Representative" */) });
+            return Json(new { data = _contenedorTrabajo.UniformCatalog.GetAll(includeProperties: "Representative") });
         }
     }
 }
