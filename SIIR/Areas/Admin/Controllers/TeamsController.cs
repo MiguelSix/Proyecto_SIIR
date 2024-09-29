@@ -29,7 +29,14 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            TeamVM teamVM = new()
+            {
+                Team = new(),
+                RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList(),
+                CoachList = _contenedorTrabajo.Coach.GetCoachesList(),
+                StudentList = _contenedorTrabajo.Student.GetStudentsList()
+            };
+            return View(teamVM);
         }
 
         [HttpPost]
