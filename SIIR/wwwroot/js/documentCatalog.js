@@ -21,9 +21,9 @@ function cargarDatatable() {
         // Configuración de las columnas que se mostrarán en la tabla
         "columns": [
             { "data": "id", "width": "5%" },    // Columna para mostrar el ID, ocupando un 5% del ancho
-            { "data": "nombre", "width": "20%" },  // Columna para el nombre, 40% del ancho
+            { "data": "name", "width": "20%" },  // Columna para el nombre, 40% del ancho
             { "data": "extension", "width": "10%" },   // Columna para el orden, 10% del ancho
-            { "data": "descripcion", "width": "40%" },   // Columna para el orden, 10% del ancho
+            { "data": "description", "width": "40%" },   // Columna para el orden, 10% del ancho
             {
                 "data": "id",                    // Columna que también usará el 'id' para renderizar botones
                 // Usamos 'render' para personalizar el contenido de esta columna

@@ -21,6 +21,7 @@ namespace SIIR.DataAccess.Data.Repository
             UniformCatalog = new UniformCatalogRepository(_db);
             Coach = new CoachRepository(_db);
             Student = new StudentRepository(_db);
+            DocumentCatalog = new DocumentCatalogRepository(_db);
         }
 
         public IUserRepository User { get; private set; }

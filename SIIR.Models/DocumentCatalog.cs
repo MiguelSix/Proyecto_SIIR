@@ -15,7 +15,7 @@ namespace SIIR.Models
 
         [Required(ErrorMessage = "Ingrese el nombre del documento")]
         [StringLength(100, ErrorMessage = "El nombre del documento no puede exceder los 100 caracteres")]
-        [Remote(action: "VerificarNombreUnico", controller: "DocumentCatalog", ErrorMessage = "Ya existe un documento con este nombre.")]
+        [Remote(action: "VerifyUniqueName", controller: "DocumentCatalog", ErrorMessage = "Ya existe un documento con este nombre.")]
         [Display(Name = "Nombre del Documento")]
         public string Name { get; set; }
 

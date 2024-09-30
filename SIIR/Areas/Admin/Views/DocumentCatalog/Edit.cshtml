@@ -1,20 +1,13 @@
 ﻿@model SIIR.Models.DocumentCatalog
 
 @{
-    ViewData["Title"] = "Crear Documento";
-
-    // Definir las opciones para el combo box
-    var extensiones = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "pdf", Text = "PDF" },
-        new SelectListItem { Value = "foto", Text = "Foto" }
-    };
+    ViewData["Title"] = "Editar Documento";
 }
 
 <br />
 <br />
-<h3 class="text-center"> Crear un documento nuevo</h3>
-<form method="POST" asp-action="Create" enctype="multipart/form-data">
+<h3 class="text-center"> Editar Documento</h3>
+<form method="POST" asp-action="Edit">
     <div class="row px-2 offset-1 border">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -52,9 +45,13 @@
             </div>
 
             <br />
-            <div class="form-group-row">
-                <div class="col-8">
-                    <partial name="_VistaCrearVolver" />
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary form-control">Editar Documento</button>
+                </div>
+                &nbsp;
+                <div class="col">
+                    <a asp-action="Index" class="btn btn-success form-control">Volver atrás</a>
                 </div>
             </div>
             <br />
@@ -62,8 +59,3 @@
     </div>
 </form>
 
-@section Scripts {
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
-}
