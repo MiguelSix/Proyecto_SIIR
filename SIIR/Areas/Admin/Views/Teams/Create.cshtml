@@ -1,0 +1,83 @@
+﻿@model SIIR.Models.ViewModels.TeamVM
+
+@{
+    ViewData["Title"] = "Crear Equipo";
+}
+
+<h2 class="display-2">Dar de alta nuevo Equipo</h2>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="row px-2 offset-1" border>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="col-10 offset-1 mt-4">
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <label asp-for="Team.Name">Nombre</label>
+                            </div>
+                            <div class="col-8">
+                                <input asp-for="Team.Name" class="form-control" placeholder="Ingresa el nombre del equipo" />
+                                <span asp-validation-for="Team.Name" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mt-2">
+                            <div class="col-4">
+                                <label asp-for="Team.Category">Categoria</label>
+                            </div>
+                            <div class="col-8">
+                                <select asp-for="Team.Category" class="form-control">
+                                    <option value="">Seleccione una opción</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                </select>
+                                <span asp-validation-for="Team.Category" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mt-2">
+                            <div class="col-4">
+                                <label asp-for="Team.ImageUrl">Imagen del equipo</label>
+                            </div>
+                            <div class="col-8">
+                                <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+                                <span asp-validation-for="Team.ImageUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mt-2">
+                            <div class="col-4">
+                                <label for="Coach">Coach</label>
+                            </div>
+                            <div class="col-8">
+                                @Html.DropDownListFor(m => m.Team.CoachId, Model.CoachList, "Selecciona un Coach:", new { @class = "form-control" })
+                                <span asp-validation-for="Team.CoachId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mt-2">
+                            <div class="col-4">
+                                <label for="Representativo">Representativo</label>
+                            </div>
+                            <div class="col-8">
+                                @Html.DropDownListFor(m => m.Team.RepresentativeId, Model.RepresentativeList, "Selecciona un Grupo Representativo:", new { @class = "form-control" })
+                                <span asp-validation-for="Team.RepresentativeId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group-row">
+                            <div class="col-8">
+                                <partial name="_VistaCrearVolver" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Coach\Views\" />
+    <Folder Include="wwwroot\images\teams\" />
   </ItemGroup>
 
   <ItemGroup>

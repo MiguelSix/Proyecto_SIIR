@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Lista de Equipos";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-8">
+            <h1 class="display-2">Equipos</h1>
+        </div>
+        <div class="col-4 text-right">
+            <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Dar de alta nuevo Equipo</a>
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+    <table id="tblTeams" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Categoria</th>
+                <th>Imagen</th>
+                <th>Coach</th>
+                <th>Representativo</th>
+                <th>Capitan</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/teams.js"></script>
+}
