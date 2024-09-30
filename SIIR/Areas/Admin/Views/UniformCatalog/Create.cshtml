@@ -22,7 +22,7 @@
             <br />
             <div class="form-group row">
                 <div class="col-4">
-                    <label>¿Tiene número?</label>
+                    <label asp-for="UniformCatalog.HasNumber"></label>
                 </div>
                 <div class="col-8">
                     <button type="button" class="btn btn-danger" id="toggleButton">
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-8">
                     @Html.DropDownListFor(m => m.UniformCatalog.RepresentativeId, Model.RepresentativeList,
-                             "-Por favor seleccione un grupo representativo-", new { @class = "form-control" })
+                             "Selecciona un Grupo Representativo:", new { @class = "form-control" })
                     <span asp-validation-for="UniformCatalog.RepresentativeId" class="text-danger"></span>
                 </div>
             </div>
