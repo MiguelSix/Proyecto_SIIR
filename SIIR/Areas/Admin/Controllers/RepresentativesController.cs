@@ -74,6 +74,18 @@ namespace SIIR.Areas.Admin.Controllers
             return Json(new { data = _contenedorTrabajo.Representative.GetAll() });
         }
 
+        [HttpDelete]
+        public IActionResult Delete(int id) {
+            var objFromDb = _contenedorTrabajo.Representative.GetById(id);
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error al borrar el grupo representativo." });
+            }
+            _contenedorTrabajo.Representative.Remove(objFromDb);
+            _contenedorTrabajo.Save();
+            return Json(new { success = true, message = "Grupo representativo borrado exitosamente." });
+        }
+
         #endregion
 
     }
