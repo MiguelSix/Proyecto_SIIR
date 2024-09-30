@@ -19,6 +19,7 @@ namespace SIIR.Data
         public DbSet<Representative> Representatives { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<UniformCatalog> UniformCatalog { get; set; }
+        public DbSet<DocumentCatalog> DocumentCatalog { get; set; }
 
     }
 }

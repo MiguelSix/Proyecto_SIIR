@@ -15,6 +15,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
         IUniformCatalogRepository UniformCatalog { get; }
         ICoachRepository Coach { get; }
         IStudentRepository Student { get; }
+        IDocumentCatalogRepository DocumentCatalog { get; }
         void Save();
     }
 }

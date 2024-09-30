@@ -29,7 +29,7 @@ namespace SIIR.DataAccess.Data.Repository
         public IUniformCatalogRepository UniformCatalog { get; private set; }
         public ICoachRepository Coach { get; private set; }
         public IStudentRepository Student { get; private set; }
-
+        public IDocumentCatalogRepository DocumentCatalog { get; private set; }
         public void Dispose()
         {
             _db.Dispose();
