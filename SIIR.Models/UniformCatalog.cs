@@ -20,6 +20,6 @@ namespace SIIR.Models
         [Required(ErrorMessage = "Este campo es obligatorio.")]
         [StringLength(100, ErrorMessage = "La descripción no puede acceder los 100 caracteres.")]
         public string Description { get; set; }
-        public ICollection<Team>? Team { get; set; }
+        public ICollection<Representative>? Representative { get; set; }
     }
 }
