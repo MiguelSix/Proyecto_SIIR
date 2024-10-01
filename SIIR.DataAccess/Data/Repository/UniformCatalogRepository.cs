@@ -1,4 +1,5 @@
-﻿using SIIR.Data;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using System;
@@ -28,5 +29,14 @@ namespace SIIR.DataAccess.Data.Repository
                 _db.SaveChanges();
             }
         }
-    }
+
+		public IEnumerable<SelectListItem> GetUniformCatalogList()
+		{
+			return _db.UniformCatalog.Select(i => new SelectListItem
+			{
+				Text = i.Name,
+				Value = i.Id.ToString()
+			});
+		}
+	}
 }

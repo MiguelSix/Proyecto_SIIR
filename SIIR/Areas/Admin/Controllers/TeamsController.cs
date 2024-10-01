@@ -34,7 +34,8 @@ namespace SIIR.Areas.Admin.Controllers
                 Team = new(),
                 RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList(),
                 CoachList = _contenedorTrabajo.Coach.GetCoachesList(),
-                StudentList = _contenedorTrabajo.Student.GetStudentsList()
+                StudentList = _contenedorTrabajo.Student.GetStudentsList(),
+                UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList()
             };
             return View(teamVM);
         }
@@ -61,6 +62,7 @@ namespace SIIR.Areas.Admin.Controllers
 
                     teamVM.Team.ImageUrl = @"\images\teams\" + fileName + extension;
                     _contenedorTrabajo.Team.Add(teamVM.Team);
+                    CreateRepresentativeUniformCatalog(teamVM);
                     _contenedorTrabajo.Save();
                     return RedirectToAction(nameof(Index));
                 }
@@ -72,8 +74,28 @@ namespace SIIR.Areas.Admin.Controllers
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
             teamVM.StudentList = _contenedorTrabajo.Student.GetStudentsList();
-            return View(teamVM);
+            teamVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
+
+			return View(teamVM);
         }
+
+        private void CreateRepresentativeUniformCatalog(TeamVM teamVM)
+        {
+            var representative = _contenedorTrabajo.Representative.GetById(teamVM.Team.RepresentativeId);
+            if (representative.UniformCatalogs == null)
+            {
+                representative.UniformCatalogs = new List<UniformCatalog>();
+            }
+
+            foreach (var uniformCatalogId in teamVM.SelectedUniformCatalogIds)
+            {
+                var uniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(uniformCatalogId);
+                representative.UniformCatalogs.Add(uniformCatalog);
+            }
+
+            _contenedorTrabajo.Save();
+        }
+
 
         [HttpGet]
         public IActionResult Edit(int? id)
