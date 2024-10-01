@@ -47,6 +47,7 @@ namespace SIIR.Areas.Admin.Controllers
 			if (ModelState.IsValid)
             {
                 _contenedorTrabajo.UniformCatalog.Add(uniformCatalog);
+
                 _contenedorTrabajo.Save();
 
                 return RedirectToAction(nameof(Index)); 

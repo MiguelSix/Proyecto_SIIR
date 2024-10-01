@@ -13,7 +13,7 @@
                 <div class="row px-2 offset-1" border>
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    <div-- class="col-10 offset-1 mt-4">
+                    <div class="col-10 offset-1 mt-4">
                         <div class="form-group row">
                             <div class="col-4">
                                 <label asp-for="Team.Name">Nombre</label>
@@ -68,23 +68,6 @@
                             </div>
                         </div>
 
-                        <p class="">Agregar prendas al grupo</p>
-
-                        <!-- Bloque dinámico de uniformes -->
-                        <div id="uniformsContainer">
-                            
-                        </div>
-
-                        <!-- Botón para agregar un nuevo bloque de uniformes -->
-                        <div class="form-group row mt-2">
-                            <div class="col-4"></div>
-                            <div class="col-8">
-                                <button type="button" id="addUniformBtn" class="btn btn-success">
-                                    <i class="fas fa-plus"></i> Añadir Uniforme
-                                </button>
-                            </div>
-                        </div>
-
                         <div class="form-group-row">
                             <div class="col-8">
                                 <partial name="_VistaCrearVolver" />
@@ -98,46 +81,3 @@
         </div>
     </div>
 </div>
-
-
-@section Scripts {
-        <script>
-                $(document).ready(function () {
-    var uniformIndex = $('#uniformsContainer .uniform-item').length || 0;
-
-    $('#addUniformBtn').click(function () {
-        var newUniform = `
-            <div class="form-group row mt-2 uniform-item">
-                <div class="col-4">
-                    <label for="UniformCatalog">Uniforme</label>
-                </div>
-                <div class="col-8">
-                    <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control">
-                        <option value="">Selecciona una prenda:</option>
-                        @foreach (var item in Model.UniformCatalogList)
-                        {
-                            <option value="@item.Value">@item.Text</option>
-                        }
-                    </select>
-                    <span class="text-danger"></span>
-                </div>
-                <div class="col-12 mt-2 text-end">
-                    <button type="button" class="btn btn-danger remove-uniform-btn">
-                        <i class="fas fa-trash-alt"></i> Eliminar
-                    </button>
-                </div>
-            </div>
-        `;
-        $('#uniformsContainer').append(newUniform); // Agrega el nuevo bloque al contenedor
-        uniformIndex++; // Incrementa el índice para futuros uniformes
-    });
-
-    // Manejar eliminar uniforme
-    $('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
-        $(this).closest('.uniform-item').remove();
-    });
-});
-
-
-        </script>
-}

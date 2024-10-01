@@ -2,6 +2,7 @@
 using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -24,47 +25,78 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            RepresentativeVM representativeVM = new RepresentativeVM()
+            {
+                Representative = new Models.Representative(),
+                UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList()
+            };
+            return View(representativeVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Representative representative)
+        public IActionResult Create(RepresentativeVM representativeVM)
         {
             if (ModelState.IsValid)
             {
-                _contenedorTrabajo.Representative.Add(representative);
+                _contenedorTrabajo.Representative.Add(representativeVM.Representative);
                 _contenedorTrabajo.Save();
+                CreateRepresentativeUniformCatalog(representativeVM);
                 return RedirectToAction(nameof(Index));
             }
-            return View(representative);
+            representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
+            return View(representativeVM);
+        }
+
+        private void CreateRepresentativeUniformCatalog(RepresentativeVM representativeVM)
+        {
+            if (representativeVM.SelectedUniformCatalogIds != null)
+            {
+                var representative = _contenedorTrabajo.Representative.GetById(representativeVM.Representative.Id);
+                if (representative.UniformCatalogs == null)
+                {
+                    representative.UniformCatalogs = new List<UniformCatalog>();
+                }
+
+
+                foreach (var uniformCatalogId in representativeVM.SelectedUniformCatalogIds)
+                {
+                    var uniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(uniformCatalogId);
+                    representative.UniformCatalogs.Add(uniformCatalog);
+                }
+                _contenedorTrabajo.Save();
+            }
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(int? id)
         {
-            Representative representative = new Representative();
-            representative = _contenedorTrabajo.Representative.GetById(id);
-            if (representative == null)
+            RepresentativeVM representativeVM = new RepresentativeVM()
             {
-                return NotFound();
+                Representative = new Representative(),
+                UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList()
+            };
+            if (id != null)
+            {
+                representativeVM.Representative = _contenedorTrabajo.Representative.GetById(id.GetValueOrDefault());
             }
-            return View(representative);
+            return View(representativeVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Representative representative)
+        public IActionResult Edit(RepresentativeVM representativeVM)
         {
             if (ModelState.IsValid)
             {
-                _contenedorTrabajo.Representative.Update(representative);
+                _contenedorTrabajo.Representative.Add(representativeVM.Representative);
                 _contenedorTrabajo.Save();
+                CreateRepresentativeUniformCatalog(representativeVM);
                 return RedirectToAction(nameof(Index));
             }
-            return View(representative);
+            representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
+            return View(representativeVM);
         }
-
 
         #region
 
