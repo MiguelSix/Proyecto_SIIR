@@ -22,8 +22,5 @@ namespace SIIR.Models
         [Display(Name = "Apellido Materno")]
         public string SecondLastName { get; set; }
 
-        /*public int? TeamId { get; set; }
-        [ForeignKey("TeamId")]
-        public Team Team { get; set; }*/
     }
 }

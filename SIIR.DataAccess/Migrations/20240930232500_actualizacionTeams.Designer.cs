@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIIR.Data;
 
@@ -11,9 +12,11 @@ using SIIR.Data;
 namespace SIIR.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240930232500_actualizacionTeams")]
+    partial class actualizacionTeams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -446,45 +449,22 @@ namespace SIIR.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-<<<<<<< HEAD
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-=======
                     b.Property<bool>("HasNumber")
                         .HasColumnType("bit");
->>>>>>> 5fbd5507195bf5a81d35dd209525d3e4fbcb9c33
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-<<<<<<< HEAD
-=======
 
                     b.Property<int>("RepresentativeId")
                         .HasColumnType("int");
->>>>>>> 5fbd5507195bf5a81d35dd209525d3e4fbcb9c33
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RepresentativeId");
+
                     b.ToTable("UniformCatalog");
-                });
-
-            modelBuilder.Entity("TeamUniformCatalog", b =>
-                {
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UniformCatalogsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TeamId", "UniformCatalogsId");
-
-                    b.HasIndex("UniformCatalogsId");
-
-                    b.ToTable("TeamUniformCatalog");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>
@@ -597,23 +577,15 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("TeamUniformCatalog", b =>
+            modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
                 {
-                    b.HasOne("SIIR.Models.Team", null)
+                    b.HasOne("SIIR.Models.Representative", "Representative")
                         .WithMany()
-<<<<<<< HEAD
-                        .HasForeignKey("TeamId")
-=======
                         .HasForeignKey("RepresentativeId")
->>>>>>> 5fbd5507195bf5a81d35dd209525d3e4fbcb9c33
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SIIR.Models.UniformCatalog", null)
-                        .WithMany()
-                        .HasForeignKey("UniformCatalogsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Representative");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>

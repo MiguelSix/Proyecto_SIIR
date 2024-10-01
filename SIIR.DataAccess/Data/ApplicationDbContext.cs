@@ -21,5 +21,27 @@ namespace SIIR.Data
         public DbSet<UniformCatalog> UniformCatalog { get; set; }
         public DbSet<DocumentCatalog> DocumentCatalog { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Team>()
+                .HasOne(t => t.Coach)
+                .WithMany()
+                .HasForeignKey(t => t.CoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Team>()
+                .HasOne(t => t.Representative)
+                .WithMany()
+                .HasForeignKey(t => t.RepresentativeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Team>()
+                .HasOne(t => t.Student)
+                .WithMany()
+                .HasForeignKey(t => t.StudentId)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
     }
 }
