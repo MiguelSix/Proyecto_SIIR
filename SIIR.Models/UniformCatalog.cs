@@ -12,16 +12,14 @@ namespace SIIR.Models
     {
         [Key]
         public int Id { get; set; }
-        [Display(Name="Nombre")]
+        [Display(Name="Prenda")]
         [Required(ErrorMessage = "Este campo es obligatorio.")]
         [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
         public string Name { get; set; }
-        [Display(Name = "¿Tiene número?")]
+        [Display(Name = "Descripción")]
         [Required(ErrorMessage = "Este campo es obligatorio.")]
-        public bool HasNumber { get; set; }
-        [Required(ErrorMessage = "Debe seleccionar un grupo representativo.")]
-        public int RepresentativeId { get; set; }
-        [ForeignKey("RepresentativeId")]
-        public Representative? Representative { get; set; }
+        [StringLength(100, ErrorMessage = "La descripción no puede acceder los 100 caracteres.")]
+        public string Description { get; set; }
+        public ICollection<Team>? Team { get; set; }
     }
 }

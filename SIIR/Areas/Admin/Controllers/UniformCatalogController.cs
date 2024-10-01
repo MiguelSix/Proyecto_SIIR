@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Packaging.Signing;
 using SIIR.DataAccess.Data.Repository.IRepository;
+using SIIR.Models;
 using SIIR.Models.ViewModels;
 
 namespace SIIR.Areas.Admin.Controllers
@@ -26,64 +27,71 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            UniformCatalogVM UniformVM = new UniformCatalogVM()
-            {
-                UniformCatalog = new Models.UniformCatalog(),
-                RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList()
-            };
-
-            return View(UniformVM);
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(UniformCatalogVM uniformVM)
+        public IActionResult Create(UniformCatalog uniformCatalog)
         {
-            if (ModelState.IsValid)
+			var existUniform = _contenedorTrabajo.UniformCatalog.GetAll()
+									.Any(d => d.Name.ToLower() == uniformCatalog.Name.ToLower()
+										   && d.Id != uniformCatalog.Id);
+
+
+			if (existUniform)
+			{
+				ModelState.AddModelError("Nombre", "Ya existe un uniforme del catalogo con este nombre.");
+			}
+
+			if (ModelState.IsValid)
             {
-                _contenedorTrabajo.UniformCatalog.Add(uniformVM.UniformCatalog);
+                _contenedorTrabajo.UniformCatalog.Add(uniformCatalog);
                 _contenedorTrabajo.Save();
 
                 return RedirectToAction(nameof(Index)); 
             }
 
-            uniformVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
-
-            return View(uniformVM);
+            return View(uniformCatalog);
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public IActionResult Edit(int id)
         {
-            UniformCatalogVM uniformVM = new UniformCatalogVM()
-            {
-                UniformCatalog = new Models.UniformCatalog(),
-                RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList()
-            };
 
-            if (id != null)
-            {
-                uniformVM.UniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(id.GetValueOrDefault());
-            }
+			UniformCatalog uniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(id);
+			if (uniformCatalog == null)
+			{
+				return NotFound();
+			}
 
-            return View(uniformVM);
-        }
+
+			return View(uniformCatalog);
+		}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(UniformCatalogVM uniformVM)
+        public IActionResult Edit(UniformCatalog uniformCatalog)
         {
-            if (ModelState.IsValid)
-            {
-                var UniformCatalogDesdeDb = _contenedorTrabajo.UniformCatalog.GetById(uniformVM.UniformCatalog.Id);
-                _contenedorTrabajo.UniformCatalog.Update(uniformVM.UniformCatalog);
-                _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
-            }
+			var existUniform = _contenedorTrabajo.UniformCatalog.GetAll()
+									.Any(d => d.Name.ToLower() == uniformCatalog.Name.ToLower()
+										   && d.Id != uniformCatalog.Id); 
 
-            uniformVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
-            return View(uniformVM);
-        }
+
+			if (existUniform)
+			{
+				ModelState.AddModelError("Nombre", "Ya existe un uniforme del catalogo con este nombre.");
+			}
+
+			if (ModelState.IsValid)
+			{
+				_contenedorTrabajo.UniformCatalog.Update(uniformCatalog);
+				_contenedorTrabajo.Save();
+				return RedirectToAction(nameof(Index));
+			}
+
+            return View(uniformCatalog);
+		}
 
         [HttpDelete]
         public IActionResult Delete(int id)
@@ -97,7 +105,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         public IActionResult GetAll()
         {
-            return Json(new { data = _contenedorTrabajo.UniformCatalog.GetAll(includeProperties: "Representative") });
+            return Json(new { data = _contenedorTrabajo.UniformCatalog.GetAll() });
         }
     }
 }

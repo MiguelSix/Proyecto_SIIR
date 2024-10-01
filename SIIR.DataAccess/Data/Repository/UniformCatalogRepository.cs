@@ -24,8 +24,7 @@ namespace SIIR.DataAccess.Data.Repository
             if (objFromDb != null)
             {
                 objFromDb.Name = uniformCatalog.Name;
-                objFromDb.HasNumber = uniformCatalog.HasNumber;
-                objFromDb.RepresentativeId = uniformCatalog.RepresentativeId;
+                objFromDb.Description = uniformCatalog.Description;
                 _db.SaveChanges();
             }
         }

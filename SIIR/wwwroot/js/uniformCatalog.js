@@ -12,38 +12,30 @@ function cargarDatatable() {
             "datatype": "json"
         },
         "columns": [
-            { "data": "name", "width": "40%" }, // Ajustado para usar 'name'
-            {
-                "data": "hasNumber", // Ajustado para usar 'hasNumber'
-                "width": "20%",
-                "render": function (data) {
-                    return data ? "Sí" : "No"; // Renderiza 'Sí' o 'No' según el valor booleano
-                }
-            },
-            { "data": "representative.name", "width": "30%" }, 
+            { "data": "name", "width": "50%" }, // Usamos 'name'
+            { "data": "description", "width": "40%" }, // Usamos 'description'
             {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                                <a href="/Admin/UniformCatalog/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer; width:140px;">
+                                <a href="/Admin/UniformCatalog/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer; width:100px;">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
                                 &nbsp;
-                                <a onclick=Delete("/Admin/UniformCatalog/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer; width:140px;">
+                                <a onclick=Delete("/Admin/UniformCatalog/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer; width:100px;">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
                             </div>`;
                 },
-                "width": "40%" // Ajusta el ancho según tu preferencia
+                "width": "10%" // Ajustamos el ancho
             }
         ],
         "language": {
             "decimal": "",
             "emptyTable": "No hay registros",
             "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-            "infoEmpty": "Mostrando 0 to 0 de 0 Entradas",
+            "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
             "infoFiltered": "(Filtrado de _MAX_ total entradas)",
-            "infoPostFix": "",
             "thousands": ",",
             "lengthMenu": "Mostrar _MENU_ Entradas",
             "loadingRecords": "Cargando...",
@@ -52,7 +44,7 @@ function cargarDatatable() {
             "zeroRecords": "Sin resultados encontrados",
             "paginate": {
                 "first": "Primero",
-                "last": "Ultimo",
+                "last": "Último",
                 "next": "Siguiente",
                 "previous": "Anterior"
             }

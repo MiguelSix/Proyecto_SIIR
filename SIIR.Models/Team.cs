@@ -42,5 +42,8 @@ namespace SIIR.Models
         public int? StudentId { get; set; }
         [ForeignKey("StudentId")]
         public Student Student { get; set; }
+
+        //UNIFORM CATALOG
+        public ICollection<UniformCatalog>? UniformCatalogs { get; set; }
     }
 }
