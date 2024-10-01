@@ -29,18 +29,18 @@ namespace SIIR.Models
 
         //COACH ID
         [Required]
-        public int? CoachId { get; set; }
+        public int CoachId { get; set; }
         [ForeignKey("CoachId")]
-        public Coach Coach { get; set; }
+        public Coach? Coach { get; set; }
         //EQUIPO REPRESENTATIVO ID
         [Required]
-        public int? RepresentativeId { get; set; }
+        public int RepresentativeId { get; set; }
         [ForeignKey("RepresentativeId")]
-        public Representative Representative { get; set; }
+        public Representative? Representative { get; set; }
 
         //CAPITAN ID
         public int? StudentId { get; set; }
         [ForeignKey("StudentId")]
-        public Student Student { get; set; }
+        public Student? Student { get; set; }
     }
 }

@@ -81,8 +81,20 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Error al borrar el grupo representativo." });
             }
+
+            // Verificar si hay equipos asociados a este representativo
+            var teamsAssociated = _contenedorTrabajo.Team.GetAll(t => t.RepresentativeId == id);
+
+            if (teamsAssociated.Any())
+            {
+                // Si hay equipos asociados, no permitimos el borrado
+                return Json(new { success = false, message = "No se puede borrar el grupo representativo porque hay equipos asociados a él." });
+            }
+
+            // Si no hay equipos asociados, procedemos con el borrado
             _contenedorTrabajo.Representative.Remove(objFromDb);
             _contenedorTrabajo.Save();
+
             return Json(new { success = true, message = "Grupo representativo borrado exitosamente." });
         }
 
