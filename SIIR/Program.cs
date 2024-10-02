@@ -46,11 +46,11 @@ app.MapControllerRoute(
 
 // Redirect to login page instead of any other page
 
-app.MapGet("/", context =>
-{
-    context.Response.Redirect("/Identity/Account/Login");
-    return Task.CompletedTask;
-});
+//app.MapGet("/", context =>
+//{
+//    context.Response.Redirect("/Identity/Account/Login");
+//    return Task.CompletedTask;
+//});
 
 
 app.Run();

@@ -23,7 +23,7 @@ namespace SIIR.DataAccess.Data.Repository
         {
             return _db.Students.Select(i => new SelectListItem
             {
-                Text = i.Name,
+                Text = i.Name + " " + i.LastName,
                 Value = i.Id.ToString()
             });
         }

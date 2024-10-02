@@ -21,7 +21,7 @@ namespace SIIR.DataAccess.Data.Repository
         {
             return _db.Coaches.Select(i => new SelectListItem()
             {
-                Text = i.Name,
+                Text = i.Name + " " + i.LastName,
                 Value = i.Id.ToString()
             });
         }
