@@ -1,7 +1,7 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
-    cargarDatatable();
+    cargarDataTable();
 });
 
 function cargarDataTable() {
@@ -29,7 +29,7 @@ function cargarDataTable() {
                                 </a>
                             </div>
                     `;
-                }, "widht": "40%"
+                }, "width": "40%"
             }
         ],
         "language": {
