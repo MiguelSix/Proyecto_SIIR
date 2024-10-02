@@ -57,7 +57,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Adit(Coach coach)
+        public IActionResult Edit(Coach coach)
         {
             if (ModelState.IsValid)
             {
@@ -74,7 +74,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Json(new { data = _contenedorTrabajo.Coach.GetCoachesList() });
+            return Json(new { data = _contenedorTrabajo.Coach.GetAll() });
         }
 
         [HttpDelete]
