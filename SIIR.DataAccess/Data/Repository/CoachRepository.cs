@@ -19,11 +19,21 @@ namespace SIIR.DataAccess.Data.Repository
         }
         public IEnumerable<SelectListItem> GetCoachesList()
         {
-            return _db.Coaches.Select(i => new SelectListItem
+            return _db.Coaches.Select(i => new SelectListItem()
             {
                 Text = i.Name,
                 Value = i.Id.ToString()
             });
+        }
+
+        public void Update(Coach coach)
+        {
+            var objDesdeDb = _db.Coaches.FirstOrDefault(i => i.Id == coach.Id);
+            objDesdeDb.Name = coach.Name;
+            objDesdeDb.LastName = coach.LastName;
+            objDesdeDb.SecondLastName = coach.SecondLastName;
+
+            _db.SaveChanges();
         }
     }
 }

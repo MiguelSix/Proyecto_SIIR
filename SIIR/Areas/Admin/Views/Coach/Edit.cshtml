@@ -1,0 +1,63 @@
+﻿@model SIIR.Models.Coach
+
+@{
+    ViewData["Title"] = "Editar Coach";
+}
+
+<br />
+<br />
+<h3 class="text-center"> Editar a un Coach</h3>
+<form method="POST" asp-action="Edit">
+    <div class="rows px-2 offset-1 border">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-10 offset-1 mt-4">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="Name"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="LastName"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="LastName" class="form-control" placeholder="Ingresa el Apellido Paterno" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="SecondLastName"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="SecondLastName" class="form-control" placeholder="Ingresa el Apellido Materno" />
+                    <span asp-validation-for="SecondLastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary form-control">Editar Coach</button>
+                </div>
+                &nbsp;
+                <div class="col">
+                    <a asp-action="Index" class="btn btn-success form-control">Volver atrás</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
