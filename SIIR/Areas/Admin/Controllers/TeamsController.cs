@@ -34,7 +34,7 @@ namespace SIIR.Areas.Admin.Controllers
                 Team = new(),
                 RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList(),
                 CoachList = _contenedorTrabajo.Coach.GetCoachesList(),
-                StudentList = _contenedorTrabajo.Student.GetStudentsList()
+                StudentList = _contenedorTrabajo.Student.GetStudentsList(),
             };
             return View(teamVM);
         }
@@ -72,8 +72,10 @@ namespace SIIR.Areas.Admin.Controllers
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
             teamVM.StudentList = _contenedorTrabajo.Student.GetStudentsList();
-            return View(teamVM);
+
+			return View(teamVM);
         }
+
 
         [HttpGet]
         public IActionResult Edit(int? id)

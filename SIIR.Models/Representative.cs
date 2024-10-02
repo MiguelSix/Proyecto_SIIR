@@ -15,7 +15,9 @@ namespace SIIR.Models
         [Required(ErrorMessage = "La categoría del grupo Representativo es obligatoria.")]
         [Display(Name = "Categoría del grupo Representativo.")]
         public string Category { get; set; }
-    }
+		//UNIFORM CATALOG
+		public ICollection<UniformCatalog>? UniformCatalogs { get; set; }
+	}
 
     
 }

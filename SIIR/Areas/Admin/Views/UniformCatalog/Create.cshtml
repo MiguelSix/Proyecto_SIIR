@@ -1,4 +1,4 @@
-﻿@model SIIR.Models.ViewModels.UniformCatalogVM
+﻿@model SIIR.Models.UniformCatalog
 @{
     ViewData["Title"] = "Crear uniforme";
 }
@@ -12,39 +12,23 @@
         <div class="col-10 offset-1 mt-4">
             <div class="form-group row">
                 <div class="col-4">
-                    <label asp-for="UniformCatalog.Name"></label>
+                    <label asp-for="Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="UniformCatalog.Name" class="form-control" placeholder="Ingresa el nombre del uniforme" />
-                    <span asp-validation-for="UniformCatalog.Name" class="text-danger"></span>
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre del uniforme" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
             <br />
             <div class="form-group row">
                 <div class="col-4">
-                    <label asp-for="UniformCatalog.HasNumber"></label>
+                    <label asp-for="Description"></label>
                 </div>
                 <div class="col-8">
-                    <button type="button" class="btn btn-danger" id="toggleButton">
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                    <input type="hidden" asp-for="UniformCatalog.HasNumber" id="UniformCatalogHasNumber" value="false" />
+                    <textarea asp-for="Description" class="form-control" placeholder="Ingresa la descripción" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div>
-
-            <br />
-
-            <div class="form-group row">
-                <div class="col-4">
-                    <label for="Representative">Grupo representativo</label>
-                </div>
-                <div class="col-8">
-                    @Html.DropDownListFor(m => m.UniformCatalog.RepresentativeId, Model.RepresentativeList,
-                             "Selecciona un Grupo Representativo:", new { @class = "form-control" })
-                    <span asp-validation-for="UniformCatalog.RepresentativeId" class="text-danger"></span>
-                </div>
-            </div>
-
             <br />
             <div class="row">
                 <div class="col">
@@ -61,41 +45,7 @@
 </form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function () {
-            $('#toggleButton').click(function () {
-                var icon = $(this).find('i');
-                var hasNumberInput = $('#UniformCatalogHasNumber'); 
-
-                if (icon.hasClass('fa-x')) {
-                    // Cambiar de 'x' a 'check'
-                    icon.removeClass('fa-x');
-                    icon.addClass('fa-check');
-                    $(this).removeClass('btn-danger');
-                    $(this).addClass('btn-success');
-
-                    // Actualizar el valor del campo oculto a true
-                    hasNumberInput.val(true);
-                } else {
-                    // Cambiar de 'check' a 'x'
-                    icon.removeClass('fa-check');
-                    icon.addClass('fa-x');
-                    $(this).removeClass('btn-success');
-                    $(this).addClass('btn-danger');
-
-                    // Actualizar el valor del campo oculto a false
-                    hasNumberInput.val(false);
-                }
-            });
-        });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" integrity="sha512-VCEWnpOl7PIhbYMcb64pqGZYez41C2uws/M/mDdGPy+vtEJHd9BqbShE4/VNnnZdr7YCPOjd+CBmYca/7WWWCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>
-        tinymce.init({
-            select: 'textarea',
-            plugins: 'lists',
-            menubar: 'file edit format'
-        })
-    </script>
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
 }

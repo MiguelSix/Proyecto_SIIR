@@ -1,4 +1,4 @@
-﻿@model SIIR.Models.Representative
+﻿@model SIIR.Models.ViewModels.RepresentativeVM
 
 @{
     ViewData["Title"] = "Editar Representativo";
@@ -14,11 +14,11 @@
         <div class="col-10 offset-1 mt-4">
             <div class="form-group row">
                 <div class="col-4">
-                    <label asp-for="Name"></label>
+                    <label asp-for="Representative.Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <input asp-for="Representative.Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo" />
+                    <span asp-validation-for="Representative.Name" class="text-danger"></span>
                 </div>
             </div>
 
@@ -26,22 +26,68 @@
 
             <div class="form-group row">
                 <div class="col-4">
-                    <label asp-for="Category"></label>
+                    <label asp-for="Representative.Category"></label>
                 </div>
                 <div class="col-8">
                     <div class="form-check">
-                        <input asp-for="Category" class="form-check-input" type="radio" value="Deportivo" id="Deportivo" />
+                        <input asp-for="Representative.Category" class="form-check-input" type="radio" value="Deportivo" id="Deportivo" />
                         <label class="form-check-label" for="Deportivo">Deportivo</label>
                     </div>
                     <div class="form-check">
-                        <input asp-for="Category" class="form-check-input" type="radio" value="Cultural" id="Cultural" />
+                        <input asp-for="Representative.Category" class="form-check-input" type="radio" value="Cultural" id="Cultural" />
                         <label class="form-check-label" for="Cultural">Cultural</label>
                     </div>
-                    <span asp-validation-for="Category" class="text-danger"></span>
+                    <span asp-validation-for="Representative.Category" class="text-danger"></span>
                 </div>
             </div>
 
             <br />
+
+            <!-- Uniformes asociados -->
+            <div id="uniformsContainer">
+                @if (Model.Representative.UniformCatalogs != null && Model.Representative.UniformCatalogs.Any())
+                {
+                var index = 0;
+                    foreach (var uniform in Model.Representative.UniformCatalogs)
+                    {
+                        <div class="form-group row mt-2 uniform-item">
+                            <div class="col-4">
+                                <label for="UniformCatalog">Uniforme</label>
+                            </div>
+                            <div class="col-8">
+                                <select name="SelectedUniformCatalogIds[@index]" class="form-control">
+                                    <option value="">Selecciona una prenda:</option>
+                                    @foreach (var item in Model.UniformCatalogList)
+                                    {
+                                                    <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                                <span class="text-danger"></span>
+                            </div>
+                            <div class="col-12 mt-2 text-end">
+                                <button type="button" class="btn btn-danger remove-uniform-btn">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        index++;
+                    }
+                }
+            </div>
+
+
+            <!-- Botón para añadir un nuevo uniforme -->
+            <div class="form-group row mt-2">
+                <div class="col-4"></div>
+                <div class="col-8">
+                    <button type="button" id="addUniformBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Añadir Uniforme
+                    </button>
+                </div>
+            </div>
+
+            </br>
+
 
             <div class="form-group-row">
                 <div class="col-8">
@@ -55,7 +101,43 @@
 </form>
 
 @section Scripts {
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            var uniformIndex = $('#uniformsContainer .uniform-item').length || 0;
+
+            // Añadir nuevo uniforme
+            $('#addUniformBtn').click(function () {
+                var newUniform = `
+                            <div class="form-group row mt-2 uniform-item">
+                                <div class="col-4">
+                                    <label for="UniformCatalog">Uniforme</label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control">
+                                        <option value="">Selecciona una prenda:</option>
+        @foreach (var item in Model.UniformCatalogList)
+        {
+                                                <option value="@item.Value">@item.Text</option>
+        }
+                                    </select>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12 mt-2 text-end">
+                                    <button type="button" class="btn btn-danger remove-uniform-btn">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                $('#uniformsContainer').append(newUniform);
+                uniformIndex++;
+            });
+
+            // Eliminar uniforme
+            $('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
+                $(this).closest('.uniform-item').remove();
+            });
+        });
+    </script>
 }

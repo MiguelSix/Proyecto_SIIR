@@ -1,4 +1,4 @@
-﻿@model SIIR.Models.ViewModels.UniformCatalogVM
+﻿@model SIIR.Models.UniformCatalog
 @{
     ViewData["Title"] = "Editar uniforme";
 }
@@ -8,44 +8,30 @@
 <h3 class="text-center">Editar uniforme</h3>
 <form method="POST" asp-action="Edit" enctype="multipart/form-data">
 
-    <input type="hidden" asp-for="UniformCatalog.Id" />
+    <input type="hidden" asp-for="Id" />
 
     <div class="row px-2 offset-1 border">
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="col-8 offset-1 mt-4">
             <div class="form-group row">
                 <div class="col-4">
-                    <label asp-for="UniformCatalog.Name"></label>
+                    <label asp-for="Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="UniformCatalog.Name" class="form-control" placeholder="Ingresa el nombre del uniforme" />
-                    <span asp-validation-for="UniformCatalog.Name" class="text-danger"></span>
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre del uniforme" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
             <br />
             <div class="form-group row">
                 <div class="col-4">
-                    <label>¿Tiene número?</label>
+                    <label asp-for="Description"></label>
                 </div>
                 <div class="col-8">
-
-                    <button type="button" class="btn btn-danger d-none" id="toggleButton">
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                    <input type="hidden" asp-for="UniformCatalog.HasNumber" id="UniformCatalogHasNumber" value="@Model.UniformCatalog.HasNumber" />
+                    <textarea asp-for="Description" class="form-control" placeholder="Ingresa la descripción" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div>
-            <br />
-                <div class="form-group row">
-                    <div class="col-4">
-                        <label for="Representative">Grupo representativo</label>
-                    </div>
-                    <div class="col-8">
-                        @Html.DropDownListFor(m => m.UniformCatalog.RepresentativeId, Model.RepresentativeList,
-                                 "-Por favor seleccione un grupo representativo-", new { @class = "form-control" })
-                        <span asp-validation-for="UniformCatalog.RepresentativeId" class="text-danger"></span>
-                    </div>
-                </div>
             <br />
             <div class="row">
                 <div class="col">
@@ -62,61 +48,7 @@
 </form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function () {
-            var hasNumberInput = $('#UniformCatalogHasNumber');
-            var toggleButton = $('#toggleButton');
-            var icon = toggleButton.find('i');
-
-            // Verificar el valor inicial y actualizar el botón
-            if (hasNumberInput.val() === 'True') {
-                // Si tiene número, mostrar check y botón verde
-                icon.removeClass('fa-x');
-                icon.addClass('fa-check');
-                toggleButton.removeClass('btn-danger');
-                toggleButton.addClass('btn-success');
-            } else {
-                // Si no tiene número, mostrar X y botón rojo
-                icon.removeClass('fa-check');
-                icon.addClass('fa-x');
-                toggleButton.removeClass('btn-success');
-                toggleButton.addClass('btn-danger');
-            }
-
-            // Mostrar el botón después de la configuración
-            toggleButton.removeClass('d-none');
-
-            // Manejar el evento de click para cambiar el estado del botón
-            toggleButton.click(function () {
-                if (icon.hasClass('fa-x')) {
-                    // Cambiar de 'x' a 'check'
-                    icon.removeClass('fa-x');
-                    icon.addClass('fa-check');
-                    toggleButton.removeClass('btn-danger');
-                    toggleButton.addClass('btn-success');
-
-                    // Actualizar el valor del campo oculto a true
-                    hasNumberInput.val(true);
-                } else {
-                    // Cambiar de 'check' a 'x'
-                    icon.removeClass('fa-check');
-                    icon.addClass('fa-x');
-                    toggleButton.removeClass('btn-success');
-                    toggleButton.addClass('btn-danger');
-
-                    // Actualizar el valor del campo oculto a false
-                    hasNumberInput.val(false);
-                }
-            });
-        });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" integrity="sha512-VCEWnpOl7PIhbYMcb64pqGZYez41C2uws/M/mDdGPy+vtEJHd9BqbShE4/VNnnZdr7YCPOjd+CBmYca/7WWWCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>
-        tinymce.init({
-            select: 'textarea',
-            plugins: 'lists',
-            menubar: 'file edit format'
-        })
-    </script>
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
 }
