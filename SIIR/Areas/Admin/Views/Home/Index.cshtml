@@ -7,10 +7,7 @@
     <p class="lead">Sistema Integral de Información de Grupos Representativos</p>
 
     <div class="my-4">
-
-        <img src="/images/fox.png" alt="Fox Mascot" class="img-fluid" style="width: 400px;">
-
-        <img src="/images/fox.png" alt="Fox Mascot" class="img-fluid" style="width: 400px;">
+        <img id="fox-image" src="/images/fox-americano.png" alt="Fox Mascot" class="img-fluid" style="width: 400px;">
     </div>
 
     <div class="row mt-5">
@@ -27,4 +24,24 @@
     <br />
     <br />
     <br />
+</main>
 
+@section Scripts {
+    <script>
+        // Array de las rutas de las imágenes
+        const images = [
+            "/images/fox-basquet.png",
+            "/images/fox-voleibol.png",
+            "/images/fox-americano.png"
+        ];
+
+        let currentIndex = 0;
+        const imageElement = document.getElementById("fox-image");
+
+        // Cambiar imagen cada 3 segundos (3000 milisegundos)
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % images.length; // Ciclar entre las imágenes
+            imageElement.src = images[currentIndex]; // Cambiar el src de la imagen
+        }, 3000);
+    </script>
+}
