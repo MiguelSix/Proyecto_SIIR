@@ -127,10 +127,10 @@ namespace SIIR.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                // Ensure roles exist
-                await EnsureRoleExists(CNT.AdminRole);
-                await EnsureRoleExists(CNT.StudentRole);
-                await EnsureRoleExists(CNT.CoachRole);  
+                //// Ensure roles exist
+                //await EnsureRoleExists(CNT.AdminRole);
+                //await EnsureRoleExists(CNT.StudentRole);
+                //await EnsureRoleExists(CNT.CoachRole);  
 
                 switch (selectedRole)
                 {
