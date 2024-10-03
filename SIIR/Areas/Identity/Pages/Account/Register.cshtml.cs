@@ -127,10 +127,10 @@ namespace SIIR.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                //// Ensure roles exist
-                //await EnsureRoleExists(CNT.AdminRole);
-                //await EnsureRoleExists(CNT.StudentRole);
-                //await EnsureRoleExists(CNT.CoachRole);  
+                // Ensure roles exist
+                await EnsureRoleExists(CNT.AdminRole);
+                await EnsureRoleExists(CNT.StudentRole);
+                await EnsureRoleExists(CNT.CoachRole);
 
                 switch (selectedRole)
                 {
@@ -177,7 +177,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        return LocalRedirect(GetDashboardUrl(selectedRole));
                     }
                 }
                 foreach (var error in result.Errors)
@@ -219,6 +219,21 @@ namespace SIIR.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
             return (IUserEmailStore<ApplicationUser>)_userStore;
+        }
+
+        private string GetDashboardUrl(string role)
+        {
+            switch (role)
+            {
+                case CNT.AdminRole:
+                    return "/Admin/Home";
+                case CNT.CoachRole:
+                    return "/Coach/Home";
+                case CNT.StudentRole:
+                    return "/Student/Home";
+                default:
+                    return "/";
+            }
         }
     }
 }
