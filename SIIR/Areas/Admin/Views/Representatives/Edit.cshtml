@@ -9,7 +9,9 @@
 <h3 class="text-center">Editar un grupo representativo</h3>
 <form method="POST" asp-action="Edit">
     <div class="row p-xl-2 offset-1 border">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <input type="hidden" asp-for="Representative.Id" />
 
         <div class="col-10 offset-1 mt-4">
             <div class="form-group row">
@@ -45,7 +47,7 @@
 
             <!-- Uniformes asociados -->
             <div id="uniformsContainer">
-                @if (Model.Representative.UniformCatalogs != null && Model.Representative.UniformCatalogs.Any())
+                @if (Model.Representative.UniformCatalogs != null)
                 {
                 var index = 0;
                     foreach (var uniform in Model.Representative.UniformCatalogs)
@@ -59,7 +61,10 @@
                                     <option value="">Selecciona una prenda:</option>
                                     @foreach (var item in Model.UniformCatalogList)
                                     {
-                                                    <option value="@item.Value">@item.Text</option>
+                                        <!option value="@item.Value" @(uniform.Id.ToString() == item.Value ? "selected" : "")>
+                                            @item.Text
+                                        </!option>
+
                                     }
                                 </select>
                                 <span class="text-danger"></span>

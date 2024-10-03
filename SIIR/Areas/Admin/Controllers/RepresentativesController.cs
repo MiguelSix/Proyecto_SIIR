@@ -52,7 +52,7 @@ namespace SIIR.Areas.Admin.Controllers
         {
             if (representativeVM.SelectedUniformCatalogIds != null)
             {
-                var representative = _contenedorTrabajo.Representative.GetById(representativeVM.Representative.Id);
+                var representative = representativeVM.Representative;
                 if (representative.UniformCatalogs == null)
                 {
                     representative.UniformCatalogs = new List<UniformCatalog>();
@@ -69,7 +69,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public IActionResult Edit(int id)
         {
             RepresentativeVM representativeVM = new RepresentativeVM()
             {
@@ -78,7 +78,10 @@ namespace SIIR.Areas.Admin.Controllers
             };
             if (id != null)
             {
-                representativeVM.Representative = _contenedorTrabajo.Representative.GetById(id.GetValueOrDefault());
+                representativeVM.Representative = _contenedorTrabajo.Representative
+                .GetAll(r => r.Id == id, includeProperties: "UniformCatalogs")
+                .FirstOrDefault();
+                
             }
             return View(representativeVM);
         }
@@ -89,14 +92,56 @@ namespace SIIR.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _contenedorTrabajo.Representative.Add(representativeVM.Representative);
+                _contenedorTrabajo.Representative.Update(representativeVM.Representative);
                 _contenedorTrabajo.Save();
-                CreateRepresentativeUniformCatalog(representativeVM);
+                UpdateRepresentativeUniformCatalog(representativeVM);
                 return RedirectToAction(nameof(Index));
             }
+            representativeVM.Representative = _contenedorTrabajo.Representative
+                .GetAll(r => r.Id == representativeVM.Representative.Id, includeProperties: "UniformCatalogs")
+                .FirstOrDefault();
             representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
-            return View(representativeVM);
+            return View(representativeVM); 
         }
+
+        private void UpdateRepresentativeUniformCatalog(RepresentativeVM representativeVM)
+        {
+            //if (representativeVM.SelectedUniformCatalogIds != null)
+            //{
+                var representative = representativeVM.Representative;
+
+                var existingUniformCatalogs = _contenedorTrabajo.Representative
+                    .GetAll(r => r.Id == representative.Id, includeProperties: "UniformCatalogs")
+                    .FirstOrDefault()?.UniformCatalogs ?? new List<UniformCatalog>();
+
+                representative.UniformCatalogs = existingUniformCatalogs;
+                var selectedUniformCatalogs = new HashSet<int>(representativeVM.SelectedUniformCatalogIds ?? new List<int>());
+                var existingUniformCatalogIds = new HashSet<int>(existingUniformCatalogs.Select(u => u.Id));
+
+                var catalogsToRemove = existingUniformCatalogIds.Except(selectedUniformCatalogs).ToList();
+                foreach (var catalogId in catalogsToRemove)
+                {
+                    var catalogToRemove = existingUniformCatalogs.FirstOrDefault(c => c.Id == catalogId);
+                    if (catalogToRemove != null)
+                    {
+                        representative.UniformCatalogs.Remove(catalogToRemove);
+                    }
+                }
+
+                var catalogsToAdd = selectedUniformCatalogs.Except(existingUniformCatalogIds).ToList();
+                foreach (var catalogId in catalogsToAdd)
+                {
+                    var catalogToAdd = _contenedorTrabajo.UniformCatalog.GetById(catalogId);
+                    if (catalogToAdd != null)
+                    {
+                        representative.UniformCatalogs.Add(catalogToAdd);
+                    }
+                }
+
+                _contenedorTrabajo.Save();
+            //}
+        }
+
 
         #region
 
