@@ -13,7 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI();
 builder.Services.AddControllersWithViews();
@@ -46,11 +46,11 @@ app.MapControllerRoute(
 
 // Redirect to login page instead of any other page
 
-//app.MapGet("/", context =>
-//{
-//    context.Response.Redirect("/Identity/Account/Login");
-//    return Task.CompletedTask;
-//});
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Identity/Account/Login");
+    return Task.CompletedTask;
+});
 
 
 app.Run();

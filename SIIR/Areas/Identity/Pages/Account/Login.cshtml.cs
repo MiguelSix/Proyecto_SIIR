@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using SIIR.Models;
+using SIIR.Utilities;
 
 namespace SIIR.Areas.Identity.Pages.Account
 {
@@ -22,11 +23,33 @@ namespace SIIR.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
+        }
+
+        private string GetDashboardUrl(ApplicationUser user)
+        {
+            if (_userManager.IsInRoleAsync(user, CNT.AdminRole).Result)
+            {
+                return "/Admin/Home";
+            }
+            else if (_userManager.IsInRoleAsync(user, CNT.CoachRole).Result)
+            {
+                return "/Coach/Home";
+            }
+            else if (_userManager.IsInRoleAsync(user, CNT.StudentRole).Result)
+            {
+                return "/Student/Home";
+            }
+            else
+            {
+                return "/";
+            }
         }
 
         /// <summary>
@@ -116,7 +139,13 @@ namespace SIIR.Areas.Identity.Pages.Account
                 if (true)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    // Get the logged-in user
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+
+                    // Get the appropriate dashboard URL based on the user's role
+                    var dashboardUrl = GetDashboardUrl(user);
+
+                    return LocalRedirect(dashboardUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {
