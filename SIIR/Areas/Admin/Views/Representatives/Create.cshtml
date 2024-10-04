@@ -81,15 +81,14 @@
                             <label for="UniformCatalog">Uniforme</label>
                         </div>
                         <div class="col-8">
-                            <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control">
+                            <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required>
                                 <option value="">Selecciona una prenda:</option>
                                 @foreach(var item in Model.UniformCatalogList)
                                 {
                                     <option value="@item.Value">@item.Text</option>
                                 }
-                                // Es importante asegurarse que Razor se renderice correctamente antes de usarla en el script.
                             </select>
-                            <span class="text-danger"></span>
+                            <span asp-validation-for="SelectedUniformCatalogIds[` + uniformIndex + `]" class="text-danger"></span>
                         </div>
                         <div class="col-12 mt-2 text-end">
                             <button type="button" class="btn btn-danger remove-uniform-btn">
@@ -98,15 +97,23 @@
                         </div>
                     </div>
                 `;
-                $('#uniformsContainer').append(newUniform); // Agrega el nuevo bloque al contenedor
-                uniformIndex++; // Incrementa el índice para futuros uniformes
+                $('#uniformsContainer').append(newUniform); 
+                uniformIndex++; 
             });
 
 
         // Manejar eliminar uniforme
-        $('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
-            $(this).closest('.uniform-item').remove();
-        });
+            $('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
+                $(this).closest('.uniform-item').remove();
+                reindexUniforms();
+            });
+
+            // Reindexar selectores de uniformes
+            function reindexUniforms() {
+                $('#uniformsContainer .uniform-item').each(function (index) {
+                    $(this).find('select[name^="SelectedUniformCatalogIds"]').attr('name', 'SelectedUniformCatalogIds[' + index + ']');
+                });
+            }
     });
 </script>
 }

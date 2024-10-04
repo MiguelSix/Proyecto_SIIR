@@ -27,7 +27,7 @@ namespace SIIR.Areas.Admin.Controllers
         {
             RepresentativeVM representativeVM = new RepresentativeVM()
             {
-                Representative = new Models.Representative(),
+                Representative = new Representative(),
                 UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList()
             };
             return View(representativeVM);
@@ -90,33 +90,15 @@ namespace SIIR.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(RepresentativeVM representativeVM)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                // Recuperamos la lista de catálogos de uniformes para los dropdowns existentes
-                representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
-
-                // Si hay uniformes seleccionados, aseguramos que se mantengan en la lista de SelectedUniformCatalogIds
-                if (representativeVM.SelectedUniformCatalogIds != null)
-                {
-                    var selectedUniforms = new List<UniformCatalog>();
-                    foreach (var uniformCatalogId in representativeVM.SelectedUniformCatalogIds)
-                    {
-                        var uniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(uniformCatalogId);
-                        if (uniformCatalog != null)
-                        {
-                            selectedUniforms.Add(uniformCatalog);
-                        }
-                    }
-
-                    representativeVM.Representative.UniformCatalogs = selectedUniforms;
-                }
-                return View(representativeVM);
+                _contenedorTrabajo.Representative.Update(representativeVM.Representative);
+                _contenedorTrabajo.Save();
+                UpdateRepresentativeUniformCatalog(representativeVM);
+                return RedirectToAction(nameof(Index));
             }
-
-            _contenedorTrabajo.Representative.Update(representativeVM.Representative);
-            _contenedorTrabajo.Save();
-            UpdateRepresentativeUniformCatalog(representativeVM);
-            return RedirectToAction(nameof(Index));
+            representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
+            return View(representativeVM);
         }
 
 
