@@ -9,7 +9,7 @@
 <h3 class="text-center">Editar un grupo representativo</h3>
 <form method="POST" asp-action="Edit">
     <div class="row p-xl-2 offset-1 border">
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <input type="hidden" asp-for="Representative.Id" />
 
@@ -31,14 +31,11 @@
                     <label asp-for="Representative.Category"></label>
                 </div>
                 <div class="col-8">
-                    <div class="form-check">
-                        <input asp-for="Representative.Category" class="form-check-input" type="radio" value="Deportivo" id="Deportivo" />
-                        <label class="form-check-label" for="Deportivo">Deportivo</label>
-                    </div>
-                    <div class="form-check">
-                        <input asp-for="Representative.Category" class="form-check-input" type="radio" value="Cultural" id="Cultural" />
-                        <label class="form-check-label" for="Cultural">Cultural</label>
-                    </div>
+                    <select asp-for="Representative.Category" class="form-control">
+                        <option value="">Seleccione una opción</option>
+                        <option value="Deportivo">Deportivo</option>
+                        <option value="Cultural">Cultural</option>
+                    </select>
                     <span asp-validation-for="Representative.Category" class="text-danger"></span>
                 </div>
             </div>
