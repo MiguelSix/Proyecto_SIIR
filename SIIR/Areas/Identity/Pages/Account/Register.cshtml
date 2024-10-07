@@ -30,6 +30,27 @@
                             <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                         </div>
+
+                        <!-- Campos adicionales para Admin y Coach -->
+                        <div id="additionalFields" style="display: none;">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Name" class="form-control" aria-required="true" placeholder="Nombre" />
+                                <label asp-for="Input.Name">Nombre</label>
+                                <span asp-validation-for="Input.Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.LastName" class="form-control" aria-required="true" placeholder="Apellido Paterno" />
+                                <label asp-for="Input.LastName">Apellido Paterno</label>
+                                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.SecondLastName" class="form-control" aria-required="true" placeholder="Apellido Materno" />
+                                <label asp-for="Input.SecondLastName">Apellido Materno</label>
+                                <span asp-validation-for="Input.SecondLastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
                         <!-- Selector de roles -->
                         <div class="form-group mb-3">
                             <h4 class="text-center mb-3">Selecciona un rol</h4>
@@ -48,6 +69,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                     </form>
                 </div>
@@ -58,4 +80,16 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('input[name="rdUserRole"]').change(function () {
+                var selectedRole = $('input[name="rdUserRole"]:checked').val();
+                if (selectedRole === '@CNT.AdminRole' || selectedRole === '@CNT.CoachRole') {
+                    $('#additionalFields').show();
+                } else {
+                    $('#additionalFields').hide();
+                }
+            });
+        });
+    </script>
 }

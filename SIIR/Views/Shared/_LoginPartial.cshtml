@@ -42,7 +42,7 @@
             else if (user.AdminId.HasValue)
             {
                 var admin = await DbContext.Admins.FindAsync(user.AdminId);
-                userName = "Admin";
+                userName = admin?.Name ?? "Administrador";
             }
             
     }

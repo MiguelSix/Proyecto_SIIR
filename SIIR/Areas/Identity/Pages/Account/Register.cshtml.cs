@@ -104,6 +104,18 @@ namespace SIIR.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+            [Display(Name = "Nombre")]
+            public string Name { get; set; }
+
+            [StringLength(50, ErrorMessage = "El apellido paterno no puede exceder los 50 caracteres.")]
+            [Display(Name = "Apellido Paterno")]
+            public string LastName { get; set; }
+
+            [StringLength(50, ErrorMessage = "El apellido materno no puede exceder los 50 caracteres.")]
+            [Display(Name = "Apellido Materno")]
+            public string SecondLastName { get; set; }
+
         }
 
 
@@ -135,11 +147,21 @@ namespace SIIR.Areas.Identity.Pages.Account
                 switch (selectedRole)
                 {
                     case CNT.AdminRole:
-                        var admin = new Models.Admin();
+                        var admin = new Models.Admin()
+                        {
+                            Name = Input.Name,
+                            LastName = Input.LastName,
+                            SecondLastName = Input.SecondLastName
+                        };
                         user.Admin = admin;
                         break;
                     case CNT.CoachRole:
-                        var coach = new Coach();
+                        var coach = new Coach()
+                        {
+                            Name = Input.Name,
+                            LastName = Input.LastName,
+                            SecondLastName = Input.SecondLastName
+                        };
                         user.Coach = coach;
                         break;
                     case CNT.StudentRole:

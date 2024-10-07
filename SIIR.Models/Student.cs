@@ -6,6 +6,8 @@ namespace SIIR.Models
 {
     public class Student
     {
+        // Campos Comunes de los 3 Roles
+
         [Key]
         public int Id { get; set; }
 
@@ -24,8 +26,9 @@ namespace SIIR.Models
         [Display(Name = "Apellido Materno")]
         public string? SecondLastName { get; set; }
 
+        // Campos Comunes de los 3 Roles
 
-        //[Required(ErrorMessage = "El número de control es obligatorio.")]
+
         [StringLength(8, ErrorMessage = "El número de control no puede exceder los 8 caracteres.")]
         [Display(Name = "Número de Control")]
         public string? ControlNumber { get; set; }
