@@ -41,54 +41,22 @@
                     <ul class="navbar-nav me-auto">
                         
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">
-                                INICIO
-                                <span class="visually-hidden">(current)</span>
-                            </a>
+                            <a class="nav-link" asp-area="Admin" asp-controller="Students" asp-action="Index">ESTUDIANTES</a>
                         </li>
-
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ESTUDIANTES</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Students" asp-action="Index">Crear</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Students" asp-action="Index">Aministrar</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Representatives" asp-action="Index">GRUPOS REPRESENTATIVOS</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">GRUPOS REPRESENTATIVOS</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Representatives" asp-action="Create">Crear</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Representatives" asp-action="Index">Administrar</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Teams" asp-action="Index">EQUIPOS</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">EQUIPOS</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Teams" asp-action="Create">Crear</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Teams" asp-action="Index">Administrar</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="DocumentCatalog" asp-action="Index">DOCUMENTOS</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">DOCUMENTOS</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="DocumentCatalog" asp-action="Create">Crear</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="DocumentCatalog" asp-action="Index">Administrar</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="UniformCatalog" asp-action="Index">UNIFORMES</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">UNIFORMES</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="UniformCatalog" asp-action="Create">Crear</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="UniformCatalog" asp-action="Index">Administrar</a>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">COACHES</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Coach" asp-action="Create">Crear</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Coach" asp-action="Index">Administrar</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Coach" asp-action="Index">COACHES</a>
                         </li>
 
                     </ul>
