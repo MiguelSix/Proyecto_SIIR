@@ -46,6 +46,15 @@ namespace SIIR.DataAccess.Data.Repository
             });
         }
 
+        public IEnumerable<SelectListItem> GetListaTeams()
+        {
+            return _db.Teams.Select(i => new SelectListItem
+            {
+                Text = i.Name + " " + i.Category,
+                Value = i.Id.ToString()
+            });
+        }
+
         public void Update(Team team)
         {
             var objDesdeDb = _db.Teams.FirstOrDefault(s => s.Id == team.Id);

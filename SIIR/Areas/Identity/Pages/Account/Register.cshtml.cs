@@ -16,9 +16,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
+using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Utilities;
 
@@ -33,6 +35,7 @@ namespace SIIR.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ITeamRepository _teamRepository;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -40,7 +43,8 @@ namespace SIIR.Areas.Identity.Pages.Account
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            ITeamRepository teamRepository)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -49,6 +53,7 @@ namespace SIIR.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager;
+            _teamRepository = teamRepository;
         }
 
         /// <summary>
@@ -57,6 +62,7 @@ namespace SIIR.Areas.Identity.Pages.Account
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
+        public IEnumerable<SelectListItem> TeamList { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -116,6 +122,9 @@ namespace SIIR.Areas.Identity.Pages.Account
             [Display(Name = "Apellido Materno")]
             public string SecondLastName { get; set; }
 
+            [Display(Name = "Equipo")]
+            public int? TeamId { get; set; }
+
         }
 
 
@@ -123,6 +132,7 @@ namespace SIIR.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            TeamList = _teamRepository.GetListaTeams();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -165,7 +175,16 @@ namespace SIIR.Areas.Identity.Pages.Account
                         user.Coach = coach;
                         break;
                     case CNT.StudentRole:
-                        var student = new Models.Student();
+                        if (!Input.TeamId.HasValue)
+                        {
+                            ModelState.AddModelError(string.Empty, "Debe seleccionar un equipo para el estudiante.");
+                            TeamList = _teamRepository.GetListaTeams();
+                            return Page();
+                        }
+                        var student = new Models.Student
+                        {
+                            TeamId = Input.TeamId.Value
+                        };
                         user.Student = student;
                         break;
                     default:
@@ -209,6 +228,7 @@ namespace SIIR.Areas.Identity.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form
+            TeamList = _teamRepository.GetListaTeams();
             return Page();
         }
 
