@@ -7,7 +7,7 @@
 <br />
 <br />
 <h3 class="text-center">Editar un grupo representativo</h3>
-<form method="POST" asp-action="Edit">
+<form id="representative-form" method="POST" asp-action="Edit">
     <div class="row p-xl-2 offset-1 border">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -57,7 +57,7 @@
                                     <label for="UniformCatalog">Uniforme</label>
                                 </div>
                                 <div class="col-8">
-                                    <select name="SelectedUniformCatalogIds[@index]" class="form-control" required>
+                                    <select name="SelectedUniformCatalogIds[@index]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
                                         <option value="">Selecciona una prenda:</option>
                                         @foreach (var item in Model.UniformCatalogList)
                                         {
@@ -112,31 +112,35 @@
             // Añadir nuevo uniforme
             $('#addUniformBtn').click(function () {
                 var newUniform = `
-                    <div class="form-group row mt-2 uniform-item">
-                        <div class="col-4">
-                            <label for="UniformCatalog">Uniforme</label>
+                        <div class="form-group row mt-2 uniform-item">
+                            <div class="col-4">
+                                <label for="UniformCatalog">Uniforme</label>
+                            </div>
+                            <div class="col-8">
+                                        <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
+                                    <option value="">Selecciona una prenda:</option>
+                                        @foreach (var item in Model.UniformCatalogList)
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                        @Html.Raw("</option>")
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="col-12 mt-2 text-end">
+                                <button type="button" class="btn btn-danger remove-uniform-btn">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-8">
-                            <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required>
-                                <option value="">Selecciona una prenda:</option>
-                                @foreach (var item in Model.UniformCatalogList)
-                                {
-                                    <option value="@item.Value">@item.Text</option>
-                                }
-                            </select>
-                            <span asp-validation-for="SelectedUniformCatalogIds[` + uniformIndex + `]" class="text-danger"></span>
-                        </div>
-                        <div class="col-12 mt-2 text-end">
-                            <button type="button" class="btn btn-danger remove-uniform-btn">
-                                <i class="fas fa-trash-alt"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                `;
+                    `;
                 $('#uniformsContainer').append(newUniform);
                 uniformIndex++;
-                // Reindexar selectores de uniformes después de añadir uno nuevo
                 reindexUniforms();
+
+                // Reaplicar validación unobtrusive
+                var form = $("#representative-form");
+                $.validator.unobtrusive.parse(form);
             });
 
             // Eliminar uniforme
@@ -148,9 +152,14 @@
             // Reindexar selectores de uniformes
             function reindexUniforms() {
                 $('#uniformsContainer .uniform-item').each(function (index) {
-                    $(this).find('select[name^="SelectedUniformCatalogIds"]').attr('name', 'SelectedUniformCatalogIds[' + index + ']');
-                    // Actualiza el asp-validation-for
-                    $(this).find('span').attr('asp-validation-for', 'SelectedUniformCatalogIds[' + index + ']');
+                    var select = $(this).find('select');
+                    var span = $(this).find('span');
+
+                    // Actualizar el atributo 'name' del select
+                    select.attr('name', 'SelectedUniformCatalogIds[' + index + ']');
+
+                    // Actualizar el asp-validation-for del span
+                    span.attr('data-valmsg-for', 'SelectedUniformCatalogIds[' + index + ']');
                 });
             }
         });
