@@ -2,9 +2,20 @@
 @model AccessDeniedModel
 @{
     ViewData["Title"] = "Access denied";
+    Layout = "_LayoutWithoutNavBar";
 }
+<div class="container">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-4 text-danger mb-4">@ViewData["Title"]</h1>
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+            <!-- Placeholder para la imagen -->
+            <div class="mb-4">
+                <img src="/images/denied.png" alt="Access Denied" class="img-fluid" style="max-width: 300px;">
+            </div>
+
+            <p class="lead text-muted">Lo sentimos, no tienes acceso a este recurso.</p>
+            <a href="/" class="btn btn-primary mt-3">Volver a la página principal</a>
+        </div>
+    </div>
+</div>

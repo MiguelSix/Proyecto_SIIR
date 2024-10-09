@@ -8,11 +8,11 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h1 class="text-center display-3">@ViewData["Title"]</h1>
+            <h1 class="text-center display-5">@ViewData["Title"]</h1>
             <div class="card">
                 <div class="card-body">
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                        <h2 class="card-title text-center display-6">Create a new account</h2>
+                        <h2 class="card-title text-center display-6">Agrega un Nuevo Usuario</h2>
                         <hr />
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                         <div class="form-floating mb-3">
@@ -32,7 +32,7 @@
                         </div>
 
                         <!-- Campos adicionales para Admin y Coach -->
-                        <div id="additionalFields" style="display: none;">
+                        <div id="additionalFields">
                             <div class="form-floating mb-3">
                                 <input asp-for="Input.Name" class="form-control" aria-required="true" placeholder="Nombre" />
                                 <label asp-for="Input.Name">Nombre</label>
@@ -50,22 +50,24 @@
                             </div>
                         </div>
 
-
                         <!-- Selector de roles -->
                         <div class="form-group mb-3">
                             <h4 class="text-center mb-3">Selecciona un rol</h4>
                             <div class="d-flex justify-content-center">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rdUserRole" id="adminRole" value="@CNT.AdminRole" required />
-                                    <label class="form-check-label" for="adminRole">@CNT.AdminRole</label>
-                                </div>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="rdUserRole" id="adminRole" value="@CNT.AdminRole" required />
+                                        <label class="form-check-label" for="adminRole">@CNT.AdminRole</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="rdUserRole" id="coachRole" value="@CNT.CoachRole" required />
+                                        <label class="form-check-label" for="coachRole">@CNT.CoachRole</label>
+                                    </div>
+                                }
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="rdUserRole" id="studentRole" value="@CNT.StudentRole" required />
                                     <label class="form-check-label" for="studentRole">@CNT.StudentRole</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rdUserRole" id="coachRole" value="@CNT.CoachRole" required />
-                                    <label class="form-check-label" for="coachRole">@CNT.CoachRole</label>
                                 </div>
                             </div>
                         </div>
@@ -97,13 +99,16 @@
                     $('#additionalFields').show();
                     $('#teamSelection').hide();
                 } else if (selectedRole === '@CNT.StudentRole') {
-                    $('#additionalFields').hide();
+                    $('#additionalFields').show();
                     $('#teamSelection').show();
                 } else {
                     $('#additionalFields').hide();
                     $('#teamSelection').hide();
                 }
             });
+
+            // Trigger change event on page load
+            $('input[name="rdUserRole"]:checked').change();
         });
     </script>
 }
