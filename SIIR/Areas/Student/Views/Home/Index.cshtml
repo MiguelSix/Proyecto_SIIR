@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+        .container {
+            height: 100%;
+        }
+
+        .dashboard-container{
+            height: 100%;
+            max-width: 800px;
+            margin:0 auto;
+            padding: 10px;
+        }
+
+        .img-container {
+        }
+
+        .student-info {
+        }
+
+        .profile-picture {
+            max-width: 250px;
+            width: 95%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .btn-primary {
+            background-color: #1a3c6e;
+            border-color: #1a3c6e;
+            max-height:50px;
+        }
+
+        .btn-primary:hover {
+            background-color: #15305a;
+            border-color: #15305a;
+        }
+
+        @@media (min-height: 700px) {
+        .dashboard-container {
+                height: auto;
+                display: flex;
+                align-items: center;
+        }
+    }
+
+</style>
+
+
+<div class="container">
+    <div class="dashboard-container d-flex">
+        <div class="row g-3">
+            <div class="img-container col-md-4 d-flex align-items-center">
+                <img class="profile-picture" src="/profile.jpg" />
+            </div>
+            <div class="student-info col-md-8 d-flex align-items-center">
+                <div class="row mx-2">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input class="form-control" type="text" placeholder="Juan Pérez" aria-label="Disabled" disabled>
+                    </div>
+                    <div class="col-sm-8 mb-3">
+                        <label class="form-label">Numero control</label>
+                        <input class="form-control" type="text" placeholder="20140950" aria-label="Disabled" disabled>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Semestre</label>
+                        <input class="form-control" type="text" placeholder="9no" aria-label="Disabled" disabled>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Carrera</label>
+                        <input class="form-control" type="text" placeholder="Ingeniería en Sistemas Computacionales" aria-label="Disabled" disabled>
+                    </div>
+                    <div class="col-12">
+                        <label class="mb-1">Grupo Representativo</label>
+                        <input class="form-control" type="text" placeholder="Basquetbol varonil" aria-label="Disabled" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-container col-12 d-flex mt-3 justify-content-center flex-column flex-sm-row">
+                <!--button type="button" class="btn btn-primary mx-3 mb-2 mb-sm-0"
+                        onclick="location.href='@Url.Action("Information", "User")'">
+                    Modificar información
+                </!--button-->
+                <a asp-action="Edit" class="btn btn-primary">Modificar información</a>
+                <button class="btn btn-primary mx-3">Cargar documentos</button>
+            </div>
+        </div>
+    </div>
+</div>
