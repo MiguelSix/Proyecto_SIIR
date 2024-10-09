@@ -117,13 +117,13 @@
                                 <label for="UniformCatalog">Uniforme</label>
                             </div>
                             <div class="col-8">
-                                        <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
+                                <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
                                     <option value="">Selecciona una prenda:</option>
-                                        @foreach (var item in Model.UniformCatalogList)
-                                        {
-                                            <option value="@item.Value">@item.Text</option>
-                                        }
-                                        @Html.Raw("</option>")
+                                    @foreach (var item in Model.UniformCatalogList)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                    @Html.Raw("</option>")
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
                             </div>
