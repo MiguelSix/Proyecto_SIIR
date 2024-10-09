@@ -17,6 +17,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 
 //Contenedor de Trabajo
 builder.Services.AddScoped<IContenedorTrabajo, ContenedorTrabajo>();

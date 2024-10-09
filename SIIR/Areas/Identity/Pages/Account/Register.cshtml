@@ -70,6 +70,15 @@
                             </div>
                         </div>
 
+                        <!-- Dropdown para seleccionar equipo (solo para estudiantes) -->
+                        <div id="teamSelection" class="form-floating mb-3" style="display: none;">
+                            <select asp-for="Input.TeamId" asp-items="Model.TeamList" class="form-select">
+                                <option value="">Seleccione un equipo</option>
+                            </select>
+                            <label asp-for="Input.TeamId">Equipo</label>
+                            <span asp-validation-for="Input.TeamId" class="text-danger"></span>
+                        </div>
+
                         <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                     </form>
                 </div>
@@ -86,8 +95,13 @@
                 var selectedRole = $('input[name="rdUserRole"]:checked').val();
                 if (selectedRole === '@CNT.AdminRole' || selectedRole === '@CNT.CoachRole') {
                     $('#additionalFields').show();
+                    $('#teamSelection').hide();
+                } else if (selectedRole === '@CNT.StudentRole') {
+                    $('#additionalFields').hide();
+                    $('#teamSelection').show();
                 } else {
                     $('#additionalFields').hide();
+                    $('#teamSelection').hide();
                 }
             });
         });

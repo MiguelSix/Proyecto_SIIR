@@ -17,5 +17,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
 
         // Para el capitan
         IEnumerable<SelectListItem> GetListaStudents();
+
+        IEnumerable<SelectListItem> GetListaTeams();
     }
 }
