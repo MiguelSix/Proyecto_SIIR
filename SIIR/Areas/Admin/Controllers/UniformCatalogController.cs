@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Packaging.Signing;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -7,6 +8,7 @@ using SIIR.Models.ViewModels;
 namespace SIIR.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class UniformCatalogController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;

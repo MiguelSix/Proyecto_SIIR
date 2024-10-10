@@ -6,8 +6,8 @@ using SIIR.Models.ViewModels;
 
 namespace SIIR.Areas.Admin.Controllers
 {
-    //[Authorize(Roles = "Administrador")]
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class TeamsController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -6,6 +7,7 @@ using SIIR.Models;
 namespace SIIR.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class DocumentCatalogController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;

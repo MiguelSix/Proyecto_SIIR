@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SIIR.Areas.Student.Controllers
 {
 	[Area("Student")]
-	public class HomeController : Controller
+    [Authorize(Roles = "Student")]
+    public class HomeController : Controller
 	{
         [HttpGet]
         public IActionResult Index()
