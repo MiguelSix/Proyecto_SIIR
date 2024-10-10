@@ -167,7 +167,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                         user.Admin = admin;
                         break;
                     case CNT.CoachRole:
-                        var coach = new Coach()
+                        var coach = new Models.Coach()
                         {
                             Name = Input.Name,
                             LastName = Input.LastName,

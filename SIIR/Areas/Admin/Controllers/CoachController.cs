@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 
 namespace SIIR.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class CoachController : Controller
     {
         //Se utiliza el contenedor de trabajo de Coach para almacenar los datos y utilizarlos
@@ -30,7 +32,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Coach coach)
+        public IActionResult Create(Models.Coach coach)
         {
             if (ModelState.IsValid)
             {
@@ -44,7 +46,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            Coach coach = new Coach();
+            Models.Coach coach = new Models.Coach();
             coach = _contenedorTrabajo.Coach.GetById(id);
             
             if (coach == null)
@@ -57,7 +59,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Coach coach)
+        public IActionResult Edit(Models.Coach coach)
         {
             if (ModelState.IsValid)
             {

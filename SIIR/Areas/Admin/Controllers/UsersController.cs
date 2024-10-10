@@ -4,8 +4,8 @@ using SIIR.DataAccess.Data.Repository.IRepository;
 
 namespace SIIR.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
