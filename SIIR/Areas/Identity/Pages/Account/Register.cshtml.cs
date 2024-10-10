@@ -26,6 +26,7 @@ using SIIR.Utilities;
 
 namespace SIIR.Areas.Identity.Pages.Account
 {
+    [Authorize(Roles = "Admin, Coach")]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
