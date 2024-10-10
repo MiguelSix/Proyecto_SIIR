@@ -182,9 +182,22 @@ namespace SIIR.Areas.Identity.Pages.Account
                             TeamList = _teamRepository.GetListaTeams();
                             return Page();
                         }
+
+                        var team = _teamRepository.GetFirstOrDefault(t => t.Id == Input.TeamId.Value);
+                        if (team == null || team.CoachId == null)
+                        {
+                            ModelState.AddModelError(string.Empty, "El equipo seleccionado no tiene un entrenador asignado.");
+                            TeamList = _teamRepository.GetListaTeams();
+                            return Page();
+                        }
+
                         var student = new Models.Student
                         {
-                            TeamId = Input.TeamId.Value
+                            Name = Input.Name,
+                            LastName = Input.LastName,
+                            SecondLastName = Input.SecondLastName,
+                            TeamId = Input.TeamId.Value,
+                            CoachId = team.CoachId
                         };
                         user.Student = student;
                         break;

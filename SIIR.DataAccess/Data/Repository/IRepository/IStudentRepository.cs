@@ -10,7 +10,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
 {
     public interface IStudentRepository: IRepository<Student>
     {
-        void Update(Team team);
+        void Update(Student student);
         IEnumerable<SelectListItem> GetStudentsList();
     }
 }
