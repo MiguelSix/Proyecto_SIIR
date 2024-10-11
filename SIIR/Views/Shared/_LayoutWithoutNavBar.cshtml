@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isStudentPage = Context.Request.Path.StartsWithSegments("/Student");
+}
+
+<!DOCTYPE html>
 <html lang="en" class="h-100">
 <head>
     <meta charset="utf-8" />
@@ -28,7 +32,7 @@
             width: 100%;
             display: flex;
             align-items: center;
-            padding-left: 15px;
+            padding: 0 15px;
         }
 
         .blue-footer {
@@ -52,13 +56,23 @@
         footer {
             flex-shrink: 0;
         }
+
+        .navbar-nav .dropdown-toggle
+        {
+            color: white;
+        }
     </style>
 </head>
 <body class="d-flex flex-column h-100">
     <header>
         <div class="blue-header mb-5">
             <img src="/images/LOGO_TECNM_BLANCO.png" alt="SIIR Logo" class="logo" />
+            @if (isStudentPage)
+            {
+                <partial name="_LoginPartial" />
+            }
         </div>
+        
     </header>
     <main role="main" class="flex-shrink-0">
         <div class="container">
