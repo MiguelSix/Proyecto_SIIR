@@ -103,6 +103,7 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult Delete(int id)
         {
             var objFromDb = _contenedorTrabajo.Student.GetById(id);
+            var user = _contenedorTrabajo.User.GetAll(u => u.StudentId == id).FirstOrDefault();
             //string webRootPath = _hostingEnvironment.WebRootPath;
             //var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
 

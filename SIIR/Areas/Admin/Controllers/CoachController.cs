@@ -84,12 +84,17 @@ namespace SIIR.Areas.Admin.Controllers
         {
             var objFromDb = _contenedorTrabajo.Coach.GetById(id);
 
+            //Obtener el id de usuario basado en el id de coach en la tabla Users
+
+            var user = _contenedorTrabajo.User.GetAll(u => u.CoachId == id).FirstOrDefault();
+
             if (objFromDb == null)
             {
                 return Json(new { succes = false, message = "Error al borrar Coach"});
             }
 
             _contenedorTrabajo.Coach.Remove(objFromDb);
+            _contenedorTrabajo.User.Remove(user);
             _contenedorTrabajo.Save();
             return Json(new { succes = true, message = "Exito al borrar Coach" });
         }
