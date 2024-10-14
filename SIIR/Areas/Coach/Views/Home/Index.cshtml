@@ -4,23 +4,28 @@
 }
 
 <style>
-    .welcome-text {
-        margin-top: -50px;
+    .welcome-text{
+        min-width: 150px;
     }
 
     .search-bar {
         display: flex;
         align-items: center; 
         width: 100%;
-        max-width: 400px;  
+        min-width: 140px;
+        max-width: 300px;
         margin-top: 20px;  
+    }
+
+    .icon-search{
+        width: 5%;
     }
 
     .search-input {
         border: none;
         border-bottom: 2px solid #000;
         outline: none;
-        font-size: 18px; /*Modificar*/
+        width: 95%;
         background-color: transparent;
     }
 
@@ -32,25 +37,31 @@
         background-color: #1a3c6e;
     }
 
+    .card {
+        min-width: 150px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
     .card-img-top {
         max-height: 125px;
-        object-fit: cover; /* Esto asegura que la imagen se recorte manteniendo su proporción */
-        object-position: top; /* Centra la imagen dentro del contenedor */
-        width: 100%; /* Asegura que la imagen ocupe todo el ancho disponible */
+        object-fit: cover; 
+        object-position: top; 
+        width: 100%; 
     }
 
 
 </style>
 
-<div class="container mt-5 text-center">
+<div class="container text-center">
     <h1 class="display-2 welcome-text">Bienvenido Alan</h1>
 
     <div class="search-bar">
-        <i class="fa-solid fa-magnifying-glass me-2"></i>
-        <input type="text" class="search-input" placeholder="Buscar...">
+        <i class="fa-solid fa-magnifying-glass me-2 icon-search"></i>
+        <input type="text" class="search-input fs-5" placeholder="Buscar...">
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 p-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 py-4">
         @for (int i = 0; i < 3; i++)
         {
             <div class="col">
@@ -59,7 +70,7 @@
                     alt="Hollywood Sign on The Hill" />
                     <p class="text-center fs-6 py-2 mb-0 text-white title">BASQUETBOL FEMENIL</p>
                     <div class="card-body">
-                        <div class="d-flex gap-2">
+                        <div class="d-flex flex-wrap gap-2 mb-2">
                             <span class="badge rounded-pill bg-success">Deportivo</span>
                             <span class="badge rounded-pill bg-danger">Femenil</span>
                         </div>
@@ -77,7 +88,7 @@
                          alt="Hollywood Sign on The Hill" />
                     <p class="text-center fs-6 py-2 mb-0 text-white title">BASQUETBOL VARONIL</p>
                     <div class="card-body">
-                        <div class="d-flex gap-2">
+                        <div class="d-flex flex-wrap gap-2 mb-2">
                             <span class="badge rounded-pill bg-success">Deportivo</span>
                             <span class="badge rounded-pill bg-primary">Varonil</span>
                         </div>
@@ -95,8 +106,8 @@
                          alt="Hollywood Sign on The Hill" />
                     <p class="text-center fs-6 py-2 mb-0 text-white title">FUTBOL VARONIL</p>
                     <div class="card-body">
-                        <div class="d-flex gap-2">
-                            <span class="badge rounded-pill bg-warning">Cultural</span>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <span class="badge rounded-pill" style="background-color: #9575cd">Cultural</span>
                             <span class="badge rounded-pill bg-primary">Varonil</span>
                         </div>
                         <div class="d-flex justify-content-end fs-5">
