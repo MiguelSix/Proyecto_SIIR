@@ -16,13 +16,19 @@ function cargarDatatable() {
             { "data": "name", "width": "12%" },
             { "data": "lastName", "width": "8%" },
             { "data": "secondLastName", "width": "8%" },
-            { "data": "semester", "width": "5%" },
+            {
+                "data": "imageUrl",
+                "render": function (imagen) {
+                    return `<img src="../${imagen}" width="100"/>`
+                },
+                "width": "10%"
+            },
             {
                 "data": "team",
                 "render": function (data) {
                     return data ? `${data.name}  ${data.category}` : 'N/A';
                 },
-                "width": "15%"
+                "width": "18%"
             },
             {
                 "data": "coach",
@@ -38,21 +44,17 @@ function cargarDatatable() {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
+                                <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
                              
-                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger btn-sm text-white" style="width:80px;">
+                                <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white" style="width:80px;">
                                     <i class="far fa-trash-alt"></i> Borrar
-                                </a>
-
-                                <a href="/Admin/Teams/Roster/${data}" class="btn btn-info btn-sm text-white" style="width:140px;">
-                                    <i class="fas fa-users"></i> Ver plantilla
                                 </a>
 
                             </div>`;
                 },
-                "width": "29%"
+                "width": "25%"
             }
         ],
         "language": {

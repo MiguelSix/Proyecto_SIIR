@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -33,27 +34,28 @@ namespace SIIR.DataAccess.Data.Repository
         {
             var objFromDb = _db.Students.FirstOrDefault(s => s.Id == student.Id);
 
-            // Falta implementar
-            objFromDb.Name = student.Name;
-            objFromDb.LastName = student.LastName;
-            objFromDb.SecondLastName = student.SecondLastName;
-            objFromDb.ControlNumber = student.ControlNumber;
-            objFromDb.Curp = student.Curp;
-            objFromDb.BirthDate = student.BirthDate;
-            objFromDb.Career = student.Career;
-            objFromDb.Semester = student.Semester;
-            objFromDb.Phone = student.Phone;
-            objFromDb.Age = student.Age;
-            objFromDb.BloodType = student.BloodType;
-            objFromDb.Email = student.Email;
-            objFromDb.Weight = student.Weight;
-            objFromDb.Height = student.Height;
-            objFromDb.Allergies = student.Allergies;
-            objFromDb.Nss = student.Nss;
-            objFromDb.CoachId = student.CoachId;
-            objFromDb.TeamId = student.TeamId;
+            if (objFromDb != null)
+            {
+                objFromDb.Name = student.Name;
+                objFromDb.LastName = student.LastName;
+                objFromDb.SecondLastName = student.SecondLastName;
+                objFromDb.ControlNumber = student.ControlNumber;
+                objFromDb.Curp = student.Curp;
+                objFromDb.BirthDate = student.BirthDate;
+                objFromDb.Career = student.Career;
+                objFromDb.Semester = student.Semester;
+                objFromDb.Phone = student.Phone;
+                objFromDb.Age = student.Age;
+                objFromDb.BloodType = student.BloodType;
+                objFromDb.Email = student.Email;
+                objFromDb.Weight = student.Weight;
+                objFromDb.Height = student.Height;
+                objFromDb.Allergies = student.Allergies;
+                objFromDb.Nss = student.Nss;
+                objFromDb.ImageUrl = student.ImageUrl;
 
-            _db.SaveChanges();
+                _db.SaveChanges();
+            }
         }
     }
 }
