@@ -76,6 +76,10 @@ namespace SIIR.Models
         [Display(Name = "NSS")]
         public string? Nss { get; set; }
 
+        [Display(Name = "Foto")]
+        [DataType(DataType.ImageUrl)]
+        public string? ImageUrl { get; set; }
+
         // Llaves foráneas
         public int? CoachId { get; set; }
 

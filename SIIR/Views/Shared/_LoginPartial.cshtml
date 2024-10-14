@@ -4,31 +4,32 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext DbContext
-
 <style>
+    .navbar-nav .nav-link.lead,
     .navbar-nav .dropdown-toggle.lead,
     .navbar-nav .dropdown-item.lead {
         font-size: 1.1rem;
         font-weight: 300;
         line-height: 1.5;
-    }
-    .navbar-nav .dropdown-item.lead {
         padding: 0.5rem 1rem;
     }
-    .navbar-nav .dropdown-item.lead:hover,
-    .navbar-nav .dropdown-item.lead:focus {
-        background-color: #f8f9fa;
+
+        .navbar-nav .dropdown-item.lead:hover,
+        .navbar-nav .dropdown-item.lead:focus {
+            background-color: #f8f9fa;
+        }
+
+    .navbar-nav {
+        align-items: center;
     }
 </style>
-
 <ul class="navbar-nav ms-auto">
-@if (SignInManager.IsSignedIn(User))
-{
-    var user = await UserManager.GetUserAsync(User);
-    string userName = "Usuario";
-
-    if (user != null)
+    @if (SignInManager.IsSignedIn(User))
     {
+        var user = await UserManager.GetUserAsync(User);
+        string userName = "Usuario";
+        if (user != null)
+        {
             if (user.CoachId.HasValue)
             {
                 var coach = await DbContext.Coaches.FindAsync(user.CoachId);
@@ -44,13 +45,11 @@
                 var admin = await DbContext.Admins.FindAsync(user.AdminId);
                 userName = admin?.Name ?? "Administrador";
             }
-            
-    }
-
+        }
+        <li class="nav-item">
+            <a class="nav-link lead" asp-area="Identity" asp-controller="Account" asp-action="Register">Registrar</a>
+        </li>
         <li class="nav-item dropdown">
-            <li class="nav-item">
-                <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">Registrar</a>
-            </li>
             <a class="nav-link dropdown-toggle lead" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Hola, @userName!
             </a>
@@ -66,5 +65,5 @@
                 </li>
             </ul>
         </li>
-}
+    }
 </ul>
