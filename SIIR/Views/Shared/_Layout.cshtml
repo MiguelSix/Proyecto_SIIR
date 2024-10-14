@@ -20,6 +20,18 @@
         body {
             font-family: 'Montserrat', sans-serif;
         }
+
+        .navbar {
+            background-color: #1a3c6e !important;
+        }
+
+        .navbar .nav-link {
+            color: white !important;
+        }
+
+        .navbar .navbar-brand {
+            color: white !important;
+        }
     </style>
 
 </head>
@@ -49,9 +61,16 @@
                     <ul class="navbar-nav me-auto">
                         
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index">USUARIOS</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">USUARIOS</a>
+                            <div class="dropdown-menu">
+                                <!--Poner la Vista para ver a Estudiantes, Coaches y Admins-->
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Estudiantes</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Coaches</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Administradores</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Ver Todo</a>
+                            </div>
                         </li>
-                        <li class="nav-item">
                             <a class="nav-link" asp-area="Admin" asp-controller="Representatives" asp-action="Index">GRUPOS REPRESENTATIVOS</a>
                         </li>
                         <li class="nav-item">
