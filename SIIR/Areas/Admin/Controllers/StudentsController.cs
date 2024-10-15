@@ -104,18 +104,21 @@ namespace SIIR.Areas.Admin.Controllers
         {
             var objFromDb = _contenedorTrabajo.Student.GetById(id);
             var user = _contenedorTrabajo.User.GetAll(u => u.StudentId == id).FirstOrDefault();
-            //string webRootPath = _hostingEnvironment.WebRootPath;
-            //var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
+            if (user != null) {
+                _contenedorTrabajo.User.Remove(user);
+            }
+            string webRootPath = _hostingEnvironment.WebRootPath;
+            var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
 
-            //if (System.IO.File.Exists(imagePath))
-            //{
-            //    System.IO.File.Delete(imagePath);
-            //}
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
 
-            //if (objFromDb == null)
-            //{
-            //    return Json(new { success = false, message = "Error while deleting." });
-            //}
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while deleting." });
+            }
 
             _contenedorTrabajo.Student.Remove(objFromDb);
             _contenedorTrabajo.Save();
