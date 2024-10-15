@@ -1,4 +1,6 @@
-﻿@{
+﻿@model SIIR.Models.Coach
+
+@{
     ViewData["Title"] = "Home Page";
     Layout = "_LayoutWithoutNavBar";
 }
@@ -54,17 +56,15 @@
 </style>
 
 <div class="container text-center">
-    <h1 class="display-2 welcome-text">Bienvenido Alan</h1>
+    <h1 class="display-2 welcome-text">Bienvenido @Model.Name</h1>
 
     <div class="search-bar">
         <i class="fa-solid fa-magnifying-glass me-2 icon-search"></i>
         <input type="text" class="search-input fs-5" placeholder="Buscar...">
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 py-4">
-        @for (int i = 0; i < 3; i++)
-        {
-            <div class="col">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 py-4" id="teamsContainer">
+            <!--div class="col">
                 <div class="card h-100">
                     <img src="https://vivabasquet.com/wp-content/uploads/2018/09/FOTOUSAWOMENS.jpg" class="card-img-top h-100"
                     alt="Hollywood Sign on The Hill" />
@@ -82,7 +82,7 @@
                 </div>
             </div>
 
-            <div class="col">
+            <div-- class="col">
                 <div class="card h-100">
                     <img src="https://jgbasket.net/wp-content/uploads/2015/11/Bulls-95-96-600x340.jpg" class="card-img-top h-100"
                          alt="Hollywood Sign on The Hill" />
@@ -98,25 +98,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <img src="https://cdn.clarosports.com/clarosports/2024/05/cruz-azul-112214-1024x576.jpg" class="card-img-top h-100"
-                         alt="Hollywood Sign on The Hill" />
-                    <p class="text-center fs-6 py-2 mb-0 text-white title">FUTBOL VARONIL</p>
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap gap-2 mb-2">
-                            <span class="badge rounded-pill" style="background-color: #9575cd">Cultural</span>
-                            <span class="badge rounded-pill bg-primary">Varonil</span>
-                        </div>
-                        <div class="d-flex justify-content-end fs-5">
-                            <i class="fa-solid fa-eye me-3" style="color: #1a3c6e"></i>
-                            <i class="fa-solid fa-file-arrow-down" style="color: #2e8b57"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
+            </div-->
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/coachTeams.js"></script>
+}
