@@ -103,8 +103,6 @@ namespace SIIR.Areas.Admin.Controllers
             return View(representativeVM);
         }
 
-
-
         private void UpdateRepresentativeUniformCatalog(RepresentativeVM representativeVM)
         {
                 var representative = representativeVM.Representative;
@@ -139,7 +137,6 @@ namespace SIIR.Areas.Admin.Controllers
 
                 _contenedorTrabajo.Save();
         }
-
 
         #region
 

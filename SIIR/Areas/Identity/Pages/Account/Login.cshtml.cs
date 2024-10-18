@@ -129,31 +129,39 @@ namespace SIIR.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (true)
+                // Primero verificamos si el usuario existe
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+                if (user == null)
                 {
-                    _logger.LogInformation("User logged in.");
-                    // Get the logged-in user
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
-
-                    // Get the appropriate dashboard URL based on the user's role
-                    var dashboardUrl = GetDashboardUrl(user);
-
-                    return LocalRedirect(dashboardUrl);
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
                 }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
+
+                // Verificamos si el usuario está bloqueado
+                if (await _userManager.IsLockedOutAsync(user))
                 {
                     _logger.LogWarning("User account locked out.");
+                    ModelState.AddModelError(string.Empty, "This account has been locked out, please try again later.");
+                    return Page();
+                }
+
+                // Intentamos el inicio de sesión usando SignInManager
+                var result = await _signInManager.PasswordSignInAsync(Input.Email,
+                                                                    Input.Password,
+                                                                    Input.RememberMe,
+                                                                    lockoutOnFailure: true); // La cuenta se bloquea despues de varios try
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User logged in successfully.");
+                    return LocalRedirect(GetDashboardUrl(user));
+                }
+
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("User account locked out. Please contact the administrator.");
                     return RedirectToPage("./Lockout");
                 }
                 else

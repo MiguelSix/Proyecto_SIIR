@@ -104,9 +104,7 @@ namespace SIIR.Areas.Admin.Controllers
         {
             var objFromDb = _contenedorTrabajo.Student.GetById(id);
             var user = _contenedorTrabajo.User.GetAll(u => u.StudentId == id).FirstOrDefault();
-            if (user != null) {
-                _contenedorTrabajo.User.Remove(user);
-            }
+
             string webRootPath = _hostingEnvironment.WebRootPath;
             var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
 
@@ -120,6 +118,7 @@ namespace SIIR.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Error while deleting." });
             }
 
+            _contenedorTrabajo.User.Remove(user);
             _contenedorTrabajo.Student.Remove(objFromDb);
             _contenedorTrabajo.Save();
             return Json(new { success = true, message = "Delete successful." });
