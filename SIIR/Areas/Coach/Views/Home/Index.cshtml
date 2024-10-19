@@ -123,13 +123,21 @@
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 py-4" id="teamsContainer">
     </div>
+
+    <div class="not-found" style="display: none;">
+        <i class="fa-solid fa-ban fs-2" style="color: red"></i>
+        <p class="fs-2">No se encontraron elementos</p>
+    </div>
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            cargarEquipos();
             var content = $('#popoverContent').html();
+            var isPopoverVisible = false; // Variable global para verificar si el popover está visible
+
+            var genderCategories = [];
+            var groupCategories = [];
 
             // Inicializar el popover con contenido HTML
             $('[data-bs-toggle="popover"]').popover({
@@ -137,62 +145,50 @@
                 content: content
             });
 
-            $(document).on('click', '.filter-badge', function () {
-                var $this = $(this);
+            // Eventos de Bootstrap para saber cuándo el popover se muestra y oculta
+            $('[data-bs-toggle="popover"]').on('shown.bs.popover', function () {
+                isPopoverVisible = true;
+            });
 
-                // Definir colores según el filtro
-                var filterType = $this.text().toLowerCase();
-
-                // Cambiar color según el filtro seleccionado
-                switch (filterType) {
-                    case 'masculino':
-                        $this.toggleClass('bg-primary bg-secondary');
-                        break;
-                    case 'femenino':
-                        $this.toggleClass('bg-danger bg-secondary');
-                        break;
-                    case 'deportivo':
-                        $this.toggleClass('bg-success bg-secondary');
-                        break;
-                    case 'cultural':
-                        $this.toggleClass('bg-warning bg-secondary');
-                        break;
-                    case 'mixto':
-                        $this.toggleClass('bg-info bg-secondary');
-                        break;
-                    default:
-                        $this.toggleClass('bg-dark bg-secondary');
-                        break;
-                }
-
-                // Obtener los filtros seleccionados para género (masculino, femenino)
-                var genderCategories = $(".filter-badge.bg-primary, .filter-badge.bg-danger")
-                    .map(function () {
-                        return $(this).text().toLowerCase();
-                    }).get();
-
-                // Obtener los filtros seleccionados para grupos (deportivo, cultural)
-                var groupCategories = $(".filter-badge.bg-success, .filter-badge.bg-warning")
-                    .map(function () {
-                        return $(this).text().toLowerCase();
-                    }).get();
-
-                // Llamar a la función cargarEquipos con los filtros seleccionados
-                cargarEquipos(genderCategories, groupCategories);
+            $('[data-bs-toggle="popover"]').on('hidden.bs.popover', function () {
+                isPopoverVisible = false;
             });
 
             // Función para cargar los equipos mediante AJAX
-            function cargarEquipos(genderCategories, groupCategories) {
+            function cargarEquipos() {
+                var searchTerm = $(".search-input").val(); // Obtener el valor de búsqueda
+
+                if (isPopoverVisible) {
+                    // Obtener los filtros seleccionados para género (masculino, femenino)
+                    genderCategories = $(".filter-badge.bg-primary, .filter-badge.bg-danger")
+                        .map(function () {
+                            return $(this).text().toLowerCase();
+                        }).get();
+
+                    // Obtener los filtros seleccionados para grupos (deportivo, cultural)
+                    groupCategories = $(".filter-badge.bg-success, .filter-badge.bg-warning")
+                        .map(function () {
+                            return $(this).text().toLowerCase();
+                        }).get();
+                }
+
                 $.ajax({
                     url: '/Coach/Home/GetAllTeams',
                     type: 'GET',
                     data: {
                         genderCategories: JSON.stringify(genderCategories),
-                        groupCategories: JSON.stringify(groupCategories)
+                        groupCategories: JSON.stringify(groupCategories),
+                        searchTerm: searchTerm
                     },
                     success: function (data) {
                         var teamsContainer = $("#teamsContainer");
                         teamsContainer.empty(); // Limpiar el contenedor antes de agregar las tarjetas
+
+                        if (data.data.length == 0) {
+                            $(".not-found").show();
+                        } else {
+                            $(".not-found").hide();
+                        }
 
                         // Iterar sobre los equipos obtenidos y crear las tarjetas
                         data.data.forEach(function (team) {
@@ -224,7 +220,7 @@
                             var categoryBadges = `
                                     <span class="badge rounded-pill ${teamCategoryClass}">${team.category}</span>
                                     <span class="badge rounded-pill ${representativeCategoryClass}">${team.representative.category}</span>
-                                    `;
+                                `;
 
                             var cardHtml = `
                                     <div class="col">
@@ -251,6 +247,49 @@
                     }
                 });
             }
+
+            // Capturar el evento de búsqueda y filtrar los equipos
+            $(".search-input").on("input", function () {
+                cargarEquipos(); // Llamar a la función con filtros y búsqueda
+            });
+
+            // Manejo de los filtros
+            $(document).on('click', '.filter-badge', function () {
+                var $this = $(this);
+
+                // Definir colores según el filtro
+                var filterType = $this.text().toLowerCase();
+
+                // Cambiar color según el filtro seleccionado
+                switch (filterType) {
+                    case 'masculino':
+                        $this.toggleClass('bg-primary bg-secondary');
+                        break;
+                    case 'femenino':
+                        $this.toggleClass('bg-danger bg-secondary');
+                        break;
+                    case 'deportivo':
+                        $this.toggleClass('bg-success bg-secondary');
+                        break;
+                    case 'cultural':
+                        $this.toggleClass('bg-warning bg-secondary');
+                        break;
+                    case 'mixto':
+                        $this.toggleClass('bg-info bg-secondary');
+                        break;
+                    default:
+                        $this.toggleClass('bg-dark bg-secondary');
+                        break;
+                }
+
+                // Llamar a cargarEquipos() también cuando se modifiquen los filtros
+                cargarEquipos();
+            });
+
+            // Llamar a la función al cargar la página para mostrar los equipos iniciales
+            cargarEquipos();
         });
     </script>
+
 }
+
