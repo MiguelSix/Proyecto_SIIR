@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Newtonsoft.Json;
 using SIIR.Data;
+using SIIR.DataAccess.Data.Repository;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using System.Security.Claims;
@@ -34,12 +36,26 @@ namespace SIIR.Areas.Coach.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllTeams()
+        public IActionResult GetAllTeams(string genderCategories = null, string groupCategories = null)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             ApplicationUser user = _userManager.FindByIdAsync(userId).Result;
             int coachId = (int)user.CoachId;
-            return Json(new { data = _contenedorTrabajo.Team.GetAll(t => t.CoachId == coachId, includeProperties: "Representative") });
+
+            List<string> genderList = !string.IsNullOrEmpty(genderCategories) ?
+                JsonConvert.DeserializeObject<List<string>>(genderCategories) : new List<string>();
+
+            List<string> groupList = !string.IsNullOrEmpty(groupCategories) ?
+                JsonConvert.DeserializeObject<List<string>>(groupCategories) : new List<string>();
+
+            // Filtrar los equipos con las listas de filtros
+            var equipos = _contenedorTrabajo.Team.GetAll(t => t.CoachId == coachId &&
+                (genderList.Count == 0 || genderList.Contains(t.Category)) &&
+                (groupList.Count == 0 || groupList.Contains(t.Representative.Category)),
+                includeProperties: "Representative");
+
+            return Json(new { data = equipos });
         }
+
     }
 }

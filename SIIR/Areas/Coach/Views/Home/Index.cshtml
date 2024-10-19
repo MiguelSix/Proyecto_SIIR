@@ -126,18 +126,18 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/coachTeams.js"></script>
     <script>
         $(document).ready(function () {
+            cargarEquipos();
             var content = $('#popoverContent').html();
 
             // Inicializar el popover con contenido HTML
             $('[data-bs-toggle="popover"]').popover({
                 html: true,
-                content: content 
+                content: content
             });
 
-            $(document).on('click', '.filter-badge', function() {
+            $(document).on('click', '.filter-badge', function () {
                 var $this = $(this);
 
                 // Definir colores según el filtro
@@ -162,10 +162,95 @@
                         break;
                     default:
                         $this.toggleClass('bg-dark bg-secondary');
-                        console.log(filterType);
                         break;
                 }
+
+                // Obtener los filtros seleccionados para género (masculino, femenino)
+                var genderCategories = $(".filter-badge.bg-primary, .filter-badge.bg-danger")
+                    .map(function () {
+                        return $(this).text().toLowerCase();
+                    }).get();
+
+                // Obtener los filtros seleccionados para grupos (deportivo, cultural)
+                var groupCategories = $(".filter-badge.bg-success, .filter-badge.bg-warning")
+                    .map(function () {
+                        return $(this).text().toLowerCase();
+                    }).get();
+
+                // Llamar a la función cargarEquipos con los filtros seleccionados
+                cargarEquipos(genderCategories, groupCategories);
             });
+
+            // Función para cargar los equipos mediante AJAX
+            function cargarEquipos(genderCategories, groupCategories) {
+                $.ajax({
+                    url: '/Coach/Home/GetAllTeams',
+                    type: 'GET',
+                    data: {
+                        genderCategories: JSON.stringify(genderCategories),
+                        groupCategories: JSON.stringify(groupCategories)
+                    },
+                    success: function (data) {
+                        var teamsContainer = $("#teamsContainer");
+                        teamsContainer.empty(); // Limpiar el contenedor antes de agregar las tarjetas
+
+                        // Iterar sobre los equipos obtenidos y crear las tarjetas
+                        data.data.forEach(function (team) {
+                            var teamCategory = team.category ? team.category.toLowerCase() : 'sin categoría';
+                            var representativeCategory = team.representative && team.representative.category
+                                ? team.representative.category.toLowerCase()
+                                : 'sin categoría';
+
+                            var teamCategoryClass = 'bg-secondary';
+                            switch (teamCategory) {
+                                case 'femenino':
+                                    teamCategoryClass = 'bg-danger';
+                                    break;
+                                case 'masculino':
+                                    teamCategoryClass = 'bg-primary';
+                                    break;
+                            }
+
+                            var representativeCategoryClass = 'bg-secondary';
+                            switch (representativeCategory) {
+                                case 'deportivo':
+                                    representativeCategoryClass = 'bg-success';
+                                    break;
+                                case 'cultural':
+                                    representativeCategoryClass = 'bg-warning';
+                                    break;
+                            }
+
+                            var categoryBadges = `
+                                    <span class="badge rounded-pill ${teamCategoryClass}">${team.category}</span>
+                                    <span class="badge rounded-pill ${representativeCategoryClass}">${team.representative.category}</span>
+                                    `;
+
+                            var cardHtml = `
+                                    <div class="col">
+                                        <div class="card h-100">
+                                            <img src="${team.imageUrl}" class="card-img-top h-100" alt="Imagen del equipo" />
+                                            <p class="text-center fs-6 py-2 mb-0 text-white title">${team.name.toUpperCase()}</p>
+                                            <div class="card-body">
+                                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                                    ${categoryBadges}
+                                                </div>
+                                                <div class="d-flex justify-content-end fs-5">
+                                                    <i class="fa-solid fa-eye me-3" style="color: #1a3c6e"></i>
+                                                    <i class="fa-solid fa-file-arrow-down" style="color: #2e8b57"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>`;
+
+                            teamsContainer.append(cardHtml);
+                        });
+                    },
+                    error: function (error) {
+                        console.log("Error al cargar los equipos:", error);
+                    }
+                });
+            }
         });
     </script>
 }
