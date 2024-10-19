@@ -15,7 +15,7 @@
     }
 
     .card {
-        min-width: 150px;
+        min-width: 175px;
         max-width: 400px;
         margin: 0 auto;
     }
@@ -28,6 +28,7 @@
     }
 
     .search-container {
+        min-width: 175px;
         background-color: rgba(0, 0, 0, 0.05);
         border-radius: 5px;
         color: #000;
@@ -75,7 +76,11 @@
         border: none;
         box-shadow: 0 0 10px rgba(0,0,0,0.5);
         font-family: 'Montserrat', sans-serif;
+    }
 
+    .custom-popover-sm {
+        max-width: 300px;
+        width: 100%;
     }
 
     .popover-header {
@@ -98,9 +103,15 @@
             <i class="fa-solid fa-magnifying-glass icon-search mx-2"></i>
             <input class="form-control search-input" placeholder="Busca un equipo...">
             <div><button class="btn-search me-2"><i class="fa-solid fa-list"></i></button></div>
-            <div>
-                <button class="btn-search" data-bs-title="Filtros" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="custom-popover" data-bs-offset="-110,15">
+            <div class="d-none d-sm-block">
+                <button class="btn-search" data-bs-title="Filtros" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="custom-popover d-none d-sm-block" data-bs-offset="-110,15">
                     <i class="fa-solid fa-filter"></i> Filtrar
+                </button>
+            </div>
+
+            <div class="d-sm-none d-block" style="display:none">
+                <button class="btn-search" data-bs-title="Filtros" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="custom-popover custom-popover-sm d-sm-none d-block" data-bs-offset="-120,15">
+                    <i class="fa-solid fa-filter"></i>
                 </button>
             </div>
         </div>
