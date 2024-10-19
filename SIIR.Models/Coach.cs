@@ -19,5 +19,9 @@ namespace SIIR.Models
         [Display(Name = "Apellido Materno")]
         public string? SecondLastName { get; set; }
 
+        [Display(Name = "Imagen Coach")]
+        [DataType(DataType.ImageUrl)]
+        public string? ImageUrl { get; set; }
+
     }
 }
