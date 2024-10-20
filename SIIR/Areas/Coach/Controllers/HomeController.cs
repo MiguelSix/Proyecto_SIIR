@@ -36,7 +36,7 @@ namespace SIIR.Areas.Coach.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllTeams(string genderCategories = null, string groupCategories = null)
+        public IActionResult GetAllTeams(string genderCategories = null, string groupCategories = null, string searchTerm = null)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             ApplicationUser user = _userManager.FindByIdAsync(userId).Result;
@@ -48,14 +48,18 @@ namespace SIIR.Areas.Coach.Controllers
             List<string> groupList = !string.IsNullOrEmpty(groupCategories) ?
                 JsonConvert.DeserializeObject<List<string>>(groupCategories) : new List<string>();
 
-            // Filtrar los equipos con las listas de filtros
-            var equipos = _contenedorTrabajo.Team.GetAll(t => t.CoachId == coachId &&
+            // Filtrar los equipos con las listas de filtros y el término de búsqueda
+            var equipos = _contenedorTrabajo.Team.GetAll(t =>
+                t.CoachId == coachId &&
                 (genderList.Count == 0 || genderList.Contains(t.Category)) &&
-                (groupList.Count == 0 || groupList.Contains(t.Representative.Category)),
+                (groupList.Count == 0 || groupList.Contains(t.Representative.Category)) &&
+                (string.IsNullOrEmpty(searchTerm) || t.Name.ToLower().Contains(searchTerm.ToLower())), // Filtrar por nombre (LIKE)
                 includeProperties: "Representative");
 
             return Json(new { data = equipos });
         }
+
+
 
     }
 }
