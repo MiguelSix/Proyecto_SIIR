@@ -3,6 +3,7 @@
 #nullable disable
 
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SIIR.Utilities;
 
 namespace SIIR.Areas.Identity.Pages.Account
 {
@@ -18,6 +19,17 @@ namespace SIIR.Areas.Identity.Pages.Account
         /// </summary>
         public void OnGet()
         {
+        }
+
+        public string GetDashboardUrl()
+        {
+            if (User.IsInRole(CNT.AdminRole))
+                return "/Admin/Home";
+            if (User.IsInRole(CNT.CoachRole))
+                return "/Coach/Home";
+            if (User.IsInRole(CNT.StudentRole))
+                return "/Student/Home";
+            return "/";
         }
     }
 }
