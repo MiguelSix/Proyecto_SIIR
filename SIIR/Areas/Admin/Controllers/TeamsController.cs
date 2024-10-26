@@ -158,17 +158,28 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult Delete(int id)
         {
             var objFromDb = _contenedorTrabajo.Team.GetById(id);
+
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error al borrar el equipo" });
+            }
+
+            // Verificar si el equipo tiene estudiantes asignados
+            var teamWithStudents = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id);
+
+            //Si el equipo tiene alumnos asignados, no se puede borrar  
+            if (teamWithStudents.Any())
+            {
+                return Json(new { success = false, message = "No se puede borrar el equipo porque tiene alumnos asignados" });
+            }
+
+            // Si llegamos aquí, podemos borrar la imagen y el equipo
             string webRootPath = _hostingEnvironment.WebRootPath;
             var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
 
             if (System.IO.File.Exists(imagePath))
             {
                 System.IO.File.Delete(imagePath);
-            }
-
-            if (objFromDb == null)
-            {
-                return Json(new { success = false, message = "Error al borrar el equipo" });
             }
 
             _contenedorTrabajo.Team.Remove(objFromDb);
