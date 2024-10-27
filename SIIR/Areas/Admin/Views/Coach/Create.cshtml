@@ -1,11 +1,13 @@
 ﻿@model SIIR.Models.Coach
 
 @{
-    ViewData["Title"] = "Editar Coach";
+    ViewData["Title"] = "Crear Coach";
 }
 
-<h3 class="text-center"> Editar a un Coach</h3>
-<form method="POST" asp-action="Edit">
+<br />
+<br />
+<h3 class="text-center"> Crear un Nuevo Coach</h3>
+<form method="POST" asp-action="Create">
     <div class="rows px-2 offset-1 border">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -15,7 +17,7 @@
                     <label asp-for="Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre" />
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre"/>
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
@@ -40,19 +42,19 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="ImageUrl" class="form-label fw-bold">Imagen del equipo</label>
-                <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            <div class="form-group row mt-2">
+                <div class="col-4">
+                    <label asp-for="ImageUrl">Imagen del Coach</label>
+                </div>
+                <div class="col-8">
+                    <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="row">
-                <div class="col">
-                    <button type="submit" class="btn btn-primary form-control">Editar Coach</button>
-                </div>
-                &nbsp;
-                <div class="col">
-                    <a asp-action="Index" class="btn btn-success form-control">Volver atrás</a>
+            <div class="form-check-group-row">
+                <div class="col-8">
+                    <partial name="_VistaCrearVolver"/>
                 </div>
             </div>
         </div>

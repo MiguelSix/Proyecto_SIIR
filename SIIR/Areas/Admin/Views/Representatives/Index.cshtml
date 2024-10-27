@@ -1,16 +1,16 @@
 ﻿@{
-    ViewData["Title"] = "Lista de Representativos";
+    ViewData["Title"] = "Grupos Representativos";
 }
 
 <div class="container mt-4">
     <div class="row">
         <div class="col-8">
-            <h1 class="display-4">Lista de Grupos Representativos</h1>
+            <h1 class="display-4">Grupos Representativos</h1>
         </div>
-    </div>
-    <div class="col-4 d-flex justify-content-end align-items-center">
-        <!--REVISAR DISPLAY-->
-        <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Crear nuevo grupo representativo</a>
+        <div class="col-4 d-flex justify-content-end align-items-center">
+            <!--REVISAR DISPLAY-->
+            <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Crear nuevo grupo representativo</a>
+        </div>
     </div>
     <br/>
     <br/>
@@ -23,9 +23,7 @@
                 <th>Acciones</th>
             </tr>
         </thead>
-
     </table>
-
 </div>
 
 @section Scripts{

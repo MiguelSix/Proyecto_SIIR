@@ -26,60 +26,44 @@
         body {
             font-family: 'Montserrat', sans-serif;
         }
-        .blue-header {
-            background-color: #1a3c6e;
+
+        .navbar {
+            background-color: #1a3c6e !important;
+            flex-wrap: wrap;
             height: 75px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
         }
 
-        .blue-footer {
-            background-color: #1a3c6e;
-            height: 50px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding-left: 15px;
-            color: white;
-        }
+            .navbar .nav-link {
+                color: white !important;
+            }
+
+            .navbar .navbar-brand {
+                color: white !important;
+            }
+
         .logo {
             height: 60px;
             width: auto;
-        }
-
-        main {
-            flex: 1 0 auto;
-        }
-
-        footer {
-            flex-shrink: 0;
-        }
-
-        .navbar-nav .dropdown-toggle
-        {
-            color: white;
         }
     </style>
 </head>
 <body class="d-flex flex-column h-100">
     <header>
-        <div class="blue-header mb-5">
-            <img src="/images/LOGO_TECNM_BLANCO.png" alt="SIIR Logo" class="logo" />
-            @if (isStudentPage)
-            {
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid mx-3">
+                <img src="/images/LOGO_TECNM_BLANCO.png" alt="SIIR Logo" class="logo" />
                 <partial name="_LoginPartial" />
-            }
-        </div>
-        
+            </div>
+        </nav>
     </header>
+
+
     <main role="main" class="flex-shrink-0">
         <div class="container">
             @RenderBody()
         </div>
     </main>
-    <footer class="footer mt-auto py-3 blue-footer">
+    <footer class="footer mt-auto py-3 text-muted" style="background-color: #1a3c6e; color: white !important;">
         <div class="container">
             <span class="text-white">&copy; 2024 - SIIR</span>
         </div>
@@ -92,6 +76,13 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.2.1/jquery.serializejson.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+    @if (TempData["Message"] != null)
+    {
+        <script>
+            toastr['@TempData["Type"]']('@TempData["Message"]');
+        </script>
+    }
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -17,6 +17,13 @@ function cargarDataTable() {
             { "data": "lastName", "width": "25%" },
             { "data": "secondLastName", "width": "25%" },
             {
+                "data": "imageUrl",
+                "render": function (imagen) {
+                    return `<img src="../${imagen}" width="100"/>`
+                },
+                "width": "10%"
+            },
+            {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">

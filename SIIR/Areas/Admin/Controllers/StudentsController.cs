@@ -103,19 +103,22 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult Delete(int id)
         {
             var objFromDb = _contenedorTrabajo.Student.GetById(id);
-            //string webRootPath = _hostingEnvironment.WebRootPath;
-            //var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
+            var user = _contenedorTrabajo.User.GetAll(u => u.StudentId == id).FirstOrDefault();
 
-            //if (System.IO.File.Exists(imagePath))
-            //{
-            //    System.IO.File.Delete(imagePath);
-            //}
+            string webRootPath = _hostingEnvironment.WebRootPath;
+            var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
 
-            //if (objFromDb == null)
-            //{
-            //    return Json(new { success = false, message = "Error while deleting." });
-            //}
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
 
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while deleting." });
+            }
+
+            _contenedorTrabajo.User.Remove(user);
             _contenedorTrabajo.Student.Remove(objFromDb);
             _contenedorTrabajo.Save();
             return Json(new { success = true, message = "Delete successful." });

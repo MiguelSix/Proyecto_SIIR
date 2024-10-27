@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIIR.Data;
 
@@ -11,9 +12,11 @@ using SIIR.Data;
 namespace SIIR.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017142925_Migracion para agregar imagenes a Coach")]
+    partial class MigracionparaagregarimagenesaCoach
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,37 +300,6 @@ namespace SIIR.DataAccess.Migrations
                     b.ToTable("Coaches");
                 });
 
-            modelBuilder.Entity("SIIR.Models.Document", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DocumentCatalogId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UploadDate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentCatalogId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("Document");
-                });
-
             modelBuilder.Entity("SIIR.Models.DocumentCatalog", b =>
                 {
                     b.Property<int>("Id")
@@ -417,9 +389,6 @@ namespace SIIR.DataAccess.Migrations
 
                     b.Property<float?>("Height")
                         .HasColumnType("real");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .HasMaxLength(50)
@@ -609,25 +578,6 @@ namespace SIIR.DataAccess.Migrations
                         .HasForeignKey("UniformCatalogsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("SIIR.Models.Document", b =>
-                {
-                    b.HasOne("SIIR.Models.DocumentCatalog", "DocumentCatalog")
-                        .WithMany()
-                        .HasForeignKey("DocumentCatalogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SIIR.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DocumentCatalog");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("SIIR.Models.Student", b =>

@@ -67,63 +67,96 @@
 @section Scripts {
 
 	<partial name="_ValidationScriptsPartial" />
-	<script>
-		$(document).ready(function () {
-			var uniformIndex = $('#uniformsContainer .uniform-item').length || 0;
+    <script>
+        $(document).ready(function () {
+            var uniformIndex = $('#uniformsContainer .uniform-item').length || 0;
 
-			// Añadir nuevo uniforme
-			$('#addUniformBtn').click(function () {
-				var newUniform = `
-								<div class="form-group row mt-2 uniform-item">
-									<div class="col-4">
-										<label for="UniformCatalog">Uniforme</label>
-									</div>
-									<div class="col-8">
-										<select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
-											<option value="">Selecciona una prenda:</option>
-												@foreach (var item in Model.UniformCatalogList)
-												{
-													<option value="@item.Value">@item.Text</option>
-												}
-												@Html.Raw("</option>")
-										</select>
-										<span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
-									</div>
-									<div class="col-12 mt-2 text-end">
-										<button type="button" class="btn btn-danger remove-uniform-btn">
-											<i class="fas fa-trash-alt"></i> Eliminar
-										</button>
-									</div>
-								</div>
-								`;
-				$('#uniformsContainer').append(newUniform);
-				uniformIndex++;
-				reindexUniforms();
+            // Función para actualizar las opciones de los selects
+            function updateUniformOptions() {
+                // Obtener todos los valores seleccionados
+                var selectedValues = [];
+                $('#uniformsContainer select').each(function () {
+                    var selectedValue = $(this).val();
+                    if (selectedValue) {
+                        selectedValues.push(selectedValue);
+                    }
+                });
 
-				// Reaplicar validación unobtrusive
-				var form = $("#representative-form");
-				$.validator.unobtrusive.parse(form);
-			});
+                // Actualizar cada select, deshabilitando las opciones seleccionadas en los demás
+                $('#uniformsContainer select').each(function () {
+                    var currentSelect = $(this);
+                    currentSelect.find('option').each(function () {
+                        var optionValue = $(this).val();
 
-			// Eliminar uniforme
-			$('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
-				$(this).closest('.uniform-item').remove();
-				reindexUniforms();
-			});
+                        // Deshabilitar la opción si está seleccionada en otro select
+                        if (selectedValues.includes(optionValue) && currentSelect.val() !== optionValue) {
+                            $(this).attr('disabled', 'disabled');
+                        } else {
+                            $(this).removeAttr('disabled');
+                        }
+                    });
+                });
+            }
 
-			// Reindexar selectores de uniformes
-			function reindexUniforms() {
-				$('#uniformsContainer .uniform-item').each(function (index) {
-					var select = $(this).find('select');
-					var span = $(this).find('span');
+            // Añadir nuevo uniforme
+            $('#addUniformBtn').click(function () {
+                var newUniform = `
+                        <div class="form-group row mt-2 uniform-item">
+                            <div class="col-4">
+                                <label for="UniformCatalog">Uniforme</label>
+                            </div>
+                            <div class="col-8">
+                                <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
+                                    <option value="">Selecciona una prenda:</option>
+                                    @foreach (var item in Model.UniformCatalogList)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="col-12 mt-2 text-end">
+                                <button type="button" class="btn btn-danger remove-uniform-btn">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                $('#uniformsContainer').append(newUniform);
+                uniformIndex++;
+                reindexUniforms();
+                updateUniformOptions(); // Actualizar opciones al añadir un nuevo select
 
-					// Actualizar el atributo 'name' del select
-					select.attr('name', 'SelectedUniformCatalogIds[' + index + ']');
+                // Reaplicar validación unobtrusive
+                var form = $("#representative-form");
+                $.validator.unobtrusive.parse(form);
+            });
 
-					// Actualizar el asp-validation-for del span
-					span.attr('data-valmsg-for', 'SelectedUniformCatalogIds[' + index + ']');
-				});
-			}
-		});
-	</script>
+            // Eliminar uniforme
+            $('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
+                $(this).closest('.uniform-item').remove();
+                reindexUniforms();
+                updateUniformOptions(); // Actualizar opciones al eliminar un select
+            });
+
+            // Actualizar las opciones cuando se selecciona un uniforme
+            $('#uniformsContainer').on('change', 'select', function () {
+                updateUniformOptions();
+            });
+
+            // Reindexar selectores de uniformes
+            function reindexUniforms() {
+                $('#uniformsContainer .uniform-item').each(function (index) {
+                    var select = $(this).find('select');
+                    var span = $(this).find('span');
+
+                    // Actualizar el atributo 'name' del select
+                    select.attr('name', 'SelectedUniformCatalogIds[' + index + ']');
+
+                    // Actualizar el asp-validation-for del span
+                    span.attr('data-valmsg-for', 'SelectedUniformCatalogIds[' + index + ']');
+                });
+            }
+        });
+    </script>
 }
