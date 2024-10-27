@@ -1,5 +1,7 @@
 ﻿@{
     var isStudentPage = Context.Request.Path.StartsWithSegments("/Student");
+
+    var isLoginPage = Context.Request.Path.Value?.ToLower().Contains("login") ?? false;
 }
 
 <!DOCTYPE html>
@@ -30,7 +32,6 @@
         .navbar {
             background-color: #1a3c6e !important;
             flex-wrap: wrap;
-            height: 75px;
         }
 
             .navbar .nav-link {
@@ -52,7 +53,10 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid mx-3">
                 <img src="/images/LOGO_TECNM_BLANCO.png" alt="SIIR Logo" class="logo" />
-                <partial name="_LoginPartial" />
+                @if (!isLoginPage)
+                {
+                    <partial name="_LoginPartial" />
+                }
             </div>
         </nav>
     </header>
