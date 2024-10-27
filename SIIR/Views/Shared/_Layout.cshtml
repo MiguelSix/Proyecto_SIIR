@@ -61,8 +61,8 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">USUARIOS</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Student" asp-action="Index">Estudiantes</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Coach" asp-action="Index">Coaches</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Estudiantes</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Coaches</a>
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Administradores</a>
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Ver Todo</a>
                             </div>
@@ -79,10 +79,15 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Admin" asp-controller="UniformCatalog" asp-action="Index">UNIFORMES</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Coach" asp-action="Index">COACHES</a>
+                        </li>
                     </ul>
                 </div>
 
+                
                 <partial name="_LoginPartial" />
+                
             </div>
         </nav>
     </header>

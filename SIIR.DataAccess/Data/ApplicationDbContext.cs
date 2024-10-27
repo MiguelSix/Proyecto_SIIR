@@ -20,6 +20,7 @@ namespace SIIR.Data
         public DbSet<Team> Teams { get; set; }
         public DbSet<UniformCatalog> UniformCatalog { get; set; }
         public DbSet<DocumentCatalog> DocumentCatalog { get; set; }
+        public DbSet<Document> Document { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
