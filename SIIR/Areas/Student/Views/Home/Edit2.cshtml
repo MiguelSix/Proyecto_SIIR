@@ -1,0 +1,144 @@
+﻿
+@{
+    ViewData["Title"] = "Información";
+    Layout = "_LayoutWithoutNavBar";
+}
+
+<style>
+    .info-container{
+        max-width: 800px;
+        margin: 2vw auto;
+    }
+
+    .header{
+        margin-bottom: 2vw;
+    }
+
+    .btn-primary {
+        background-color: #1a3c6e;
+        border-color: #1a3c6e;
+    }
+
+    .form {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        border-radius: 10px;
+    }
+
+
+    .title {
+        background-color: #1a3c6e;
+        color: white;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding: 10px;
+    }
+
+    .btn-primary:hover {
+        background-color: #15305a;
+        border-color: #15305a;
+     }
+    .form-control:focus {
+        border-color: #1a3c6e;
+        box-shadow: 0 0 0 0.2rem rgba(26,60,110,.25);
+    }
+</style>
+
+<div class="container">
+    <div class="info-container d-flex">
+        <div class="row">
+            <h2 class="text-center header">Mis datos</h2>
+            <form asp-controller="" asp-action="" method="post">
+                <div class="row general-data form">
+                    <h5 class="title">Datos personales</h5>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu(s) nombre(s)">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Apellido paterno</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu apellido paterno">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Apellido materno</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu apellido materno">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Número de teléfono</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu número de teléfono">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Número de control</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu número de control">
+                    </div>
+                    <div class="col-sm-9 mb-3">
+                        <label class="form-label">Correo institucional</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu correo institucional">
+                    </div>
+                    <div class="col-sm-3 mb-3">
+                        <label class="form-label">Edad</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu edad">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Carrera</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu carrera">
+                    </div>
+                </div>
+                <div class="row tournament-registration form">
+                    <h5 class="title">Datos para inscripción a torneos</h5>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">CURP</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu CURP">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Tipo de sangre</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu tipo de sangre">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Semestre actual</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu semestre actual">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Participaciones previas</label>
+                        <input class="form-control" type="text" placeholder="Introduce la cantidad de participaciones previas">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Fecha de nacimiento</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu fecha de nacimiento">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Peso (KG)</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu peso">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Altura (metros)</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu altura">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">NSS</label>
+                        <input class="form-control" type="text" placeholder="Introduce tu NSS">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Alergias</label>
+                        <input class="form-control" type="text" placeholder="Introduce si tienes alergias">
+                    </div>
+                </div>
+                <div class="row uniform-info form">
+                    <h5 class="title">Información de uniformes</h5>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Descripción uniformes</label>
+                        <input class="form-control" type="text" placeholder="Tallas">
+                    </div>
+                </div>
+                <div class="col-12 d-flex mt-3 justify-content-center">
+                    <!--button type="button" class="btn btn-secondary mx-3"
+                            onclick="location.href='@Url.Action("Dashboard", "Users")'">
+                        Regresar
+                    </!--button-->
+                    <a asp-action="Index" class="btn btn-secondary">Regresar</a>
+                    <button type="submit" class="btn btn-primary mx-3">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
