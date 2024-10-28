@@ -119,11 +119,11 @@
                             <div class="col-8">
                                 <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
                                     <option value="">Selecciona una prenda:</option>
-                                    @foreach (var item in Model.UniformCatalogList)
-                                    {
-                                        <option value="@item.Value">@item.Text</option>
-                                    }
-                                    @Html.Raw("</option>")
+        @foreach (var item in Model.UniformCatalogList)
+        {
+                                            <option value="@item.Value">@item.Text</option>
+        }
+        @Html.Raw("</option>")
                                 </select>
                                 <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
                             </div>
@@ -137,6 +137,7 @@
                 $('#uniformsContainer').append(newUniform);
                 uniformIndex++;
                 reindexUniforms();
+                updateUniformOptions();
 
                 // Reaplicar validación unobtrusive
                 var form = $("#representative-form");
@@ -147,6 +148,7 @@
             $('#uniformsContainer').on('click', '.remove-uniform-btn', function () {
                 $(this).closest('.uniform-item').remove();
                 reindexUniforms();
+                updateUniformOptions();
             });
 
             // Reindexar selectores de uniformes
@@ -162,6 +164,42 @@
                     span.attr('data-valmsg-for', 'SelectedUniformCatalogIds[' + index + ']');
                 });
             }
+
+            // Actualizar las opciones de los uniformes seleccionados
+            function updateUniformOptions() {
+                var selectedUniforms = [];
+
+                // Obtener los valores seleccionados de todos los selects
+                $('#uniformsContainer .uniform-item select').each(function () {
+                    var selectedValue = $(this).val();
+                    if (selectedValue) {
+                        selectedUniforms.push(selectedValue);
+                    }
+                });
+
+                // Deshabilitar las opciones seleccionadas en otros selects
+                $('#uniformsContainer .uniform-item select').each(function () {
+                    var currentSelect = $(this);
+                    var currentValue = currentSelect.val();
+
+                    currentSelect.find('option').each(function () {
+                        var optionValue = $(this).attr('value');
+                        if (optionValue && selectedUniforms.includes(optionValue) && optionValue !== currentValue) {
+                            $(this).attr('disabled', true);
+                        } else {
+                            $(this).attr('disabled', false);
+                        }
+                    });
+                });
+            }
+
+            // Actualizar las opciones al cambiar de valor en un select
+            $('#uniformsContainer').on('change', '.uniform-item select', function () {
+                updateUniformOptions();
+            });
+
+            // Llamar a updateUniformOptions al cargar la página para deshabilitar las opciones seleccionadas
+            updateUniformOptions();
         });
     </script>
 }

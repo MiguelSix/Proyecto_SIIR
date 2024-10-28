@@ -93,6 +93,10 @@
         border-bottom-color: #1a3c6e;
     }
 
+    .blue-header {
+        margin-bottom: 1rem !important;
+    }
+
 </style>
 
 <div class="container text-center" id="container-main">
@@ -116,7 +120,6 @@
             </div>
         </div>
     </div>
-
     <div id="popoverContent" style="display:none;">
         <p class="fs-5 mb-2" style="background-color:#1a3c6e">Categoría de género</p>
         <div class="d-flex flex-wrap gap-2 mb-3">
@@ -233,11 +236,15 @@
                                     <span class="badge rounded-pill ${representativeCategoryClass}">${team.representative.category}</span>
                                 `;
 
+                            var teamUrl = `/Coach/Team/Index/${team.id}`;
+
                             var cardHtml = `
                                     <div class="col">
                                         <div class="card h-100">
-                                            <img src="${team.imageUrl}" class="card-img-top h-100" alt="Imagen del equipo" />
-                                            <p class="text-center fs-6 py-2 mb-0 text-white title">${team.name.toUpperCase()}</p>
+                                            <a href="${teamUrl}" style="text-decoration: none;">
+                                                <img src="${team.imageUrl}" class="card-img-top h-100" alt="Imagen del equipo" />
+                                                <p class="text-center fs-6 py-2 mb-0 text-white title">${team.name.toUpperCase()}</p>
+                                            </a>
                                             <div class="card-body">
                                                 <div class="d-flex flex-wrap gap-2 mb-2">
                                                     ${categoryBadges}

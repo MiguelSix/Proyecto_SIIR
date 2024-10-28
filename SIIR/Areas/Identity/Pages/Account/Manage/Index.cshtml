@@ -1,30 +1,113 @@
 ﻿@page
 @model IndexModel
+@using SIIR.Models
+@inject UserManager<ApplicationUser> UserManager
+
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "Perfil";
     ViewData["ActivePage"] = ManageNavPages.Index;
+    var user = await UserManager.GetUserAsync(User);
+    var roles = await UserManager.GetRolesAsync(user);
+    var currentRole = roles.FirstOrDefault();
 }
 
 <h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-        </form>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["StatusMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+}
+
+@if (currentRole == "Student")
+{
+    <p>Para editar tu perfil completo, por favor dirígete a tu área de estudiante.</p>
+}
+else
+{
+    <div class="row">
+        <!-- Columna de información personal -->
+        <div class="col-md-8">
+            <form id="profile-form" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.Name" class="form-label"></label>
+                    <input asp-for="Input.Name" class="form-control" />
+                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.LastName" class="form-label"></label>
+                    <input asp-for="Input.LastName" class="form-control" />
+                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.SecondLastName" class="form-label"></label>
+                    <input asp-for="Input.SecondLastName" class="form-control" />
+                    <span asp-validation-for="Input.SecondLastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                    <input asp-for="Input.PhoneNumber" class="form-control" />
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                </div>
+
+                @if (currentRole == "Coach")
+                {
+                    <div class="form-group mb-3">
+                        <label asp-for="Input.ImageFile" class="form-label"></label>
+                        <input asp-for="Input.ImageFile" class="form-control" type="file" accept="image/*" />
+                        <span asp-validation-for="Input.ImageFile" class="text-danger"></span>
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </form>
+        </div>
+
+        <!-- Columna de la foto -->
+        @if (currentRole == "Coach")
+        {
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        @if (!string.IsNullOrEmpty(Model.Input.ImageUrl))
+                        {
+                            <img src="@Model.Input.ImageUrl"
+                                 alt="Foto de perfil"
+                                 class="img-fluid rounded mb-3"
+                                 style="max-height: 300px; width: auto;" />
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                No hay foto de perfil
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('Input_ImageFile').addEventListener('change', function (e) {
+            if (e.target.files && e.target.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.querySelector('img').src = e.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    </script>
 }

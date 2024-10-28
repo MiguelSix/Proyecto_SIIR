@@ -58,8 +58,5 @@ namespace SIIR.Areas.Coach.Controllers
 
             return Json(new { data = equipos });
         }
-
-
-
     }
 }

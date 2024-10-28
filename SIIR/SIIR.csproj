@@ -16,9 +16,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
+    <PackageReference Include="QuestPDF" Version="2024.10.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\images\students\" />
     <Folder Include="wwwroot\images\students\" />
     <Folder Include="wwwroot\images\coaches\" />
     <Folder Include="wwwroot\images\teams\" />
