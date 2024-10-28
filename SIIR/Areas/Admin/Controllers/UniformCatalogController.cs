@@ -61,13 +61,11 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-
 			UniformCatalog uniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(id);
 			if (uniformCatalog == null)
 			{
 				return NotFound();
 			}
-
 
 			return View(uniformCatalog);
 		}

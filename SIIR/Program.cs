@@ -22,6 +22,9 @@ builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 //Contenedor de Trabajo
 builder.Services.AddScoped<IContenedorTrabajo, ContenedorTrabajo>();
 
+//PdfQuest
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
