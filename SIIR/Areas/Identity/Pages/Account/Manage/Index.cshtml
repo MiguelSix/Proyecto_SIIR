@@ -52,7 +52,7 @@ else
                     <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                 </div>
 
-                @if (currentRole == "Coach")
+                @if (currentRole == "Coach" || currentRole == "Student")
                 {
                     <div class="form-group mb-3">
                         <label asp-for="Input.ImageFile" class="form-label"></label>
@@ -66,7 +66,7 @@ else
         </div>
 
         <!-- Columna de la foto -->
-        @if (currentRole == "Coach")
+        @if (currentRole == "Coach" || currentRole == "Student")
         {
             <div class="col-md-4">
                 <div class="card">

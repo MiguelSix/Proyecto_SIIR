@@ -41,52 +41,81 @@ namespace SIIR.Areas.Admin.Controllers
             return View(coach);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Models.Coach coach)
         {
-            //Por que aqui pone diferente de Model.Valid?
             if (ModelState.IsValid)
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-                var files = HttpContext.Request.Form.Files;
-                var coachFromDb = _contenedorTrabajo.Coach.GetById(coach.Id);
-
-                if (files.Count() > 0)
+                try
                 {
-                    // Editar Imagen
-                    string fileName = Guid.NewGuid().ToString();
-                    var uploads = Path.Combine(webRootPath, @"images\coaches");
-                    var extension = Path.GetExtension(files[0].FileName);
+                    string webRootPath = _hostingEnvironment.WebRootPath;
+                    var files = HttpContext.Request.Form.Files;
+                    var coachFromDb = _contenedorTrabajo.Coach.GetById(coach.Id);
 
-                    var extension_new = Path.GetExtension(files[0].FileName);
-
-                    if (!string.IsNullOrEmpty(coachFromDb.ImageUrl))
+                    if (coachFromDb == null)
                     {
-                        var imagePath = Path.Combine(webRootPath, coachFromDb.ImageUrl.TrimStart('\\'));
-                        if (System.IO.File.Exists(imagePath))
+                        return NotFound();
+                    }
+
+                    if (files.Count > 0)
+                    {
+                        var file = files[0];
+                        if (file.Length > 0)
                         {
-                            System.IO.File.Delete(imagePath);
+                            // Crear el directorio si no existe
+                            var uploadsFolder = Path.Combine(webRootPath, "images", "coaches");
+                            Directory.CreateDirectory(uploadsFolder);
+
+                            // Generar nombre único para el archivo
+                            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                            string filePath = Path.Combine(uploadsFolder, fileName);
+
+                            // Eliminar imagen anterior
+                            if (!string.IsNullOrEmpty(coachFromDb.ImageUrl))
+                            {
+                                var oldImagePath = Path.Combine(webRootPath, coachFromDb.ImageUrl.TrimStart('/'));
+                                if (System.IO.File.Exists(oldImagePath))
+                                {
+                                    System.IO.File.Delete(oldImagePath);
+                                }
+                            }
+
+                            // Guardar nueva imagen
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                file.CopyTo(fileStream);
+                            }
+
+                            // Actualizar la URL en el modelo
+                            coach.ImageUrl = "/images/coaches/" + fileName;
                         }
                     }
-
-                    // Subimos la nueva imagen
-                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension_new), FileMode.Create))
+                    else
                     {
-                        files[0].CopyTo(fileStreams);
+                        // Mantener la imagen existente
+                        coach.ImageUrl = coachFromDb.ImageUrl;
                     }
 
-                    coach.ImageUrl = @"\images\coaches\" + fileName + extension_new;
-                }
-                else
-                {
-                    coach.ImageUrl = coachFromDb.ImageUrl;
-                }
+                    // Actualizar otros campos del coach
+                    coachFromDb.Name = coach.Name;
+                    coachFromDb.LastName = coach.LastName;
+                    coachFromDb.SecondLastName = coach.SecondLastName;
+                    coachFromDb.ImageUrl = coach.ImageUrl;
 
-                _contenedorTrabajo.Coach.Update(coach);
-                _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
+                    _contenedorTrabajo.Coach.Update(coachFromDb);
+                    _contenedorTrabajo.Save();
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    ModelState.AddModelError("", "Ha ocurrido un error al actualizar el coach: " + ex.Message);
+                }
             }
+
             return View(coach);
         }
 
