@@ -2,6 +2,7 @@
 using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +19,23 @@ namespace SIIR.DataAccess.Data.Repository
         {
             _db = db;
         }
-        public IEnumerable<SelectListItem> GetDocumentCatalogList()
+        //public IEnumerable<SelectListItem> GetDocumentCatalogList()
+        //{
+        //    return _db.DocumentCatalog.Select(i => new SelectListItem()
+        //    {
+        //        Text = i.Name,
+        //        Value = i.Id.ToString()
+        //    });
+        //}
+        public IEnumerable<DocumentVM> GetDocumentCatalogList()
         {
-            return _db.DocumentCatalog.Select(i => new SelectListItem()
+            return _db.DocumentCatalog.Select(doc => new DocumentVM
             {
-                Text = i.Name,
-                Value = i.Id.ToString()
-            });
+                Id = doc.Id,
+                Name = doc.Name,
+                Description = doc.Description,
+                Extension = doc.Extension
+            }).ToList();
         }
 
         public void Update(DocumentCatalog documentCatalog)

@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SIIR.Data;
 using SIIR.Models;
 
 namespace SIIR.Areas.Identity.Pages.Account.Manage
@@ -17,54 +19,60 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ApplicationDbContext _context;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IWebHostEnvironment webHostEnvironment,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+
+            [Required(ErrorMessage = "El nombre es requerido")]
+            [Display(Name = "Nombre")]
+            public string Name { get; set; }
+
+            [Required(ErrorMessage = "El apellido paterno es requerido")]
+            [Display(Name = "Apellido Paterno")]
+            public string LastName { get; set; }
+
+            [Required(ErrorMessage = "El apellido materno es requerido")]
+            [Display(Name = "Apellido Materno")]
+            public string SecondLastName { get; set; }
+
             [Phone]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Teléfono")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "Foto de perfil")]
+            public IFormFile ImageFile { get; set; }
+
+            public string ImageUrl { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var currentRole = roles.FirstOrDefault();
 
             Username = userName;
 
@@ -72,6 +80,33 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             {
                 PhoneNumber = phoneNumber
             };
+
+            // Cargar los datos según el rol
+            switch (currentRole)
+            {
+                case "Admin" when user.AdminId.HasValue:
+                    var admin = await _context.Admins
+                        .FirstOrDefaultAsync(a => a.Id == user.AdminId);
+                    if (admin != null)
+                    {
+                        Input.Name = admin.Name;
+                        Input.LastName = admin.LastName;
+                        Input.SecondLastName = admin.SecondLastName;
+                    }
+                    break;
+
+                case "Coach" when user.CoachId.HasValue:
+                    var coach = await _context.Coaches
+                        .FirstOrDefaultAsync(c => c.Id == user.CoachId);
+                    if (coach != null)
+                    {
+                        Input.Name = coach.Name;
+                        Input.LastName = coach.LastName;
+                        Input.SecondLastName = coach.SecondLastName;
+                        Input.ImageUrl = coach.ImageUrl;
+                    }
+                    break;
+            }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -79,7 +114,13 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"No se pudo cargar el usuario con ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Contains("Student"))
+            {
+                return RedirectToPage("/Student/Edit");
             }
 
             await LoadAsync(user);
@@ -91,7 +132,7 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"No se pudo cargar el usuario con ID '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -100,19 +141,77 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            var roles = await _userManager.GetRolesAsync(user);
+            var currentRole = roles.FirstOrDefault();
+
+            switch (currentRole)
+            {
+                case "Admin" when user.AdminId.HasValue:
+                    var admin = await _context.Admins.FindAsync(user.AdminId);
+                    if (admin != null)
+                    {
+                        admin.Name = Input.Name;
+                        admin.LastName = Input.LastName;
+                        admin.SecondLastName = Input.SecondLastName;
+                        _context.Admins.Update(admin);
+                    }
+                    break;
+
+                case "Coach" when user.CoachId.HasValue:
+                    var coach = await _context.Coaches.FindAsync(user.CoachId);
+                    if (coach != null)
+                    {
+                        coach.Name = Input.Name;
+                        coach.LastName = Input.LastName;
+                        coach.SecondLastName = Input.SecondLastName;
+
+                        if (Input.ImageFile != null)
+                        {
+                            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(Input.ImageFile.FileName)}";
+                            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "coaches");
+
+                            if (!Directory.Exists(uploadsFolder))
+                            {
+                                Directory.CreateDirectory(uploadsFolder);
+                            }
+
+                            if (!string.IsNullOrEmpty(coach.ImageUrl))
+                            {
+                                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                                    coach.ImageUrl.TrimStart('/'));
+                                if (System.IO.File.Exists(oldImagePath))
+                                {
+                                    System.IO.File.Delete(oldImagePath);
+                                }
+                            }
+
+                            var filePath = Path.Combine(uploadsFolder, fileName);
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await Input.ImageFile.CopyToAsync(fileStream);
+                            }
+
+                            coach.ImageUrl = $"/images/coaches/{fileName}";
+                        }
+
+                        _context.Coaches.Update(coach);
+                    }
+                    break;
+            }
+
+            if (Input.PhoneNumber != user.PhoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    StatusMessage = "Error al intentar actualizar el número de teléfono.";
                     return RedirectToPage();
                 }
             }
 
+            await _context.SaveChangesAsync();
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Tu perfil ha sido actualizado";
             return RedirectToPage();
         }
     }
