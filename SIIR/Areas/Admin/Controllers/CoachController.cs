@@ -38,6 +38,7 @@ namespace SIIR.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Models.Coach coach)
         {
+            //Hacer que el modelo no sea valido? Esto creo que no funciona, al menos para mi XD
             if (ModelState.IsValid)
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
@@ -67,7 +68,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(int? id)
         {
             Models.Coach coach = new Models.Coach();
             coach = _contenedorTrabajo.Coach.GetById(id);
@@ -77,6 +78,11 @@ namespace SIIR.Areas.Admin.Controllers
                 return NotFound();
             }
 
+            if (id != null)
+            {
+                coach = _contenedorTrabajo.Coach.GetById(id.GetValueOrDefault());
+            }
+
             return View(coach);
         }
 
@@ -84,11 +90,12 @@ namespace SIIR.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Models.Coach coach)
         {
+            //Por que aqui pone diferente de Model.Valid?
             if (ModelState.IsValid)
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
-                var coachFromDb = _contenedorTrabajo.Team.GetById(coach.Id);
+                var coachFromDb = _contenedorTrabajo.Coach.GetById(coach.Id);
 
                 if (files.Count() > 0)
                 {
@@ -98,30 +105,32 @@ namespace SIIR.Areas.Admin.Controllers
                     var extension = Path.GetExtension(files[0].FileName);
 
                     var extension_new = Path.GetExtension(files[0].FileName);
+
+                    //Creamos la ruta de la imagen, quitamos la contrabarra
                     var imagePath = Path.Combine(webRootPath, coachFromDb.ImageUrl.TrimStart('\\'));
 
+                    //Si el archivo existe
                     if (System.IO.File.Exists(imagePath))
                     {
+                        //Se borra y se reemplaza con la nueva
                         System.IO.File.Delete(imagePath);
                     }
 
-                    // Subir nueva imagen
+                    // Subimos la nueva imagen
                     using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension_new), FileMode.Create))
                     {
                         files[0].CopyTo(fileStreams);
                     }
 
-                    coach.ImageUrl = @"\images\coach\" + fileName + extension_new;
+                    coach.ImageUrl = @"\images\coaches\" + fileName + extension_new;
                     _contenedorTrabajo.Coach.Update(coach);
                     _contenedorTrabajo.Save();
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    // No se seleccionó una nueva imagen
-                    //Ayudaaaaaaaaaaaaaaa   coach.ImageUrl = teamFromDb.ImageUrl;
+                    coach.ImageUrl = coachFromDb.ImageUrl;
                 }
-
 
                 _contenedorTrabajo.Coach.Update(coach);
                 _contenedorTrabajo.Save();

@@ -4,7 +4,69 @@
     ViewData["Title"] = "Editar Coach";
 }
 
-<h3 class="text-center"> Editar a un Coach</h3>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="bg-white rounded-3 shadow-sm p-4">
+                <h2 class="text-center mb-4 display-2">Editar Coach</h2>
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-bold">Nombre</label>
+                                <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre del Coach" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="LastName" class="form-label fw-bold">Apellido Paterno</label>
+                                <input asp-for="LastName" class="form-control" placeholder="Ingresa el Apellido Paterno" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="SecondLastName" class="form-label fw-bold">Apellido Materno</label>
+                                <input asp-for="SecondLastName" class="form-control" placeholder="Ingresa el Apellido Materno" />
+                                <span asp-validation-for="SecondLastName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="ImageUrl" class="form-label fw-bold">Imagen del equipo</label>
+                                <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Vista previa de la imagen</label>
+                                <img src="ImageUrl" class="img-fluid rounded border p-1" alt="Vista previa" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-save me-2"></i> Guardar Cambios
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <a asp-action="Index" class="btn btn-secondary w-100">
+                                <i class="fas fa-arrow-left me-2"></i> Volver
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+@* <h3 class="text-center"> Editar a un Coach</h3>
 <form method="POST" asp-action="Edit">
     <div class="rows px-2 offset-1 border">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -15,7 +77,7 @@
                     <label asp-for="Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre" />
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre del Coach" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
@@ -58,4 +120,4 @@
         </div>
 
     </div>
-</form>
+</form> *@

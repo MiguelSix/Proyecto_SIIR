@@ -19,6 +19,7 @@ namespace SIIR.Models
         [Display(Name = "Apellido Materno")]
         public string? SecondLastName { get; set; }
 
+        //Debo dejar esto en que acepteno null para que cargue correctamente la vista?
         [Display(Name = "Imagen Coach")]
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }

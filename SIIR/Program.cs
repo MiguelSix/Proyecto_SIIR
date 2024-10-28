@@ -4,6 +4,8 @@ using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.DataAccess.Data.Repository;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using SIIR.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +17,24 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultUI();
+    .AddDefaultUI()
+    .AddDefaultTokenProviders();
+    
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddTransient<IEmailSender, EmailSender>(i =>
+    new EmailSender(
+        builder.Configuration["EmailSettings:SmtpServer"],
+        int.Parse(builder.Configuration["EmailSettings:SmtpPort"]),
+        builder.Configuration["EmailSettings:FromEmailAddress"],
+        builder.Configuration["EmailSettings:FromEmailPassword"]
+    ));
 
 //Contenedor de Trabajo
 builder.Services.AddScoped<IContenedorTrabajo, ContenedorTrabajo>();
+
+//PdfQuest
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var app = builder.Build();
 
