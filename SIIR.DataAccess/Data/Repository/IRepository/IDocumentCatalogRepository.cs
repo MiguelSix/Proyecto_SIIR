@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
     {
         void Update(DocumentCatalog entityCatalog);
 
-        IEnumerable<SelectListItem> GetDocumentCatalogList();
+        //IEnumerable<SelectListItem> GetDocumentCatalogList();
+        public IEnumerable<DocumentVM> GetDocumentCatalogList();
     }
 }

@@ -23,7 +23,7 @@ namespace SIIR.DataAccess.Data.Repository
             Coach = new CoachRepository(_db);
             Student = new StudentRepository(_db);
             DocumentCatalog = new DocumentCatalogRepository(_db);
-            Documents = new DocumentRepository(_db);
+            Document = new DocumentRepository(_db);
         }
 
         public IUserRepository User { get; private set; }
@@ -33,7 +33,7 @@ namespace SIIR.DataAccess.Data.Repository
         public ICoachRepository Coach { get; private set; }
         public IStudentRepository Student { get; private set; }
         public IDocumentCatalogRepository DocumentCatalog { get; private set; }
-        public IDocumentRepository Documents { get; private set; }
+        public IDocumentRepository Document { get; private set; }
         public void Dispose()
         {
             _db.Dispose();
