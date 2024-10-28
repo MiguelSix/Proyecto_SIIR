@@ -146,6 +146,17 @@ namespace SIIR.Areas.Admin.Controllers
             return View(teamVM);
         }
 
+        [HttpGet]
+        public IActionResult Roster(int id)
+        {
+            Team team = _contenedorTrabajo.Team.GetById(id);
+            if (team == null)
+            {
+                return NotFound();
+            }
+            return View(team);
+        }
+
         #region API CALLS
 
         [HttpGet]
