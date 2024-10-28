@@ -4,9 +4,8 @@
     ViewData["Title"] = "Crear Coach";
 }
 
-<br />
-<br />
-<h3 class="text-center"> Crear un Nuevo Coach</h3>
+<h2 class="display-2">Dar de alta nuevo Equipo</h2>
+
 <form method="POST" asp-action="Create">
     <div class="rows px-2 offset-1 border">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -17,7 +16,7 @@
                     <label asp-for="Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre"/>
+                    <input asp-for="Name" class="form-control" placeholder="Ingresa el Nombre del Coach"/>
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>

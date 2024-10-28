@@ -24,7 +24,7 @@ namespace SIIR.DataAccess.Data.Repository
         {
             dbSet.Add(entity);
         }
-        public T GetById(int id)
+        public T GetById(int? id)
         {
             return dbSet.Find(id);
         }
