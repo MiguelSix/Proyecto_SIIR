@@ -45,7 +45,7 @@ namespace SIIR.Areas.Coach.Controllers
         public IActionResult GenerateCertificate()
         {
             // Crea el documento PDF
-            var document = Document.Create(container =>
+            var document = QuestPDF.Fluent.Document.Create(container =>
             {
                 container.Page(page =>
                 {
