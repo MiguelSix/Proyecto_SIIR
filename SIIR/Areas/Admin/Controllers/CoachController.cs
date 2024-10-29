@@ -21,7 +21,6 @@ namespace SIIR.Areas.Admin.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        //Se utiliza HttpGet por que se van a traer y utilizar los datos del coach para acceso a vistas y asi?
         [HttpGet]
         public IActionResult Index()
         {
@@ -45,7 +44,6 @@ namespace SIIR.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Models.Coach coach)
         {
-            //Por que aqui pone diferente de Model.Valid?
             if (ModelState.IsValid)
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
