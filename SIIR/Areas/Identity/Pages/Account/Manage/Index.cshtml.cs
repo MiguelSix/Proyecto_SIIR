@@ -106,6 +106,18 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                         Input.ImageUrl = coach.ImageUrl;
                     }
                     break;
+
+                case "Student" when user.StudentId.HasValue:
+                    var student = await _context.Students
+                        .FirstOrDefaultAsync(s => s.Id == user.StudentId);
+                    if (student != null)
+                    {
+                        Input.Name = student.Name;
+                        Input.LastName = student.LastName;
+                        Input.SecondLastName = student.SecondLastName;
+                        Input.ImageUrl = student.ImageUrl;
+                    }
+                    break;
             }
         }
 
@@ -118,10 +130,6 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            if (roles.Contains("Student"))
-            {
-                return RedirectToPage("/Student/Edit");
-            }
 
             await LoadAsync(user);
             return Page();
@@ -195,6 +203,47 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                         }
 
                         _context.Coaches.Update(coach);
+                    }
+                    break;
+
+                case "Student" when user.StudentId.HasValue:
+                    var student = await _context.Students.FindAsync(user.StudentId);
+                    if (student != null)
+                    {
+                        student.Name = Input.Name;
+                        student.LastName = Input.LastName;
+                        student.SecondLastName = Input.SecondLastName;
+
+                        if (Input.ImageFile != null)
+                        {
+                            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(Input.ImageFile.FileName)}";
+                            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "students");
+
+                            if (!Directory.Exists(uploadsFolder))
+                            {
+                                Directory.CreateDirectory(uploadsFolder);
+                            }
+
+                            if (!string.IsNullOrEmpty(student.ImageUrl))
+                            {
+                                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                                    student.ImageUrl.TrimStart('/'));
+                                if (System.IO.File.Exists(oldImagePath))
+                                {
+                                    System.IO.File.Delete(oldImagePath);
+                                }
+                            }
+
+                            var filePath = Path.Combine(uploadsFolder, fileName);
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await Input.ImageFile.CopyToAsync(fileStream);
+                            }
+
+                            student.ImageUrl = $"/images/students/{fileName}";
+                        }
+
+                        _context.Students.Update(student);
                     }
                     break;
             }

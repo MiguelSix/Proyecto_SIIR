@@ -12,5 +12,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
     {
         void Update(Student student);
         IEnumerable<SelectListItem> GetStudentsList();
+        void AssignCaptain(Student student);
+        void UnassignCaptain(Student student);
     }
 }

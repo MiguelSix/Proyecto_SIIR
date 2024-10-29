@@ -15,35 +15,40 @@ function cargarDatatable() {
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100"/>`
+                    return `<img src="../../../${imagen}" width="100"/>`
                 },
                 "width": "10%"
             },
-            //Ingresar nombre completo
             {
                 "data": "name",
                 "render": function (data, type, student) {
                     return student.name + " " + student.lastName + " " + student.secondLastName;
                 },
-                "width": "12%"
+                "width": "15%"
             },
-            { "data": "career", "width": "20%" },
+            { "data": "career", "width": "25%" },
             { "data": "controlNumber", "width": "10%" },
             {
                 "data": "id",
-                "render": function (data) {
-                    return `<div class="text-center">
-                                <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
-                                    <i class="far fa-edit"></i> Editar
-                                </a>
-                             
-                                <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white" style="width:80px;">
-                                    <i class="far fa-trash-alt"></i> Borrar
-                                </a>
-
-                            </div>`;
+                "render": function (data, student) {
+                    return `
+                        <div class="text-center">
+                            <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
+                                <i class="far fa-edit"></i> Editar
+                            </a>
+                            <a onclick="Delete('/Admin/Students/Delete/${data}')" class="btn btn-danger btn-sm text-white" style="width:80px;">
+                                <i class="far fa-trash-alt"></i> Borrar
+                            </a>
+                            ${student.isCaptain ?
+                            `<a onclick="changeCaptainStatus('/Admin/Students/UnassignCaptain/${data}')" class="btn btn-warning btn-sm text-white" style="width:160px;">
+                                <i class="fas fa-user-minus"></i> Quitar Capitán
+                            </a>` :
+                            `<a onclick="changeCaptainStatus('/Admin/Students/AssignCaptain/${data}')" class="btn btn-primary btn-sm text-white" style="width:160px;">
+                                <i class="fas fa-user-plus"></i> Asignar Capitán
+                            </a>`}
+                        </div>`;
                 },
-                "width": "25%"
+                "width": "35%"
             }
         ],
         "language": {
@@ -93,5 +98,20 @@ function Delete(url) {
                 }
             }
         });
+    });
+}
+
+function changeCaptainStatus(url) {
+    $.ajax({
+        url: url,
+        type: "PUT",
+        success: function (data) {
+            if (data.success) {
+                toastr.success(data.message);
+                dataTable.ajax.reload(); // Recarga la tabla para reflejar el cambio
+            } else {
+                toastr.error(data.message);
+            }
+        }
     });
 }
