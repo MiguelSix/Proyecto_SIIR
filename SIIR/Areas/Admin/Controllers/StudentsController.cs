@@ -101,6 +101,14 @@ namespace SIIR.Areas.Admin.Controllers
             return Json(new { data = _contenedorTrabajo.Student.GetAll(includeProperties: "Team,Coach") });
         }
 
+        [HttpGet]
+        public IActionResult GetStudentsByTeamId(int teamId)
+        {
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId).ToList();
+            return Json(new { data = students });
+        }
+
+
         [HttpPut]
         public IActionResult AssignCaptain(int id)
         {

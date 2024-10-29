@@ -4,12 +4,13 @@ $(document).ready(function () {
     cargarDatatable();
 });
 
-function cargarDatatable() {
+function cargarDatatable(teamId) {
     dataTable = $("#tblRoster").DataTable({
         "ajax": {
-            "url": "/admin/students/GetAll",
+            "url": "/admin/students/getStudentsByTeamId",
             "type": "GET",
-            "datatype": "json"
+            "datatype": "json",
+            "data": { teamId: teamId }
         },
         "columns": [
             {
@@ -28,28 +29,6 @@ function cargarDatatable() {
             },
             { "data": "career", "width": "25%" },
             { "data": "controlNumber", "width": "10%" },
-            {
-                "data": "id",
-                "render": function (data, student) {
-                    return `
-                        <div class="text-center">
-                            <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
-                                <i class="far fa-edit"></i> Editar
-                            </a>
-                            <a onclick="Delete('/Admin/Students/Delete/${data}')" class="btn btn-danger btn-sm text-white" style="width:80px;">
-                                <i class="far fa-trash-alt"></i> Borrar
-                            </a>
-                            ${student.isCaptain ?
-                            `<a onclick="changeCaptainStatus('/Admin/Students/UnassignCaptain/${data}')" class="btn btn-warning btn-sm text-white" style="width:160px;">
-                                <i class="fas fa-user-minus"></i> Quitar Capitán
-                            </a>` :
-                            `<a onclick="changeCaptainStatus('/Admin/Students/AssignCaptain/${data}')" class="btn btn-primary btn-sm text-white" style="width:160px;">
-                                <i class="fas fa-user-plus"></i> Asignar Capitán
-                            </a>`}
-                        </div>`;
-                },
-                "width": "35%"
-            }
         ],
         "language": {
             "decimal": "",
@@ -72,46 +51,5 @@ function cargarDatatable() {
             }
         },
         "width": "100%"
-    });
-}
-
-function Delete(url) {
-    swal({
-        title: "Esta seguro de borrar?",
-        text: "Este contenido no se puede recuperar!",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Si, borrar!",
-        closeOnconfirm: true
-    }, function () {
-        $.ajax({
-            type: 'DELETE',
-            url: url,
-            success: function (data) {
-                if (data.success) {
-                    toastr.success(data.message);
-                    dataTable.ajax.reload();
-                }
-                else {
-                    toastr.error(data.message);
-                }
-            }
-        });
-    });
-}
-
-function changeCaptainStatus(url) {
-    $.ajax({
-        url: url,
-        type: "PUT",
-        success: function (data) {
-            if (data.success) {
-                toastr.success(data.message);
-                dataTable.ajax.reload(); // Recarga la tabla para reflejar el cambio
-            } else {
-                toastr.error(data.message);
-            }
-        }
     });
 }
