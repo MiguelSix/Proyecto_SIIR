@@ -15,19 +15,18 @@ function cargarDatatable() {
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100"/>`
+                    return `<img src="../../../${imagen}" width="100"/>`
                 },
                 "width": "10%"
             },
-            //Ingresar nombre completo
             {
                 "data": "name",
                 "render": function (data, type, student) {
                     return student.name + " " + student.lastName + " " + student.secondLastName;
                 },
-                "width": "12%"
+                "width": "15%"
             },
-            { "data": "career", "width": "20%" },
+            { "data": "career", "width": "25%" },
             { "data": "controlNumber", "width": "10%" },
             {
                 "data": "id",
