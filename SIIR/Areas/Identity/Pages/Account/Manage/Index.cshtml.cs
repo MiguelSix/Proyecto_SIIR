@@ -106,6 +106,7 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                         Input.ImageUrl = coach.ImageUrl;
                     }
                     break;
+
                 case "Student" when user.StudentId.HasValue:
                     var student = await _context.Students
                         .FirstOrDefaultAsync(s => s.Id == user.StudentId);
@@ -129,10 +130,6 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            if (roles.Contains("Student"))
-            {
-                return RedirectToPage("/Student/Edit");
-            }
 
             await LoadAsync(user);
             return Page();

@@ -34,8 +34,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="ImageUrl" class="form-label fw-bold">Imagen del equipo</label>
-                                <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+                                <label asp-for="ImageUrl" class="form-label fw-bold">Imagen</label>
+                                <input type="file" class="form-control" name="files" id="subidaArchivo" />
                                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
                             </div>
 
@@ -43,7 +43,7 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Vista previa de la imagen</label>
-                                <img src="ImageUrl" class="img-fluid rounded border p-1" alt="Vista previa" />
+                                <img src="@Model.ImageUrl" class="img-fluid rounded border p-1" alt="Vista previa" />
                             </div>
                         </div>
                     </div>
@@ -64,3 +64,4 @@
             </div>
         </div>
     </div>
+</div>
