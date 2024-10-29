@@ -147,14 +147,14 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Roster(int id)
+        public IActionResult Roster(int? id)
         {
-            Team team = _contenedorTrabajo.Team.GetById(id);
-            if (team == null)
+            TeamVM teamVM = new()
             {
-                return NotFound();
-            }
-            return View(team);
+                Team = new(),
+                StudentList = _contenedorTrabajo.Student.GetStudentsList()
+            };
+            return View(teamVM);
         }
 
         #region API CALLS
