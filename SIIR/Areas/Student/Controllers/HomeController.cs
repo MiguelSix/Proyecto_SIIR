@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 
 namespace SIIR.Areas.Student.Controllers
 {
@@ -158,5 +159,20 @@ namespace SIIR.Areas.Student.Controllers
             student.Coach = currentUser.Student.Coach;
             return View(student);
         }
+
+        /*[HttpGet]
+        public IActionResult GetAllUniform(int representativeId)
+        {
+            var representative = _contenedorTrabajo.Representative
+                .GetAll(r => r.Id == representativeId, includeProperties: "UniformCatalogs")
+                .FirstOrDefault();
+
+            if (representative == null || representative.UniformCatalogs == null)
+            {
+                return Json(new { data = Array.Empty<object>() });
+            }
+
+            return Json(new { data = representative.UniformCatalogs.Select(u => new { u.Id, u.Name }) });
+        }*/
     }
 }

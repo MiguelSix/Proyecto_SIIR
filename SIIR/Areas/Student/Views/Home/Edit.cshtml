@@ -91,13 +91,16 @@
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Información del Estudiante</button>
+                <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Estudiante</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Información del Coach</button>
+                <button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#uniform" type="button" role="tab" aria-controls="uniform" aria-selected="false">Uniforme</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Información del Equipo</button>
+                <button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Coach</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Equipo</button>
             </li>
         </ul>
 
@@ -247,6 +250,30 @@
                 </form>
             </div>
 
+            <div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
+                <form asp-action="Edit" method="post">
+                    <div class="info-card">
+                        <h6>Uniformes del alumno</h6>
+
+                        <!-- Label para el número de jugador con input tipo número -->
+                        <div class="col-md-6 mb-3">
+                            <label for="PlayerNumber" class="form-label">Número del jugador:</label>
+                            <input type="number" class="form-control" id="PlayerNumber" name="PlayerNumber" placeholder="Introduce el número del jugador" required />
+                        </div>
+
+                        <!-- Contenedor para el contenido dinámico de uniformes -->
+                        <div id="uniformList" class="row g-3"></div>
+
+                        <!-- Botón para guardar cambios -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-save me-2"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <div class="tab-pane fade" id="coach" role="tabpanel" aria-labelledby="coach-tab">
                 <div class="info-card">
                     <h6>Información del Coach</h6>
@@ -267,7 +294,51 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+        <!--script> await Html.RenderPartialAsync("_ValidationScriptsPartial");</script!-->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                loadUniforms();
+            });
+
+        function loadUniforms() {
+            const representativeId = '@Model.Team.RepresentativeId';
+
+            $.ajax({
+                url: '/Student/Home/GetAllUniform', // Asegúrate de que el URL sea correcto
+                type: 'GET',
+                data: { representativeId: representativeId },
+                success: function (response) {
+                    let uniformList = $('#uniformList');
+                    uniformList.empty();
+
+                    if (response.data && response.data.length > 0) {
+                        response.data.forEach(function (uniform) {
+                            uniformList.append(`
+                                                <div class="col-6 uniform-item">
+                                    <p class="mb-1"><strong>${uniform.name}:</strong></p>
+                                    <div class="dropdown">
+                                        <select class="form-select w-100 btn-primary btn">
+                                            <option selected disabled>Talla</option>
+                                            <option value="XS">XS</option>
+                                            <option value="S">S</option>
+                                            <option value="M">M</option>
+                                            <option value="L">L</option>
+                                            <option value="XL">XL</option>
+                                            <option value="XXL">XXL</option>
+                                        </select>
+                                    </div>
+                            </div>
+                            `);
+                        });
+                    } else {
+                        uniformList.append('<p>No se encontraron uniformes disponibles.</p>');
+                    }
+                },
+                error: function () {
+                    $('#uniformList').html('<p>Error al cargar los uniformes.</p>');
+                }
+            });
+        }
+
+        </script>
 }

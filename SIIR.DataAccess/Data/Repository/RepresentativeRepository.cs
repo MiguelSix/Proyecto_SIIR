@@ -34,7 +34,6 @@ namespace SIIR.DataAccess.Data.Repository
             var objFromDb = _db.Representatives.FirstOrDefault(s => s.Id == representative.Id);
             objFromDb.Name = representative.Name;
             objFromDb.Category = representative.Category;
-            objFromDb.UniformCatalogs = representative.UniformCatalogs;
 
             _db.SaveChanges();
         }

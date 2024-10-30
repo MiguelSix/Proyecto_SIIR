@@ -229,21 +229,6 @@ namespace SIIR.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RepresentativeUniformCatalog", b =>
-                {
-                    b.Property<int>("RepresentativeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UniformCatalogsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RepresentativeId", "UniformCatalogsId");
-
-                    b.HasIndex("UniformCatalogsId");
-
-                    b.ToTable("RepresentativeUniformCatalog");
-                });
-
             modelBuilder.Entity("SIIR.Models.Admin", b =>
                 {
                     b.Property<int>("Id")
@@ -374,6 +359,23 @@ namespace SIIR.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Representatives");
+                });
+
+            modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
+                {
+                    b.Property<int>("RepresentativeId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("UniformCatalogId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("RepresentativeId", "UniformCatalogId");
+
+                    b.HasIndex("UniformCatalogId");
+
+                    b.ToTable("RepresentativeUniformCatalogs");
                 });
 
             modelBuilder.Entity("SIIR.Models.Student", b =>
@@ -596,21 +598,6 @@ namespace SIIR.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RepresentativeUniformCatalog", b =>
-                {
-                    b.HasOne("SIIR.Models.Representative", null)
-                        .WithMany()
-                        .HasForeignKey("RepresentativeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SIIR.Models.UniformCatalog", null)
-                        .WithMany()
-                        .HasForeignKey("UniformCatalogsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SIIR.Models.Document", b =>
                 {
                     b.HasOne("SIIR.Models.DocumentCatalog", "DocumentCatalog")
@@ -628,6 +615,25 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("DocumentCatalog");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
+                {
+                    b.HasOne("SIIR.Models.Representative", "Representative")
+                        .WithMany()
+                        .HasForeignKey("RepresentativeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.UniformCatalog", "UniformCatalog")
+                        .WithMany("RepresentativeUniformCatalogs")
+                        .HasForeignKey("UniformCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Representative");
+
+                    b.Navigation("UniformCatalog");
                 });
 
             modelBuilder.Entity("SIIR.Models.Student", b =>
@@ -690,6 +696,11 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("Coach");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
+                {
+                    b.Navigation("RepresentativeUniformCatalogs");
                 });
 #pragma warning restore 612, 618
         }

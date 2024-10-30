@@ -4,6 +4,8 @@ using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -54,17 +56,14 @@ namespace SIIR.Areas.Admin.Controllers
         {
             if (representativeVM.SelectedUniformCatalogIds != null)
             {
-                var representative = representativeVM.Representative;
-                if (representative.UniformCatalogs == null)
-                {
-                    representative.UniformCatalogs = new List<UniformCatalog>();
-                }
-
-
                 foreach (var uniformCatalogId in representativeVM.SelectedUniformCatalogIds)
                 {
-                    var uniformCatalog = _contenedorTrabajo.UniformCatalog.GetById(uniformCatalogId);
-                    representative.UniformCatalogs.Add(uniformCatalog);
+                    var representativeUniformCatalog = new RepresentativeUniformCatalog
+                    {
+                        RepresentativeId = representativeVM.Representative.Id,
+                        UniformCatalogId = uniformCatalogId
+                    };
+                    _contenedorTrabajo.RepresentativeUniformCatalog.Add(representativeUniformCatalog);
                 }
                 _contenedorTrabajo.Save();
             }
@@ -78,13 +77,13 @@ namespace SIIR.Areas.Admin.Controllers
                 Representative = new Representative(),
                 UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList()
             };
-            if (id != null)
-            {
-                representativeVM.Representative = _contenedorTrabajo.Representative
-                .GetAll(r => r.Id == id, includeProperties: "UniformCatalogs")
+            representativeVM.Representative = _contenedorTrabajo.Representative
+                .GetAll(r => r.Id == id)
                 .FirstOrDefault();
-
-            }
+            representativeVM.SelectedUniformCatalogIds = _contenedorTrabajo.RepresentativeUniformCatalog
+                .GetAll(ruc => ruc.RepresentativeId == id)
+                .Select(ruc => ruc.UniformCatalogId)
+                .ToList();
             return View(representativeVM);
         }
 
@@ -105,40 +104,46 @@ namespace SIIR.Areas.Admin.Controllers
 
         private void UpdateRepresentativeUniformCatalog(RepresentativeVM representativeVM)
         {
-                var representative = representativeVM.Representative;
+            var existingRUCs = _contenedorTrabajo.RepresentativeUniformCatalog
+                .GetAll(ruc => ruc.RepresentativeId == representativeVM.Representative.Id)
+                .ToList();
 
-                var existingUniformCatalogs = _contenedorTrabajo.Representative
-                    .GetAll(r => r.Id == representative.Id, includeProperties: "UniformCatalogs")
-                    .FirstOrDefault()?.UniformCatalogs ?? new List<UniformCatalog>();
-
-                representative.UniformCatalogs = existingUniformCatalogs;
-                var selectedUniformCatalogs = new HashSet<int>(representativeVM.SelectedUniformCatalogIds ?? new List<int>());
-                var existingUniformCatalogIds = new HashSet<int>(existingUniformCatalogs.Select(u => u.Id));
-
-                var catalogsToRemove = existingUniformCatalogIds.Except(selectedUniformCatalogs).ToList();
-                foreach (var catalogId in catalogsToRemove)
+            // Remove existing entries not in the new selection
+            if (representativeVM.SelectedUniformCatalogIds is null)
+            {
+                foreach (var existingRUC in existingRUCs)
                 {
-                    var catalogToRemove = existingUniformCatalogs.FirstOrDefault(c => c.Id == catalogId);
-                    if (catalogToRemove != null)
+                    _contenedorTrabajo.RepresentativeUniformCatalog.Remove(existingRUC);
+                }
+            }
+            else 
+            { 
+                foreach (var existingRUC in existingRUCs)
+                {
+                    if (!representativeVM.SelectedUniformCatalogIds.Contains(existingRUC.UniformCatalogId))
                     {
-                        representative.UniformCatalogs.Remove(catalogToRemove);
+                        _contenedorTrabajo.RepresentativeUniformCatalog.Remove(existingRUC);
                     }
                 }
 
-                var catalogsToAdd = selectedUniformCatalogs.Except(existingUniformCatalogIds).ToList();
-                foreach (var catalogId in catalogsToAdd)
+                // Add new entries
+                foreach (var uniformCatalogId in representativeVM.SelectedUniformCatalogIds)
                 {
-                    var catalogToAdd = _contenedorTrabajo.UniformCatalog.GetById(catalogId);
-                    if (catalogToAdd != null)
+                    if (!existingRUCs.Any(ruc => ruc.UniformCatalogId == uniformCatalogId))
                     {
-                        representative.UniformCatalogs.Add(catalogToAdd);
+                        var newRUC = new RepresentativeUniformCatalog
+                        {
+                            RepresentativeId = representativeVM.Representative.Id,
+                            UniformCatalogId = uniformCatalogId
+                        };
+                        _contenedorTrabajo.RepresentativeUniformCatalog.Add(newRUC);
                     }
                 }
-
-                _contenedorTrabajo.Save();
+            }
+            _contenedorTrabajo.Save();
         }
 
-        #region
+        #region API CALLS
 
         [HttpGet]
         public IActionResult GetAll()
@@ -147,7 +152,8 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Delete(int id) {
+        public IActionResult Delete(int id)
+        {
             var objFromDb = _contenedorTrabajo.Representative.GetById(id);
             if (objFromDb == null)
             {
@@ -156,7 +162,6 @@ namespace SIIR.Areas.Admin.Controllers
 
             // Verificar si hay equipos asociados a este representativo
             var teamsAssociated = _contenedorTrabajo.Team.GetAll(t => t.RepresentativeId == id);
-
             if (teamsAssociated.Any())
             {
                 // Si hay equipos asociados, no permitimos el borrado
@@ -166,11 +171,9 @@ namespace SIIR.Areas.Admin.Controllers
             // Si no hay equipos asociados, procedemos con el borrado
             _contenedorTrabajo.Representative.Remove(objFromDb);
             _contenedorTrabajo.Save();
-
             return Json(new { success = true, message = "Grupo representativo borrado exitosamente." });
         }
 
         #endregion
-
     }
 }

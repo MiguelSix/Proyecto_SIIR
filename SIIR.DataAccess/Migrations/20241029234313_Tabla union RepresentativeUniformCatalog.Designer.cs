@@ -12,8 +12,8 @@ using SIIR.Data;
 namespace SIIR.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240930232500_actualizacionTeams")]
-    partial class actualizacionTeams
+    [Migration("20241029234313_Tabla union RepresentativeUniformCatalog")]
+    partial class TablaunionRepresentativeUniformCatalog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,6 +232,21 @@ namespace SIIR.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RepresentativeUniformCatalog", b =>
+                {
+                    b.Property<int>("RepresentativeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UniformCatalogsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RepresentativeId", "UniformCatalogsId");
+
+                    b.HasIndex("UniformCatalogsId");
+
+                    b.ToTable("RepresentativeUniformCatalog");
+                });
+
             modelBuilder.Entity("SIIR.Models.Admin", b =>
                 {
                     b.Property<int>("Id")
@@ -239,6 +254,18 @@ namespace SIIR.DataAccess.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SecondLastName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -253,24 +280,55 @@ namespace SIIR.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SecondLastName")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Coaches");
+                });
+
+            modelBuilder.Entity("SIIR.Models.Document", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DocumentCatalogId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentCatalogId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Document");
                 });
 
             modelBuilder.Entity("SIIR.Models.DocumentCatalog", b =>
@@ -321,6 +379,23 @@ namespace SIIR.DataAccess.Migrations
                     b.ToTable("Representatives");
                 });
 
+            modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
+                {
+                    b.Property<int>("RepresentativeId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("UniformCatalogId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("RepresentativeId", "UniformCatalogId");
+
+                    b.HasIndex("UniformCatalogId");
+
+                    b.ToTable("RepresentativeUniformCatalogs");
+                });
+
             modelBuilder.Entity("SIIR.Models.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -346,11 +421,10 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<string>("Career")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CoachId")
+                    b.Property<int?>("CoachId")
                         .HasColumnType("int");
 
                     b.Property<string>("ControlNumber")
-                        .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
 
@@ -364,13 +438,14 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<float?>("Height")
                         .HasColumnType("real");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -382,12 +457,14 @@ namespace SIIR.DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecondLastName")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Semester")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("int");
 
                     b.Property<float?>("Weight")
                         .HasColumnType("real");
@@ -395,6 +472,8 @@ namespace SIIR.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CoachId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Students");
                 });
@@ -449,20 +528,17 @@ namespace SIIR.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("HasNumber")
-                        .HasColumnType("bit");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("RepresentativeId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RepresentativeId");
 
                     b.ToTable("UniformCatalog");
                 });
@@ -540,15 +616,72 @@ namespace SIIR.DataAccess.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RepresentativeUniformCatalog", b =>
+                {
+                    b.HasOne("SIIR.Models.Representative", null)
+                        .WithMany()
+                        .HasForeignKey("RepresentativeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.UniformCatalog", null)
+                        .WithMany()
+                        .HasForeignKey("UniformCatalogsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SIIR.Models.Document", b =>
+                {
+                    b.HasOne("SIIR.Models.DocumentCatalog", "DocumentCatalog")
+                        .WithMany()
+                        .HasForeignKey("DocumentCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DocumentCatalog");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
+                {
+                    b.HasOne("SIIR.Models.Representative", "Representative")
+                        .WithMany()
+                        .HasForeignKey("RepresentativeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.UniformCatalog", "UniformCatalog")
+                        .WithMany()
+                        .HasForeignKey("UniformCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Representative");
+
+                    b.Navigation("UniformCatalog");
+                });
+
             modelBuilder.Entity("SIIR.Models.Student", b =>
                 {
                     b.HasOne("SIIR.Models.Coach", "Coach")
                         .WithMany()
-                        .HasForeignKey("CoachId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CoachId");
+
+                    b.HasOne("SIIR.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId");
 
                     b.Navigation("Coach");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("SIIR.Models.Team", b =>
@@ -575,17 +708,6 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("Representative");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
-                {
-                    b.HasOne("SIIR.Models.Representative", "Representative")
-                        .WithMany()
-                        .HasForeignKey("RepresentativeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Representative");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>

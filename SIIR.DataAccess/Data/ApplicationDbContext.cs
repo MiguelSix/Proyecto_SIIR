@@ -21,6 +21,7 @@ namespace SIIR.Data
         public DbSet<UniformCatalog> UniformCatalog { get; set; }
         public DbSet<DocumentCatalog> DocumentCatalog { get; set; }
         public DbSet<Document> Document { get; set; }
+        public DbSet<RepresentativeUniformCatalog> RepresentativeUniformCatalogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,9 @@ namespace SIIR.Data
                 .WithMany()
                 .HasForeignKey(t => t.StudentId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<RepresentativeUniformCatalog>()
+                .HasKey(ruc => new { ruc.RepresentativeId, ruc.UniformCatalogId });
         }
     }
 }
