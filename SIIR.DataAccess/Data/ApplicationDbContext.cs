@@ -39,12 +39,6 @@ namespace SIIR.Data
                 .HasForeignKey(t => t.RepresentativeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Team>()
-                .HasOne(t => t.Student)
-                .WithMany()
-                .HasForeignKey(t => t.StudentId)
-                .OnDelete(DeleteBehavior.SetNull);
-
             modelBuilder.Entity<RepresentativeUniformCatalog>()
                 .HasKey(ruc => new { ruc.RepresentativeId, ruc.UniformCatalogId });
         }
