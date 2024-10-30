@@ -91,8 +91,6 @@ namespace SIIR.Areas.Admin.Controllers
             return View(student);
         }
 
-        
-
 
         #region API CALLS
         [HttpGet]

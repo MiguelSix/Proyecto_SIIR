@@ -38,9 +38,5 @@ namespace SIIR.Models
         [ForeignKey("RepresentativeId")]
         public Representative? Representative { get; set; }
 
-        //CAPITAN ID
-        public int? StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public Student Student { get; set; }
 	}
 }

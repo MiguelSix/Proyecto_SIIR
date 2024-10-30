@@ -76,12 +76,6 @@
                                 <span asp-validation-for="Team.RepresentativeId" class="text-danger"></span>
                             </div>
 
-                            <div class="mv-3">
-                                <label for="Capitan" class="form-label fw-bold">Capitan</label>
-                                @Html.DropDownListFor(m => m.Team.StudentId, Model.StudentList, "Selecciona un Capitan:", new { @class = "form-select" })
-                                <span asp-validation-for="Team.StudentId" class="text-danger"></span>
-                            </div>
-
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">

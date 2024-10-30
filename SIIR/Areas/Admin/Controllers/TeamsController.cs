@@ -192,11 +192,7 @@ namespace SIIR.Areas.Admin.Controllers
                 {
                     currentCaptain.IsCaptain = false;
                     _contenedorTrabajo.Student.Update(currentCaptain);
-                }
-
-                // update the studentId in the team table
-                var team = _contenedorTrabajo.Team.GetById(teamId);
-                team.StudentId = newCaptainId;
+                }  
 
                 // Set new captain
                 var newCaptain = _contenedorTrabajo.Student.GetById(newCaptainId);
@@ -207,7 +203,6 @@ namespace SIIR.Areas.Admin.Controllers
 
                 newCaptain.IsCaptain = true;
                 _contenedorTrabajo.Student.Update(newCaptain);
-                _contenedorTrabajo.Team.Update(team);
                 _contenedorTrabajo.Save();
 
                 return Json(new { success = true });
