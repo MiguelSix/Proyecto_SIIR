@@ -37,12 +37,6 @@ namespace SIIR.Data
                 .WithMany()
                 .HasForeignKey(t => t.RepresentativeId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Team>()
-                .HasOne(t => t.Student)
-                .WithMany()
-                .HasForeignKey(t => t.StudentId)
-                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

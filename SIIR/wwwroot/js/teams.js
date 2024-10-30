@@ -24,7 +24,7 @@ function cargarDatatable() {
             },
             { "data": "coach.name", "width": "10%" },
             { "data": "representative.name", "width": "10%" },
-            { "data": "student.name", "width": "10%" },
+            //{ "data": "student.name", "width": "10%" },
             {
                 "data": "id",
                 "render": function (data) {

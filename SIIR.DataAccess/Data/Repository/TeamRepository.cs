@@ -63,8 +63,6 @@ namespace SIIR.DataAccess.Data.Repository
             objDesdeDb.Category = team.Category;
             objDesdeDb.CoachId = team.CoachId;
             objDesdeDb.RepresentativeId = team.RepresentativeId;
-            objDesdeDb.StudentId = team.StudentId;
-
             _db.SaveChanges();
         }
     }
