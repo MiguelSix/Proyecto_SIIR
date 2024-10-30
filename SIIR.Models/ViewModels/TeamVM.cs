@@ -13,5 +13,6 @@ namespace SIIR.Models.ViewModels
         public IEnumerable<SelectListItem>? CoachList { get; set; }
         public IEnumerable<SelectListItem>? RepresentativeList { get; set; }
         public IEnumerable<SelectListItem>? StudentList { get; set; }
+        public Student? Captain { get; set; }
     }
 }
