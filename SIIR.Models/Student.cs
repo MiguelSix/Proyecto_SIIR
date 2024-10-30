@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -90,5 +91,9 @@ namespace SIIR.Models
         public int? TeamId { get; set; }
         [ForeignKey("TeamId")]
         public Team Team { get; set; }
+
+        // Capitán
+        [DefaultValue(false)]
+        public bool IsCaptain { get; set; }
     }
 }

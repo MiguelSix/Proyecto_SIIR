@@ -57,5 +57,35 @@ namespace SIIR.DataAccess.Data.Repository
                 _db.SaveChanges();
             }
         }
+
+        public void AssignCaptain(Student student)
+        {
+            // Desasigna al capitán actual si hay uno
+            var currentCaptain = _db.Students.FirstOrDefault(s => s.IsCaptain);
+            if (currentCaptain != null && currentCaptain.Id != student.Id)
+            {
+                currentCaptain.IsCaptain = false;
+            }
+
+            // Asigna al nuevo capitán
+            var objFromDb = _db.Students.FirstOrDefault(s => s.Id == student.Id);
+            if (objFromDb != null)
+            {
+                objFromDb.IsCaptain = true; // Asegurarse de que esté asignado
+                _db.SaveChanges();
+            }
+        }
+
+        public void UnassignCaptain(Student student)
+        {
+            var objFromDb = _db.Students.FirstOrDefault(s => s.Id == student.Id);
+
+            if (objFromDb != null)
+            {
+                objFromDb.IsCaptain = student.IsCaptain;
+
+                _db.SaveChanges();
+            }
+        }
     }
 }

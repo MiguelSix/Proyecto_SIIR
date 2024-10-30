@@ -293,6 +293,9 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<int>("DocumentCatalogId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -423,6 +426,9 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsCaptain")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -488,16 +494,11 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<int>("RepresentativeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StudentId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CoachId");
 
                     b.HasIndex("RepresentativeId");
-
-                    b.HasIndex("StudentId");
 
                     b.ToTable("Teams");
                 });
@@ -665,16 +666,9 @@ namespace SIIR.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SIIR.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Coach");
 
                     b.Navigation("Representative");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>

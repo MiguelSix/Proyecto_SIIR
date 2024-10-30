@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
@@ -34,7 +35,6 @@ namespace SIIR.Areas.Admin.Controllers
                 Team = new(),
                 RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList(),
                 CoachList = _contenedorTrabajo.Coach.GetCoachesList(),
-                StudentList = _contenedorTrabajo.Student.GetStudentsList(),
             };
             return View(teamVM);
         }
@@ -71,7 +71,6 @@ namespace SIIR.Areas.Admin.Controllers
             }
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
-            teamVM.StudentList = _contenedorTrabajo.Student.GetStudentsList();
 
 			return View(teamVM);
         }
@@ -85,7 +84,6 @@ namespace SIIR.Areas.Admin.Controllers
                 Team = new(),
                 RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList(),
                 CoachList = _contenedorTrabajo.Coach.GetCoachesList(),
-                StudentList = _contenedorTrabajo.Student.GetStudentsList()
             };
             if (id != null)
             {
@@ -142,8 +140,73 @@ namespace SIIR.Areas.Admin.Controllers
             }
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
-            teamVM.StudentList = _contenedorTrabajo.Student.GetStudentsList();
             return View(teamVM);
+        }
+
+        [HttpGet]
+        public IActionResult Roster(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var team = _contenedorTrabajo.Team.GetById(id.Value);
+            if (team == null)
+            {
+                return NotFound();
+            }
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value);
+
+            // Obtener el capitán si existe
+            var captain = students.FirstOrDefault(s => s.IsCaptain);
+
+            TeamVM teamVM = new()
+            {
+                Team = team,
+                StudentList = students.Select(s => new SelectListItem
+                {
+                    Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
+                    Value = s.Id.ToString()
+                }),
+                Captain = captain // Asegúrate de agregar esta propiedad al TeamVM
+            };
+
+            return View(teamVM);
+        }
+
+        [HttpPost]
+        public IActionResult ChangeCaptain(int teamId, int newCaptainId)
+        {
+            try
+            {
+                // Get current captain if exists
+                var currentCaptain = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && s.IsCaptain).FirstOrDefault();
+
+                // Remove captain status from current captain
+                if (currentCaptain != null)
+                {
+                    currentCaptain.IsCaptain = false;
+                    _contenedorTrabajo.Student.Update(currentCaptain);
+                }  
+
+                // Set new captain
+                var newCaptain = _contenedorTrabajo.Student.GetById(newCaptainId);
+                if (newCaptain == null || newCaptain.TeamId != teamId)
+                {
+                    return Json(new { success = false, message = "Estudiante no encontrado o no pertenece al equipo" });
+                }
+
+                newCaptain.IsCaptain = true;
+                _contenedorTrabajo.Student.Update(newCaptain);
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al cambiar el capitán: " + ex.Message });
+            }
         }
 
         #region API CALLS
@@ -151,7 +214,15 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Json(new { data = _contenedorTrabajo.Team.GetAll(includeProperties: "Representative,Coach,Student") });
+            return Json(new { data = _contenedorTrabajo.Team.GetAll(includeProperties: "Representative,Coach") });
+        }
+
+        [HttpGet]
+        public IActionResult GetStudentsByTeamId(int teamId)
+        {
+            // Obtener los estudiantes por equipo
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
+            return Json(new { data = students });
         }
 
         [HttpDelete]

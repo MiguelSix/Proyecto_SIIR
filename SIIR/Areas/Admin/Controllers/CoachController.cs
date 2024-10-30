@@ -21,7 +21,6 @@ namespace SIIR.Areas.Admin.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        //Se utiliza HttpGet por que se van a traer y utilizar los datos del coach para acceso a vistas y asi?
         [HttpGet]
         public IActionResult Index()
         {
@@ -29,48 +28,9 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(Models.Coach coach)
-        {
-            if (ModelState.IsValid)
-            {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-                var files = HttpContext.Request.Form.Files;
-                if (coach.Id == 0 && files.Count() > 0)
-                {
-                    string fileName = Guid.NewGuid().ToString();
-                    var uploads = Path.Combine(webRootPath, @"images\coaches");
-                    var extension = Path.GetExtension(files[0].FileName);
-                    
-                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
-                    {
-                        files[0].CopyTo(fileStreams);
-                    }
-                    coach.ImageUrl = @"\images\coaches\" + fileName + extension;
-                    
-                }
-                else
-                {
-                    ModelState.AddModelError("Imagen", "Debes seleccionar una imagen");
-                }
-                _contenedorTrabajo.Coach.Add(coach);
-                _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(coach);
-        }
-
-        [HttpGet]
         public IActionResult Edit(int id)
         {
-            Models.Coach coach = new Models.Coach();
-            coach = _contenedorTrabajo.Coach.GetById(id);
+            var coach = _contenedorTrabajo.Coach.GetById(id);
             
             if (coach == null)
             {
@@ -80,53 +40,81 @@ namespace SIIR.Areas.Admin.Controllers
             return View(coach);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Models.Coach coach)
         {
             if (ModelState.IsValid)
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-                var files = HttpContext.Request.Form.Files;
-                var coachFromDb = _contenedorTrabajo.Team.GetById(coach.Id);
-
-                if (files.Count() > 0)
+                try
                 {
-                    // Editar Imagen
-                    string fileName = Guid.NewGuid().ToString();
-                    var uploads = Path.Combine(webRootPath, @"images\coaches");
-                    var extension = Path.GetExtension(files[0].FileName);
+                    string webRootPath = _hostingEnvironment.WebRootPath;
+                    var files = HttpContext.Request.Form.Files;
+                    var coachFromDb = _contenedorTrabajo.Coach.GetById(coach.Id);
 
-                    var extension_new = Path.GetExtension(files[0].FileName);
-                    var imagePath = Path.Combine(webRootPath, coachFromDb.ImageUrl.TrimStart('\\'));
-
-                    if (System.IO.File.Exists(imagePath))
+                    if (coachFromDb == null)
                     {
-                        System.IO.File.Delete(imagePath);
+                        return NotFound();
                     }
 
-                    // Subir nueva imagen
-                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension_new), FileMode.Create))
+                    if (files.Count > 0)
                     {
-                        files[0].CopyTo(fileStreams);
+                        var file = files[0];
+                        if (file.Length > 0)
+                        {
+                            // Crear el directorio si no existe
+                            var uploadsFolder = Path.Combine(webRootPath, "images", "coaches");
+                            Directory.CreateDirectory(uploadsFolder);
+
+                            // Generar nombre único para el archivo
+                            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                            string filePath = Path.Combine(uploadsFolder, fileName);
+
+                            // Eliminar imagen anterior
+                            if (!string.IsNullOrEmpty(coachFromDb.ImageUrl))
+                            {
+                                var oldImagePath = Path.Combine(webRootPath, coachFromDb.ImageUrl.TrimStart('/'));
+                                if (System.IO.File.Exists(oldImagePath))
+                                {
+                                    System.IO.File.Delete(oldImagePath);
+                                }
+                            }
+
+                            // Guardar nueva imagen
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                file.CopyTo(fileStream);
+                            }
+
+                            // Actualizar la URL en el modelo
+                            coach.ImageUrl = "/images/coaches/" + fileName;
+                        }
+                    }
+                    else
+                    {
+                        // Mantener la imagen existente
+                        coach.ImageUrl = coachFromDb.ImageUrl;
                     }
 
-                    coach.ImageUrl = @"\images\coach\" + fileName + extension_new;
-                    _contenedorTrabajo.Coach.Update(coach);
+                    // Actualizar otros campos del coach
+                    coachFromDb.Name = coach.Name;
+                    coachFromDb.LastName = coach.LastName;
+                    coachFromDb.SecondLastName = coach.SecondLastName;
+                    coachFromDb.ImageUrl = coach.ImageUrl;
+
+                    _contenedorTrabajo.Coach.Update(coachFromDb);
                     _contenedorTrabajo.Save();
+
                     return RedirectToAction(nameof(Index));
                 }
-                else
+                catch (Exception ex)
                 {
-                    // No se seleccionó una nueva imagen
-                    //Ayudaaaaaaaaaaaaaaa   coach.ImageUrl = teamFromDb.ImageUrl;
+                    // Log the exception
+                    ModelState.AddModelError("", "Ha ocurrido un error al actualizar el coach: " + ex.Message);
                 }
-
-
-                _contenedorTrabajo.Coach.Update(coach);
-                _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
             }
+
             return View(coach);
         }
 

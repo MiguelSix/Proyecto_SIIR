@@ -19,33 +19,25 @@ namespace SIIR.DataAccess.Data.Repository
         {
             _db = db;
         }
-        //public IEnumerable<SelectListItem> GetDocumentCatalogList()
-        //{
-        //    return _db.DocumentCatalog.Select(i => new SelectListItem()
-        //    {
-        //        Text = i.Name,
-        //        Value = i.Id.ToString()
-        //    });
-        //}
-        public IEnumerable<DocumentVM> GetDocumentCatalogList()
+        public IEnumerable<SelectListItem> GetDocumentCatalogList()
         {
-            return _db.DocumentCatalog.Select(doc => new DocumentVM
+            return _db.DocumentCatalog.Select(i => new SelectListItem()
             {
-                Id = doc.Id,
-                Name = doc.Name,
-                Description = doc.Description,
-                Extension = doc.Extension
-            }).ToList();
+                Text = i.Name,
+                Value = i.Id.ToString(),
+                Group = new SelectListGroup { Name = i.Description ?? "Sin Descripción" }
+            });
         }
 
         public void Update(DocumentCatalog documentCatalog)
         {
             var objDesdeDb = _db.DocumentCatalog.FirstOrDefault(s => s.Id == documentCatalog.Id);
-            objDesdeDb.Name = documentCatalog.Name;
-            objDesdeDb.Description = documentCatalog.Description;
-            objDesdeDb.Extension = documentCatalog.Extension;
-
-            _db.SaveChanges();
+            if (objDesdeDb != null)
+            {
+                objDesdeDb.Name = documentCatalog.Name;
+                objDesdeDb.Description = documentCatalog.Description;
+                objDesdeDb.Extension = documentCatalog.Extension;
+            }
         }
     }
 }

@@ -11,9 +11,8 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
 {
     public interface IDocumentCatalogRepository : IRepository<DocumentCatalog>
     {
-        void Update(DocumentCatalog entityCatalog);
+        IEnumerable<SelectListItem> GetDocumentCatalogList();
+        void Update(DocumentCatalog documentCatalog);
 
-        //IEnumerable<SelectListItem> GetDocumentCatalogList();
-        public IEnumerable<DocumentVM> GetDocumentCatalogList();
     }
 }
