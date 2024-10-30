@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIIR.Data;
 
@@ -11,9 +12,11 @@ using SIIR.Data;
 namespace SIIR.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241029191742_UpdateDocumentModel")]
+    partial class UpdateDocumentModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -492,11 +495,16 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<int>("RepresentativeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CoachId");
 
                     b.HasIndex("RepresentativeId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Teams");
                 });
@@ -660,9 +668,16 @@ namespace SIIR.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SIIR.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Coach");
 
                     b.Navigation("Representative");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>

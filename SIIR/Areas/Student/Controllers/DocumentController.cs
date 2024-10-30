@@ -28,15 +28,20 @@ namespace SIIR.Areas.Student.Controllers
             {
                 Text = doc.Name, // Nombre del documento
                 Value = doc.Id.ToString(), // Id del documento
-                Group = new SelectListGroup { Name = doc.Extension }, // Agrupamos por tipo (ejemplo: pdf, foto, etc.)
+                Group = new SelectListGroup { Name = doc.Description }, 
             });
 
             DocumentVM docuVM = new DocumentVM()
             {
-                Document = new SIIR.Models.Document(),
-                ListaDocumenCatalog = listaDocumentos // Aquí pasamos la lista como SelectListItem
+                Document = new Document(),
+                ListDocumenCatalog = listaDocumentos
             };
 
+            var studentId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var existingDocs = _contenedorTrabajo.Document.GetAll(
+                filter: d => d.StudentId.ToString() == studentId,
+                includeProperties: "DocumentCatalog"
+            );
             return View(docuVM);
         }
         // Acción GET para cargar la vista de edición

@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace SIIR.Models
 {
+    public enum DocumentStatus
+    {
+        Pending = 'P',
+        Approved = 'A',
+        Rejected = 'R'
+    }
     public class Document
     {
         [Key]
@@ -22,6 +28,8 @@ namespace SIIR.Models
         public string UploadDate { get; set; }
         
         public string Url{ get; set; }
+
+        public DocumentStatus Status { get; set; } = DocumentStatus.Pending;
 
     }
 }
