@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SIIR.Data;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -26,15 +27,32 @@ namespace SIIR.DataAccess.Data.Repository
             });
         }
 
+        public IEnumerable<Document> GetDocumentsByStudent(int studentId)
+        {
+            return _db.Document
+                .Include(d => d.DocumentCatalog)
+                .Where(d => d.StudentId == studentId)
+                .ToList();
+        }
+
+        public Document GetDocumentWithCatalog(int id)
+        {
+            return _db.Document
+                .Include(d => d.DocumentCatalog)
+                .FirstOrDefault(d => d.Id == id);
+        }
+
         public void Update(Document document)
         {
             var objDesdeDb = _db.Document.FirstOrDefault(s => s.Id == document.Id);
-            objDesdeDb.StudentId = document.StudentId;
-            objDesdeDb.DocumentCatalogId = document.DocumentCatalogId;
-            objDesdeDb.UploadDate = document.UploadDate;
-            objDesdeDb.Url = document.Url;
-
-            _db.SaveChanges();
+            if (objDesdeDb != null)
+            {
+                objDesdeDb.StudentId = document.StudentId;
+                objDesdeDb.DocumentCatalogId = document.DocumentCatalogId;
+                objDesdeDb.UploadDate = document.UploadDate;
+                objDesdeDb.Url = document.Url;
+                objDesdeDb.Status = document.Status;
+            }
         }
 
     }

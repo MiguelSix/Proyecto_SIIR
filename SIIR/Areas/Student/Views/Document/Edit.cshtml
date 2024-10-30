@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<SIIR.Models.ViewModels.DocumentVM>
 
-<div class="container mt-5">
+@* <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-8">
             <form method="post" enctype="multipart/form-data" asp-action="GuardarDocumentos">
@@ -12,20 +12,20 @@
                 </div>
 
                 <br/>
-                @* Ciclo foreach para Mostrar Documentos *@
+                
                 @foreach (var document in Model)
                 {
                     <div class="mb-4">
-                        @* Nombre y Descripción del Documento *@
+                        
                         <label class="form-label fs-5 fw-bold">@document.Name</label>
                         <p class="text-muted mb-2" style="font-size: 0.9rem;">@document.Description</p>
-                        @* Sección de Subida de Archivos y Acciones *@
+                        
                         <div class="border rounded p-2">
                             <div class="d-flex align-items-center">
                                 <div class="position-relative" style="flex: 1;">
                                     <input type="file" class="form-control" id="file_@document.Id" name="files" />
                                 </div>
-                                @* Acciones: Visualizar, Descargar y Eliminar *@
+                        
                                 <div class="d-flex align-items-center ms-3">
                                     <a asp-action="ViewDocument" asp-controller="Document" asp-route-id="@document.Id"
                                        class="btn btn-outline-primary btn-sm me-2" title="Visualizar">
@@ -47,7 +47,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> *@
 <style>
     .form-control[type="file"] {
         padding: 0.375rem 0.75rem;
