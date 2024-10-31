@@ -23,7 +23,6 @@ namespace SIIR.Models
 
         [Display(Name = "Imagen")]
         [DataType(DataType.ImageUrl)]
-        [NotMapped]
         public string ImageUrl { get; set; }
 
         // Llaves foráneas
