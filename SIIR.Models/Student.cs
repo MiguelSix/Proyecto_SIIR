@@ -85,12 +85,12 @@ namespace SIIR.Models
         public int? CoachId { get; set; }
 
         [ForeignKey("CoachId")]
-        public Coach Coach { get; set; }
+        public Coach? Coach { get; set; }
 
         // Equipo
         public int? TeamId { get; set; }
         [ForeignKey("TeamId")]
-        public Team Team { get; set; }
+        public Team? Team { get; set; }
 
         // Capitán
         [DefaultValue(false)]

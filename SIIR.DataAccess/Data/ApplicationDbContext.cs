@@ -22,6 +22,7 @@ namespace SIIR.Data
         public DbSet<DocumentCatalog> DocumentCatalog { get; set; }
         public DbSet<Document> Document { get; set; }
         public DbSet<RepresentativeUniformCatalog> RepresentativeUniformCatalogs { get; set; }
+        public DbSet<Uniform> Uniform { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

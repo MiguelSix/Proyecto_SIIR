@@ -1,4 +1,5 @@
-﻿@model SIIR.Models.Student
+﻿@model SIIR.Models.ViewModels.StudentUniformVM
+
 @{
     ViewData["Title"] = "Informacion";
     Layout = "_LayoutWithoutNavBar";
@@ -85,212 +86,209 @@
         }
 </style>
 
+
 <div class="container info-container">
-    <div class="bg-white rounded-3 shadow-sm p-4">
-        <h2 class="text-center mb-4">Editar Estudiante</h2>
+	<form asp-action="Edit" method="post" enctype="multipart/form-data">
+		<input type="hidden" asp-for="student.Id" />
+		<input type="hidden" asp-for="student.CoachId" />
+		<input type="hidden" asp-for="student.TeamId" />
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<div class="bg-white rounded-3 shadow-sm p-4">
+			<h2 class="text-center mb-4">Editar Estudiante</h2>
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Estudiante</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#uniform" type="button" role="tab" aria-controls="uniform" aria-selected="false">Uniforme</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Coach</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Equipo</button>
-            </li>
-        </ul>
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Estudiante</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#uniform" type="button" role="tab" aria-controls="uniform" aria-selected="false">Uniforme</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Coach</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Equipo</button>
+				</li>
+			</ul>
 
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
-                <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="CoachId" />
-                    <input type="hidden" asp-for="TeamId" />
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
 
-                    <div class="row general-data form">
-                        <h5 class="title">Datos personales</h5>
 
-                        <div class="col-md-4 mb-3">
-                            <label asp-for="Name" class="form-label">Nombre</label>
-                            <input asp-for="Name" class="form-control" placeholder="Introduce tu(s) nombre(s)" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label asp-for="LastName" class="form-label">Apellido paterno</label>
-                            <input asp-for="LastName" class="form-control" placeholder="Introduce tu apellido paterno" />
-                            <span asp-validation-for="LastName" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label asp-for="SecondLastName" class="form-label">Apellido materno</label>
-                            <input asp-for="SecondLastName" class="form-control" placeholder="Introduce tu apellido materno" />
-                            <span asp-validation-for="SecondLastName" class="text-danger"></span>
-                        </div>
+					<div class="row general-data form">
+						<h5 class="title">Datos personales</h5>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Phone" class="form-label">Número de teléfono</label>
-                            <input asp-for="Phone" class="form-control" placeholder="Introduce tu número de teléfono" />
-                            <span asp-validation-for="Phone" class="text-danger"></span>
-                        </div>
+						<div class="col-md-4 mb-3">
+							<label asp-for="student.Name" class="form-label">Nombre</label>
+							<input asp-for="student.Name" class="form-control" placeholder="Introduce tu(s) nombre(s)" />
+							<span asp-validation-for="student.Name" class="text-danger"></span>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label asp-for="student.LastName" class="form-label">Apellido paterno</label>
+							<input asp-for="student.LastName" class="form-control" placeholder="Introduce tu apellido paterno" />
+							<span asp-validation-for="student.LastName" class="text-danger"></span>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label asp-for="student.SecondLastName" class="form-label">Apellido materno</label>
+							<input asp-for="student.SecondLastName" class="form-control" placeholder="Introduce tu apellido materno" />
+							<span asp-validation-for="student.SecondLastName" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="ControlNumber" class="form-label">Número de control</label>
-                            <input asp-for="ControlNumber" class="form-control" placeholder="Introduce tu número de control" />
-                            <span asp-validation-for="ControlNumber" class="text-danger"></span>
-                        </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.Phone" class="form-label">Número de teléfono</label>
+							<input asp-for="student.Phone" class="form-control" placeholder="Introduce tu número de teléfono" />
+							<span asp-validation-for="student.Phone" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-9 mb-3">
-                            <label asp-for="Email" class="form-label">Correo institucional</label>
-                            <input asp-for="Email" class="form-control" placeholder="Introduce tu correo institucional" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.ControlNumber" class="form-label">Número de control</label>
+							<input asp-for="student.ControlNumber" class="form-control" placeholder="Introduce tu número de control" />
+							<span asp-validation-for="student.ControlNumber" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-3 mb-3">
-                            <label asp-for="Age" class="form-label">Edad</label>
-                            <input asp-for="Age" class="form-control" placeholder="Introduce tu edad" />
-                            <span asp-validation-for="Age" class="text-danger"></span>
-                        </div>
+						<div class="col-md-9 mb-3">
+							<label asp-for="student.Email" class="form-label">Correo institucional</label>
+							<input asp-for="student.Email" class="form-control" placeholder="Introduce tu correo institucional" />
+							<span asp-validation-for="student.Email" class="text-danger"></span>
+						</div>
 
-                        <div class="col-12 mb-3">
-                            <label asp-for="Career" class="form-label">Carrera</label>
-                            <input asp-for="Career" class="form-control" placeholder="Introduce tu carrera" />
-                            <span asp-validation-for="Career" class="text-danger"></span>
-                        </div>
+						<div class="col-md-3 mb-3">
+							<label asp-for="student.Age" class="form-label">Edad</label>
+							<input asp-for="student.Age" class="form-control" placeholder="Introduce tu edad" />
+							<span asp-validation-for="student.Age" class="text-danger"></span>
+						</div>
 
-                    </div>
+						<div class="col-12 mb-3">
+							<label asp-for="student.Career" class="form-label">Carrera</label>
+							<input asp-for="student.Career" class="form-control" placeholder="Introduce tu carrera" />
+							<span asp-validation-for="student.Career" class="text-danger"></span>
+						</div>
 
-                    <div class="row tournament-registration form">
-                        <h5 class="title">Datos para inscripción a torneos</h5>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Curp" class="form-label">CURP</label>
-                            <input asp-for="Curp" class="form-control" placeholder="Introduce tu CURP" />
-                            <span asp-validation-for="Curp" class="text-danger"></span>
-                        </div>
+					</div>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="BloodType" class="form-label">Tipo de sangre</label>
-                            <input asp-for="BloodType" class="form-control" placeholder="Introduce tu tipo de sangre" />
-                            <span asp-validation-for="BloodType" class="text-danger"></span>
-                        </div>
+					<div class="row tournament-registration form">
+						<h5 class="title">Datos para inscripción a torneos</h5>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Semester" class="form-label">Semestre actual</label>
-                            <input asp-for="Semester" class="form-control" placeholder="Introduce tu semestre actual" />
-                            <span asp-validation-for="Semester" class="text-danger"></span>
-                        </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.Curp" class="form-label">CURP</label>
+							<input asp-for="student.Curp" class="form-control" placeholder="Introduce tu CURP" />
+							<span asp-validation-for="student.Curp" class="text-danger"></span>
+						</div>
 
-                        @*              <div class="col-md-6 mb-3">
-                        <label asp-for="Student.PreviousParticipations" class="form-label">Participaciones previas</label>
-                        <input asp-for="Student.PreviousParticipations" class="form-control" placeholder="Introduce la cantidad de participaciones previas" />
-                        <span asp-validation-for="Student.PreviousParticipations" class="text-danger"></span>
-                        </div> *@
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.BloodType" class="form-label">Tipo de sangre</label>
+							<input asp-for="student.BloodType" class="form-control" placeholder="Introduce tu tipo de sangre" />
+							<span asp-validation-for="student.BloodType" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="BirthDate" class="form-label">Fecha de nacimiento</label>
-                            <input asp-for="BirthDate" class="form-control" type="date" />
-                            <span asp-validation-for="BirthDate" class="text-danger"></span>
-                        </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.Semester" class="form-label">Semestre actual</label>
+							<input asp-for="student.Semester" class="form-control" placeholder="Introduce tu semestre actual" />
+							<span asp-validation-for="student.Semester" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-3 mb-3">
-                            <label asp-for="Weight" class="form-label">Peso (KG)</label>
-                            <input asp-for="Weight" class="form-control" placeholder="Introduce tu peso" />
-                            <span asp-validation-for="Weight" class="text-danger"></span>
-                        </div>
+						@*
+						<div class="col-md-6 mb-3">
+						<label asp-for="Student.PreviousParticipations" class="form-label">Participaciones previas</label>
+						<input asp-for="Student.PreviousParticipations" class="form-control" placeholder="Introduce la cantidad de participaciones previas" />
+						<span asp-validation-for="Student.PreviousParticipations" class="text-danger"></span>
+						</div> *@
 
-                        <div class="col-md-3 mb-3">
-                            <label asp-for="Height" class="form-label">Altura (metros)</label>
-                            <input asp-for="Height" class="form-control" placeholder="Introduce tu altura" />
-                            <span asp-validation-for="Height" class="text-danger"></span>
-                        </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.BirthDate" class="form-label">Fecha de nacimiento</label>
+							<input asp-for="student.BirthDate" class="form-control" type="date" />
+							<span asp-validation-for="student.BirthDate" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Nss" class="form-label">NSS</label>
-                            <input asp-for="Nss" class="form-control" placeholder="Introduce tu NSS" />
-                            <span asp-validation-for="Nss" class="text-danger"></span>
-                        </div>
+						<div class="col-md-3 mb-3">
+							<label asp-for="student.Weight" class="form-label">Peso (KG)</label>
+							<input asp-for="student.Weight" class="form-control" placeholder="Introduce tu peso" />
+							<span asp-validation-for="student.Weight" class="text-danger"></span>
+						</div>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Allergies" class="form-label">Alergias</label>
-                            <input asp-for="Allergies" class="form-control" placeholder="Introduce si tienes alergias" />
-                            <span asp-validation-for="Allergies" class="text-danger"></span>
-                        </div>
-                    </div>
+						<div class="col-md-3 mb-3">
+							<label asp-for="student.Height" class="form-label">Altura (metros)</label>
+							<input asp-for="student.Height" class="form-control" placeholder="Introduce tu altura" />
+							<span asp-validation-for="student.Height" class="text-danger"></span>
+						</div>
 
-                    <div class="col-md-8">
-                        <div class="mb-3">
-                            <label asp-for="ImageUrl" class="form-label fw-bold">Imagen del estudiante</label>
-                            <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
-                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Vista previa de la imagen</label>
-                            <img src="@Model.ImageUrl" class="img-fluid rounded border p-2" alt="Vista previa" />
-                        </div>
-                    </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.Nss" class="form-label">NSS</label>
+							<input asp-for="student.Nss" class="form-control" placeholder="Introduce tu NSS" />
+							<span asp-validation-for="student.Nss" class="text-danger"></span>
+						</div>
 
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <button type="submit" class="btn btn-primary w-100 mb-2">
-                                <i class="fas fa-save me-2"></i> Guardar Cambios
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <a asp-action="Index" class="btn btn-secondary w-100">
-                                <i class="fas fa-arrow-left me-2"></i> Volver
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.Allergies" class="form-label">Alergias</label>
+							<input asp-for="student.Allergies" class="form-control" placeholder="Introduce si tienes alergias" />
+							<span asp-validation-for="student.Allergies" class="text-danger"></span>
+						</div>
 
-            <div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
-                <form asp-action="Edit" method="post">
-                    <div class="info-card">
-                        <h6>Uniformes del alumno</h6>
+					</div>
 
-                        <!-- Label para el número de jugador con input tipo número -->
-                        <div class="col-md-6 mb-3">
-                            <label for="PlayerNumber" class="form-label">Número del jugador:</label>
-                            <input type="number" class="form-control" id="PlayerNumber" name="PlayerNumber" placeholder="Introduce el número del jugador" required />
-                        </div>
+					<div class="col-md-8">
+						<div class="mb-3">
+							<label asp-for="student.ImageUrl" class="form-label fw-bold">Imagen del estudiante</label>
+							<input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+							<span asp-validation-for="student.ImageUrl" class="text-danger"></span>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="mb-3">
+							<label class="form-label fw-bold">Vista previa de la imagen</label>
+							<img src="@Model.student.ImageUrl" class="img-fluid rounded border p-2" alt="Vista previa" />
+						</div>
+					</div>
 
-                        <!-- Contenedor para el contenido dinámico de uniformes -->
-                        <div id="uniformList" class="row g-3"></div>
+				</div>
 
-                        <!-- Botón para guardar cambios -->
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary w-100 mb-2">
-                                <i class="fas fa-save me-2"></i> Guardar Cambios
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+				<div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
 
-            <div class="tab-pane fade" id="coach" role="tabpanel" aria-labelledby="coach-tab">
-                <div class="info-card">
-                    <h6>Información del Coach</h6>
-                    <p><strong>Nombre:</strong> @Model.Coach.Name</p>
-                    <p><strong>Apellidos:</strong> @Model.Coach.LastName @Model.Coach.SecondLastName</p>
-                </div>
-            </div>
+					<div class="info-card">
+						<h6>Uniformes del alumno</h6>
 
-            <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
-                <div class="info-card">
-                    <h6>Información del Equipo</h6>
-                    <p><strong>Nombre:</strong> @Model.Team.Name</p>
-                    <p><strong>Categoria:</strong> @Model.Team.Category</p>
-                </div>
-            </div>
-        </div>
-    </div>
+						<div class="col-md-6 mb-3">
+							<label asp-for="playerNumber" class="form-label">Número del jugador:</label>
+							<input asp-for="playerNumber" class="form-control" placeholder="Introduce el número del jugador" />
+						</div>
+
+						<div id="uniformList" class="row g-3"></div>
+					</div>
+				</div>
+
+				<div class="tab-pane fade" id="coach" role="tabpanel" aria-labelledby="coach-tab">
+					<div class="info-card">
+						<h6>Información del Coach</h6>
+						<p><strong>Nombre:</strong> @Model.student.Coach.Name</p>
+						<p><strong>Apellidos:</strong> @Model.student.Coach.LastName @Model.student.Coach.SecondLastName</p>
+					</div>
+				</div>
+
+				<div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+					<div class="info-card">
+						<h6>Información del Equipo</h6>
+						<p><strong>Nombre:</strong> @Model.student.Team.Name</p>
+						<p><strong>Categoria:</strong> @Model.student.Team.Category</p>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row mt-4">
+				<div class="col-md-6">
+					<button type="submit" class="btn btn-primary w-100 mb-2">
+						<i class="fas fa-save me-2"></i> Guardar Cambios
+					</button>
+				</div>
+				<div class="col-md-6">
+					<a asp-action="Index" class="btn btn-secondary w-100">
+						<i class="fas fa-arrow-left me-2"></i> Volver
+					</a>
+				</div>
+			</div>
+
+		</div>
+	</form>
 </div>
 
 @section Scripts {
@@ -301,10 +299,10 @@
             });
 
         function loadUniforms() {
-            const representativeId = '@Model.Team.RepresentativeId';
+            const representativeId = '@Model.student.Team.RepresentativeId';
 
             $.ajax({
-                url: '/Student/Home/GetAllUniform', // Asegúrate de que el URL sea correcto
+                url: '/Student/Home/GetAllUniform',
                 type: 'GET',
                 data: { representativeId: representativeId },
                 success: function (response) {
@@ -312,23 +310,21 @@
                     uniformList.empty();
 
                     if (response.data && response.data.length > 0) {
-                        response.data.forEach(function (uniform) {
-                            uniformList.append(`
-                                                <div class="col-6 uniform-item">
-                                    <p class="mb-1"><strong>${uniform.name}:</strong></p>
-                                    <div class="dropdown">
-                                        <select class="form-select w-100 btn-primary btn">
-                                            <option selected disabled>Talla</option>
-                                            <option value="XS">XS</option>
-                                            <option value="S">S</option>
-                                            <option value="M">M</option>
-                                            <option value="L">L</option>
-                                            <option value="XL">XL</option>
-                                            <option value="XXL">XXL</option>
-                                        </select>
-                                    </div>
-                            </div>
-                            `);
+                        response.data.forEach(function (uniform, index) {
+							uniformList.append(`
+										<div class="col-6 uniform-item">
+											<p class="mb-1"><strong>${uniform.name}:</strong></p>
+											<div class="dropdown">
+												<select name="uniformSizeList[${index}]" class="form-control">
+													<option selected disabled>Talla</option>
+														@foreach (var size in Enum.GetValues(typeof(SIIR.Models.Size)))
+														{
+															<option value="@size">@size</option>
+														}
+												</select>
+											</div>
+								</div>
+							`);
                         });
                     } else {
                         uniformList.append('<p>No se encontraron uniformes disponibles.</p>');

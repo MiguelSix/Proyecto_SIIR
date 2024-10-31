@@ -25,6 +25,7 @@ namespace SIIR.DataAccess.Data.Repository
             DocumentCatalog = new DocumentCatalogRepository(_db);
             Document = new DocumentRepository(_db);
             RepresentativeUniformCatalog = new RepresentativeUniformCatalogRepository(_db);
+            Uniform = new UniformRepository(_db);
         }
 
         public IUserRepository User { get; private set; }
@@ -36,6 +37,7 @@ namespace SIIR.DataAccess.Data.Repository
         public IDocumentCatalogRepository DocumentCatalog { get; private set; }
         public IDocumentRepository Document { get; private set; }
         public IRepresentativeUniformCatalog RepresentativeUniformCatalog { get; private set; }
+        public IUniformRepository Uniform { get; private set; }
         public void Dispose()
         {
             _db.Dispose();

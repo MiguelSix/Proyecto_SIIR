@@ -83,12 +83,19 @@ namespace SIIR.Areas.Student.Controllers
                 return NotFound();
             }
 
-            return View(currentUser.Student);
+            StudentUniformVM studentVM = new StudentUniformVM()
+            {
+                student = currentUser.Student
+            };  
+
+			ViewBag.SizeOptions = Enum.GetValues(typeof(Size)).Cast<Size>();
+
+			return View(studentVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Models.Student student)
+        public async Task<IActionResult> Edit(StudentUniformVM studentVM)
         {
             // Verificar que el usuario actual es el dueño del perfil
             var user = await _userManager.GetUserAsync(User);
@@ -101,14 +108,14 @@ namespace SIIR.Areas.Student.Controllers
                 .Include(u => u.Student)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
 
-            if (currentUser?.Student == null || currentUser.Student.Id != student.Id)
+            if (currentUser?.Student == null || currentUser.Student.Id != studentVM.student.Id)
             {
                 return Forbid();
             }
 
             // Quitar Coach y Team del ModelState
-            ModelState.Remove("Coach");
-            ModelState.Remove("Team");
+            //ModelState.Remove("Coach");
+            //ModelState.Remove("Team");
 
             if (ModelState.IsValid)
             {
@@ -122,9 +129,9 @@ namespace SIIR.Areas.Student.Controllers
                     var extension = Path.GetExtension(files[0].FileName);
 
                     // Eliminar la imagen anterior
-                    if (!string.IsNullOrEmpty(student.ImageUrl))
+                    if (!string.IsNullOrEmpty(studentVM.student.ImageUrl))
                     {
-                        var imagePath = Path.Combine(webRootPath, student.ImageUrl.TrimStart('\\'));
+                        var imagePath = Path.Combine(webRootPath, studentVM.student.ImageUrl.TrimStart('\\'));
                         if (System.IO.File.Exists(imagePath))
                         {
                             System.IO.File.Delete(imagePath);
@@ -137,42 +144,46 @@ namespace SIIR.Areas.Student.Controllers
                         files[0].CopyTo(fileStream);
                     }
 
-                    student.ImageUrl = @"\images\students\" + fileName + extension;
+					studentVM.student.ImageUrl = @"\images\students\" + fileName + extension;
                 }
                 else
                 {
-                    // Mantener la imagen actual
-                    student.ImageUrl = currentUser.Student.ImageUrl;
+					// Mantener la imagen actual
+					studentVM.student.ImageUrl = currentUser.Student.ImageUrl;
                 }
 
-                // Mantener los IDs existentes
-                student.TeamId = currentUser.Student.TeamId;
-                student.CoachId = currentUser.Student.CoachId;
+				// Mantener los IDs existentes
+				studentVM.student.TeamId = currentUser.Student.TeamId;
+				studentVM.student.CoachId = currentUser.Student.CoachId;
 
-                _contenedorTrabajo.Student.Update(student);
+                _contenedorTrabajo.Student.Update(studentVM.student);
                 _contenedorTrabajo.Save();
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recargar las relaciones para la vista
-            student.Team = currentUser.Student.Team;
-            student.Coach = currentUser.Student.Coach;
-            return View(student);
+			// Recargar las relaciones para la vista
+			studentVM.student.Team = currentUser.Student.Team;
+			studentVM.student.Coach = currentUser.Student.Coach;
+            return View(studentVM);
         }
 
-        /*[HttpGet]
+        [HttpGet]
         public IActionResult GetAllUniform(int representativeId)
         {
-            var representative = _contenedorTrabajo.Representative
-                .GetAll(r => r.Id == representativeId, includeProperties: "UniformCatalogs")
-                .FirstOrDefault();
+            var representativeUniforms = _contenedorTrabajo.RepresentativeUniformCatalog
+                .GetAll(ruc => ruc.RepresentativeId == representativeId, includeProperties: "UniformCatalog")
+                .ToList();
 
-            if (representative == null || representative.UniformCatalogs == null)
+            if (representativeUniforms == null || !representativeUniforms.Any())
             {
                 return Json(new { data = Array.Empty<object>() });
             }
 
-            return Json(new { data = representative.UniformCatalogs.Select(u => new { u.Id, u.Name }) });
-        }*/
+            var uniforms = representativeUniforms
+                .Select(ruc => new { ruc.UniformCatalog.Id, ruc.UniformCatalog.Name })
+                .ToList();
+
+            return Json(new { data = uniforms });
+        }
     }
 }
