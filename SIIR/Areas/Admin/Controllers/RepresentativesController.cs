@@ -44,9 +44,9 @@ namespace SIIR.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 _contenedorTrabajo.Representative.Add(representativeVM.Representative);
-                CreateRepresentativeUniformCatalog(representativeVM);
                 _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
+				CreateRepresentativeUniformCatalog(representativeVM);
+				return RedirectToAction(nameof(Index));
             }
             representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
             return View(representativeVM);
@@ -66,7 +66,7 @@ namespace SIIR.Areas.Admin.Controllers
                     _contenedorTrabajo.RepresentativeUniformCatalog.Add(representativeUniformCatalog);
                     
                 }
-                //_contenedorTrabajo.Save();
+                _contenedorTrabajo.Save();
             }
         }
 
