@@ -98,49 +98,61 @@ namespace SIIR.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-                var files = HttpContext.Request.Form.Files;
-                var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
-
-                if (files.Count() > 0)
+                var modelErrors = ModelState.Values.SelectMany(v => v.Errors);
+                if (modelErrors.Count() == 1 &&
+                    modelErrors.Any(e => e.ErrorMessage == "The Imagen field is required") &&
+                    teamVM.Team.Id != 0)
                 {
-                    // Editar Imagen
-                    string fileName = Guid.NewGuid().ToString();
-                    var uploads = Path.Combine(webRootPath, @"images\teams");
-                    var extension = Path.GetExtension(files[0].FileName);
+                    // Limpiar el error de validación de la imagen
+                    ModelState.Remove("Imagen");
+                }
+                else
+                {
+                    teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
+                    teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
+                    return View(teamVM);
+                }
+            }
 
-                    var extension_new = Path.GetExtension(files[0].FileName);
+            string webRootPath = _hostingEnvironment.WebRootPath;
+            var files = HttpContext.Request.Form.Files;
+            var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
+
+            if (files.Count > 0)
+            {
+                // Editar Imagen
+                string fileName = Guid.NewGuid().ToString();
+                var uploads = Path.Combine(webRootPath, @"images\teams");
+                var extension_new = Path.GetExtension(files[0].FileName);
+
+                // Eliminar la imagen anterior
+                if (!string.IsNullOrEmpty(teamFromDb.ImageUrl))
+                {
                     var imagePath = Path.Combine(webRootPath, teamFromDb.ImageUrl.TrimStart('\\'));
-
                     if (System.IO.File.Exists(imagePath))
                     {
                         System.IO.File.Delete(imagePath);
                     }
-
-                    // Subir nueva imagen
-                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension_new), FileMode.Create))
-                    {
-                        files[0].CopyTo(fileStreams);
-                    }
-
-                    teamVM.Team.ImageUrl = @"\images\teams\" + fileName + extension_new;
-                    _contenedorTrabajo.Team.Update(teamVM.Team);
-                    _contenedorTrabajo.Save();
-                    return RedirectToAction(nameof(Index));
                 }
-                else
+
+                // Subir nueva imagen
+                using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension_new), FileMode.Create))
                 {
-                    // No se seleccionó una nueva imagen
-                    teamVM.Team.ImageUrl = teamFromDb.ImageUrl;
+                    files[0].CopyTo(fileStreams);
                 }
 
-                _contenedorTrabajo.Team.Update(teamVM.Team);
-                _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
+                // Actualizar la imagen nueva del equipo
+                teamVM.Team.ImageUrl = @"\images\teams\" + fileName + extension_new;
             }
-            teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
-            teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
-            return View(teamVM);
+            else
+            {
+                // No se seleccionó una nueva imagen, mantener la imagen existente
+                teamVM.Team.ImageUrl = teamFromDb.ImageUrl;
+            }
+
+            _contenedorTrabajo.Team.Update(teamVM.Team);
+            _contenedorTrabajo.Save();
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
