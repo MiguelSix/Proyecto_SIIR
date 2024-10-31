@@ -156,9 +156,9 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            // Data del equipo
+            team.Coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value);
-
-            // Obtener el capitán si existe
             var captain = students.FirstOrDefault(s => s.IsCaptain);
 
             TeamVM teamVM = new()
@@ -169,7 +169,7 @@ namespace SIIR.Areas.Admin.Controllers
                     Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
                     Value = s.Id.ToString()
                 }),
-                Captain = captain // Asegúrate de agregar esta propiedad al TeamVM
+                Captain = captain
             };
 
             return View(teamVM);

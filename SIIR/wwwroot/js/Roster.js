@@ -1,5 +1,6 @@
 ﻿let dataTable;
 let currentCaptainId;
+
 $(document).ready(function () {
     const teamId = $("#teamId").val();
 
@@ -144,6 +145,27 @@ function initializeDataTable(teamId) {
                     return data || 'Sin actualizar';
                 },
                 "width": "10%"
+            },
+            {
+                "data": null,
+                "render": function (data) {
+                    return `
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="btn-group gap-2" role="group">
+                                <button class="btn btn-danger btn-sm" onclick="darDeBaja(${data.id})">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                                <button class="btn btn-info btn-sm" onclick="descargarInfo(${data.id})">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="descargarDocs(${data.id})">
+                                    <i class="fas fa-file-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                },
+                "width": "15%"
             }
         ],
         "language": {
