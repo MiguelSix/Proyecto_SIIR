@@ -109,7 +109,6 @@ namespace SIIR.Areas.Admin.Controllers
                 .GetAll(ruc => ruc.RepresentativeId == representativeVM.Representative.Id)
                 .ToList();
 
-            // Remove existing entries not in the new selection
             if (representativeVM.SelectedUniformCatalogIds is null)
             {
                 foreach (var existingRUC in existingRUCs)

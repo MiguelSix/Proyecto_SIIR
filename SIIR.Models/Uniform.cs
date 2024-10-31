@@ -22,12 +22,19 @@ namespace SIIR.Models
         [ForeignKey(nameof(StudentId))]
         public Student Student { get; set; }
 
-        // Clave primaria compuesta para la relación con RepresentativeUniformCatalog
+		// Clave primaria compuesta para la relación con RepresentativeUniformCatalog
+		/*
         public int RepresentativeId { get; set; }
         public int UniformCatalogId { get; set; }
         [ForeignKey(nameof(RepresentativeId))]
         public Representative? Representative { get; set; }
         [ForeignKey(nameof(UniformCatalogId))]
-        public UniformCatalog? UniformCatalog { get; set; }
-    }
+        public UniformCatalog? UniformCatalog { get; set; } */
+
+		public int RepresentativeId { get; set; }
+		public int UniformCatalogId { get; set; }
+
+		[ForeignKey("RepresentativeId, UniformCatalogId")]
+		public RepresentativeUniformCatalog? RepresentativeUniformCatalog { get; set; }
+	}
 }

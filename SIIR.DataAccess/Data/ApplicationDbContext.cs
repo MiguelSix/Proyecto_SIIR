@@ -42,6 +42,13 @@ namespace SIIR.Data
 
             modelBuilder.Entity<RepresentativeUniformCatalog>()
                 .HasKey(ruc => new { ruc.RepresentativeId, ruc.UniformCatalogId });
-        }
+
+			//Borrar en cascada uniformes. 
+			modelBuilder.Entity<Uniform>()
+		        .HasOne(u => u.RepresentativeUniformCatalog)
+		        .WithMany()
+		        .HasForeignKey(u => new { u.RepresentativeId, u.UniformCatalogId })
+		        .OnDelete(DeleteBehavior.Cascade);
+		}
     }
 }
