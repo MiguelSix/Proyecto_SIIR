@@ -95,5 +95,5 @@ namespace SIIR.Models
         // Capitán
         [DefaultValue(false)]
         public bool IsCaptain { get; set; }
-    }
+	}
 }

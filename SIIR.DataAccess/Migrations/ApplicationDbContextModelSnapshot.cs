@@ -251,7 +251,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.Coach", b =>
@@ -279,7 +279,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Coaches");
+                    b.ToTable("Coaches", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.Document", b =>
@@ -313,7 +313,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Document");
+                    b.ToTable("Document", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.DocumentCatalog", b =>
@@ -339,7 +339,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DocumentCatalog");
+                    b.ToTable("DocumentCatalog", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.Representative", b =>
@@ -361,7 +361,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Representatives");
+                    b.ToTable("Representatives", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
@@ -378,7 +378,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("UniformCatalogId");
 
-                    b.ToTable("RepresentativeUniformCatalogs");
+                    b.ToTable("RepresentativeUniformCatalogs", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.Student", b =>
@@ -463,7 +463,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.Team", b =>
@@ -500,7 +500,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("RepresentativeId");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Teams", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.Uniform", b =>
@@ -532,7 +532,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasIndex("RepresentativeId", "UniformCatalogId");
 
-                    b.ToTable("Uniform");
+                    b.ToTable("Uniform", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
@@ -555,7 +555,7 @@ namespace SIIR.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UniformCatalog");
+                    b.ToTable("UniformCatalog", (string)null);
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>

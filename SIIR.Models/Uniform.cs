@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SIIR.Models
 {
@@ -16,11 +17,11 @@ namespace SIIR.Models
     {
         [Key]
         public int Id { get; set; }
-        public Size? size { get; set; }  
+		public Size? size { get; set; }  
         public int? number { get; set; }
         public int StudentId { get; set; }
         [ForeignKey(nameof(StudentId))]
-        public Student Student { get; set; }
+        public Student? Student { get; set; }
 
 		// Clave primaria compuesta para la relación con RepresentativeUniformCatalog
 

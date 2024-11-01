@@ -27,9 +27,6 @@ namespace SIIR.DataAccess.Data.Repository
             {
                 objDesdeDb.size = uniform.size;
                 objDesdeDb.number = uniform.number;
-                objDesdeDb.StudentId = uniform.StudentId;
-                objDesdeDb.RepresentativeId = uniform.RepresentativeId;
-                objDesdeDb.UniformCatalogId = uniform.UniformCatalogId;
             }
         }
 

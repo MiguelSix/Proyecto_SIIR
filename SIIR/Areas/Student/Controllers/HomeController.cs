@@ -74,7 +74,7 @@ namespace SIIR.Areas.Student.Controllers
 
             var currentUser = await _userManager.Users
                 .Include(u => u.Student)
-                    .ThenInclude(s => s.Team)
+                .ThenInclude(s => s.Team)
                 .Include(u => u.Student.Coach)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
 
@@ -112,10 +112,6 @@ namespace SIIR.Areas.Student.Controllers
             {
                 return Forbid();
             }
-
-            // Quitar Coach y Team del ModelState
-            //ModelState.Remove("Coach");
-            //ModelState.Remove("Team");
 
             if (ModelState.IsValid)
             {
@@ -156,7 +152,18 @@ namespace SIIR.Areas.Student.Controllers
 				studentVM.student.TeamId = currentUser.Student.TeamId;
 				studentVM.student.CoachId = currentUser.Student.CoachId;
 
-                _contenedorTrabajo.Student.Update(studentVM.student);
+				/*Agregar el numero a cada uniforme y la talla */
+
+				if (studentVM.Uniforms != null)
+				{
+					foreach (var uniform in studentVM.Uniforms)
+					{
+                        uniform.number = studentVM.playerNumber;
+                        _contenedorTrabajo.Uniform.Update(uniform);
+					}
+				}
+
+				_contenedorTrabajo.Student.Update(studentVM.student);
                 _contenedorTrabajo.Save();
                 return RedirectToAction(nameof(Index));
             }
@@ -168,22 +175,18 @@ namespace SIIR.Areas.Student.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllUniform(int representativeId)
+        public IActionResult GetAllUniform(int studentId)
         {
-            var representativeUniforms = _contenedorTrabajo.RepresentativeUniformCatalog
-                .GetAll(ruc => ruc.RepresentativeId == representativeId, includeProperties: "UniformCatalog")
+            var uniforms = _contenedorTrabajo.Uniform
+                .GetAll(u => u.StudentId == studentId, includeProperties: "RepresentativeUniformCatalog.UniformCatalog")
                 .ToList();
 
-            if (representativeUniforms == null || !representativeUniforms.Any())
-            {
-                return Json(new { data = Array.Empty<object>() });
-            }
+            if(!uniforms.Any())
+			{
+				return Json(new { data = Array.Empty<object>() });
+			}
 
-            var uniforms = representativeUniforms
-                .Select(ruc => new { ruc.UniformCatalog.Id, ruc.UniformCatalog.Name })
-                .ToList();
-
-            return Json(new { data = uniforms });
+			return Json(new { data = uniforms });
         }
     }
 }

@@ -293,48 +293,66 @@
 
 @section Scripts {
         <!--script> await Html.RenderPartialAsync("_ValidationScriptsPartial");</script!-->
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                loadUniforms();
-            });
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			loadUniforms();
+		});
 
-        function loadUniforms() {
-            const representativeId = '@Model.student.Team.RepresentativeId';
+		function loadUniforms() {
+			const studentId = '@Model.student.Id';
+			const sizeEnum = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(SIIR.Models.Size))));
+			$.ajax({
+				url: '/Student/Home/GetAllUniform',
+				type: 'GET',
+				data: { studentId: studentId },
+				success: function (response) {
+					let uniformList = $('#uniformList');
+					uniformList.empty();
+					if (response.data && response.data.length > 0) {
+						response.data.forEach(function (uniform, index) {
+							let optionsHtml
 
-            $.ajax({
-                url: '/Student/Home/GetAllUniform',
-                type: 'GET',
-                data: { representativeId: representativeId },
-                success: function (response) {
-                    let uniformList = $('#uniformList');
-                    uniformList.empty();
+							if (uniform.size == null) {
+								optionsHtml = `<option selected disabled>Talla</option>`;
+								sizeEnum.forEach((size, index) => {
+									optionsHtml += `<option value="${size}">${size}</option>`;
+								});
+							} else {
+								optionsHtml = `<option disabled>Talla</option>`;
+								sizeEnum.forEach((size, index) => {
+									if (size !== sizeEnum[uniform.size]) {
+										optionsHtml += `<option value="${size}">${size}</option>`;
+									}
+									else {
+										optionsHtml += `<option value="${size}" selected>${size}</option>`;
+									}
+								});
+							}
 
-                    if (response.data && response.data.length > 0) {
-                        response.data.forEach(function (uniform, index) {
 							uniformList.append(`
-										<div class="col-6 uniform-item">
-											<p class="mb-1"><strong>${uniform.name}:</strong></p>
-											<div class="dropdown">
-												<select name="uniformSizeList[${index}]" class="form-control">
-													<option selected disabled>Talla</option>
-														@foreach (var size in Enum.GetValues(typeof(SIIR.Models.Size)))
-														{
-															<option value="@size">@size</option>
-														}
-												</select>
-											</div>
+								<div class="col-6 uniform-item">
+									<p class="mb-1"><strong>${uniform.representativeUniformCatalog.uniformCatalog.name}:</strong></p>
+									<div class="dropdown">
+										<select name="Uniforms[${index}].Size" class="form-control">
+											${optionsHtml}
+										</select>
+									</div>
+									<input type="hidden" name="Uniforms[${index}].Id" value="${uniform.id}" />
+									<input type="hidden" name="Uniforms[${index}].RepresentativeId" value="${uniform.representativeId}" />
+									<input type="hidden" name="Uniforms[${index}].UniformCatalogId" value="${uniform.uniformCatalogId}" />
+									<input type="hidden" name="Uniforms[${index}].UniformCatalogId" value="${studentId}" />
 								</div>
 							`);
-                        });
-                    } else {
-                        uniformList.append('<p>No se encontraron uniformes disponibles.</p>');
-                    }
-                },
-                error: function () {
-                    $('#uniformList').html('<p>Error al cargar los uniformes.</p>');
-                }
-            });
-        }
+					});
+				} else {
+					uniformList.append('<p>No se encontraron uniformes disponibles.</p>');
+				}
+			},
+			error: function () {
+				$('#uniformList').html('<p>Error al cargar los uniformes.</p>');
+			}
+		});
 
-        </script>
+	}
+	</script>
 }

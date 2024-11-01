@@ -136,7 +136,22 @@ namespace SIIR.Areas.Admin.Controllers
                             RepresentativeId = representativeVM.Representative.Id,
                             UniformCatalogId = uniformCatalogId
                         };
-                        _contenedorTrabajo.RepresentativeUniformCatalog.Add(newRUC);
+
+						var studentsId = _contenedorTrabajo.Student
+	                        .GetAll(s => s.Team.RepresentativeId == representativeVM.Representative.Id)
+	                        .Select(s => s.Id)
+	                        .ToList();
+
+                        foreach (var studentId in studentsId)
+                        {
+							var uniform = new Uniform();
+							uniform.StudentId = studentId;
+							uniform.RepresentativeId = representativeVM.Representative.Id;
+							uniform.UniformCatalogId = uniformCatalogId;
+							_contenedorTrabajo.Uniform.Add(uniform);
+						}
+
+						_contenedorTrabajo.RepresentativeUniformCatalog.Add(newRUC);
                     }
                 }
             }
