@@ -84,32 +84,81 @@
             color: #1a3c6e;
             margin-bottom: 10px;
         }
+
+		.numberInput {
+			width: 50px;
+			height: auto;
+		}
+
+
+		.numberInput::-webkit-outer-spin-button,
+		.numberInput::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+
+		.numberInput {
+			-moz-appearance: textfield;
+		}
+
+		.menu-drop {
+			color: #fff !important;
+            background-color: #1a3c6e !important;
+			display: block;
+			padding: 0.5rem 1rem;
+			text-decoration: none;
+			border-top-left-radius: 5px;
+			border-top-right-radius: 5px;
+		}
+
+		.menu-drop:focus,
+		.menu-drop:active {
+			color: #fff;
+		}
 </style>
 
 
 <div class="container info-container">
-	<form asp-action="Edit" method="post" enctype="multipart/form-data">
-		<input type="hidden" asp-for="student.Id" />
-		<input type="hidden" asp-for="student.CoachId" />
-		<input type="hidden" asp-for="student.TeamId" />
-		<div asp-validation-summary="All" class="text-danger"></div>
+	
 		<div class="bg-white rounded-3 shadow-sm p-4">
+		<form asp-action="Edit" method="post" enctype="multipart/form-data">
+			<input type="hidden" asp-for="student.Id" />
+			<input type="hidden" asp-for="student.CoachId" />
+			<input type="hidden" asp-for="student.TeamId" />
+			<div asp-validation-summary="All" class="text-danger"></div>
 			<h2 class="text-center mb-4">Editar Estudiante</h2>
 
-			<ul class="nav nav-tabs" id="myTab" role="tablist">
-				<li class="nav-item" role="presentation">
-					<button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Estudiante</button>
-				</li>
-				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#uniform" type="button" role="tab" aria-controls="uniform" aria-selected="false">Uniforme</button>
-				</li>
-				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Coach</button>
-				</li>
-				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Equipo</button>
-				</li>
-			</ul>
+			<div>
+				<ul class="nav nav-tabs d-none d-sm-flex" id="myTab" role="tablist">
+					<li class="nav-item" role="presentation">
+						<button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Estudiante</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="uniform-tab" data-bs-toggle="tab" data-bs-target="#uniform" type="button" role="tab" aria-controls="uniform" aria-selected="false">Uniforme</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Coach</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Equipo</button>
+					</li>
+				</ul>
+
+				<!-- Menú desplegable para pantallas pequeñas -->
+				<ul class="nav nav-tabs d-sm-none">
+					<li class="nav-item dropdown">
+						<a class="menu-drop nav-link dropdown-toggle" href="#" id="dropdownMenuLink" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							Menú
+						</a>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+							<a class="dropdown-item" href="#student" data-bs-toggle="tab" onclick="updateDropdownText('Estudiante')">Estudiante</a>
+							<a class="dropdown-item" href="#uniform" data-bs-toggle="tab" onclick="updateDropdownText('Uniforme')">Uniforme</a>
+							<a class="dropdown-item" href="#coach" data-bs-toggle="tab" onclick="updateDropdownText('Coach')">Coach</a>
+							<a class="dropdown-item" href="#team" data-bs-toggle="tab" onclick="updateDropdownText('Equipo')">Equipo</a>
+						</div>
+					</li>
+				</ul>
+			</div>
 
 			<div class="tab-content" id="myTabContent">
 				<div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
@@ -245,26 +294,26 @@
 				<div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
 
 					<div class="info-card">
-						<h6>Uniformes del alumno</h6>
+						<div class="d-flex flex-wrap align-items-center justify-content-between">
+							<h6 class="me-5"><strong>Uniformes del alumno</strong></h6>
 
-						<div class="col-md-6 mb-3">
-							<label asp-for="student.numberUniform" class="form-label">Número del jugador:</label>
-							<input asp-for="student.numberUniform" class="form-control" placeholder="Introduce el número del jugador" />
-							<span asp-validation-for="student.numberUniform" class="text-danger"></span>
+							<div class="d-flex align-items-center gap-2">
+								<label asp-for="student.numberUniform" class="form-label mb-0">Número:</label>
+								<input asp-for="student.numberUniform" class="form-control numberInput text-center" placeholder=""/>
+								<span asp-validation-for="student.numberUniform" class="text-danger"></span>
+							</div>
 						</div>
-
 						<div id="uniformList" class="row g-3">
 							@for (int i = 0; i < Model.uniforms.Count; i++)
 							{
-								<div class="col-12 mb-3">
+								<div class="col-12 mb-1">
 									<label asp-for="uniforms[i].size" class="form-label mb-1">@Model.namesUniform[i]</label>
 									<input type="hidden" asp-for="namesUniform[i]" />
 									<select asp-for="uniforms[i].size" class="form-control">
-										<!option disabled @(Model.uniforms[i].size == null ? "selected" : "")>Selecciona una talla</!option>
+										<!option class="text-center" disabled @(Model.uniforms[i].size == null ? "selected" : "")>Selecciona una talla</!option>
 										@foreach (var size in Enum.GetValues(typeof(SIIR.Models.Size)))
 										{
-											<!option value="@size" @(Model.uniforms[i].size == (SIIR.Models.Size)size ? "selected" : "")>@size</!option>
-
+											<!option class="text-center" value="@size" @(Model.uniforms[i].size == (SIIR.Models.Size)size ? "selected" : "")>@size</!option>
 										}
 									</select>
 									<input type="hidden" asp-for="uniforms[i].Id" />
@@ -308,11 +357,17 @@
 					</a>
 				</div>
 			</div>
-
+		</form>
 		</div>
-	</form>
+	
 </div>
 
 @section Scripts {
-	<script src="~/js/_ValidationScriptsPartial.js"></script>
+	<partial name="_ValidationScriptsPartial" />
+	<script>
+		function updateDropdownText(selectedText)
+		{
+			document.getElementById('dropdownMenuLink').innerText = selectedText;
+		}
+	</script>
 }
