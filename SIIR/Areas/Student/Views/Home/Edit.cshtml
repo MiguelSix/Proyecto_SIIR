@@ -92,7 +92,7 @@
 		<input type="hidden" asp-for="student.Id" />
 		<input type="hidden" asp-for="student.CoachId" />
 		<input type="hidden" asp-for="student.TeamId" />
-		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<div asp-validation-summary="All" class="text-danger"></div>
 		<div class="bg-white rounded-3 shadow-sm p-4">
 			<h2 class="text-center mb-4">Editar Estudiante</h2>
 
@@ -248,11 +248,33 @@
 						<h6>Uniformes del alumno</h6>
 
 						<div class="col-md-6 mb-3">
-							<label asp-for="playerNumber" class="form-label">Número del jugador:</label>
-							<input asp-for="playerNumber" class="form-control" placeholder="Introduce el número del jugador" />
+							<label asp-for="student.numberUniform" class="form-label">Número del jugador:</label>
+							<input asp-for="student.numberUniform" class="form-control" placeholder="Introduce el número del jugador" />
+							<span asp-validation-for="student.numberUniform" class="text-danger"></span>
 						</div>
 
-						<div id="uniformList" class="row g-3"></div>
+						<div id="uniformList" class="row g-3">
+							@for (int i = 0; i < Model.uniforms.Count; i++)
+							{
+								<div class="col-md-6 mb-3">
+									<label asp-for="uniforms[i].size" class="form-label">@Model.namesUniform[i]</label>
+									<input type="hidden" asp-for="namesUniform[i]" />
+									<select asp-for="uniforms[i].size" class="form-control">
+										<!option disabled @(Model.uniforms[i].size == null ? "selected" : "")>Selecciona una talla</!option>
+										@foreach (var size in Enum.GetValues(typeof(SIIR.Models.Size)))
+										{
+											<!option value="@size" @(Model.uniforms[i].size == (SIIR.Models.Size)size ? "selected" : "")>@size</!option>
+
+										}
+									</select>
+									<input type="hidden" asp-for="uniforms[i].Id" />
+									<input type="hidden" asp-for="uniforms[i].RepresentativeId" />
+									<input type="hidden" asp-for="uniforms[i].UniformCatalogId" />
+								</div>
+							}
+						</div>
+
+
 					</div>
 				</div>
 
@@ -292,67 +314,5 @@
 </div>
 
 @section Scripts {
-        <!--script> await Html.RenderPartialAsync("_ValidationScriptsPartial");</script!-->
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			loadUniforms();
-		});
-
-		function loadUniforms() {
-			const studentId = '@Model.student.Id';
-			const sizeEnum = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(SIIR.Models.Size))));
-			$.ajax({
-				url: '/Student/Home/GetAllUniform',
-				type: 'GET',
-				data: { studentId: studentId },
-				success: function (response) {
-					let uniformList = $('#uniformList');
-					uniformList.empty();
-					if (response.data && response.data.length > 0) {
-						response.data.forEach(function (uniform, index) {
-							let optionsHtml
-
-							if (uniform.size == null) {
-								optionsHtml = `<option selected disabled>Talla</option>`;
-								sizeEnum.forEach((size, index) => {
-									optionsHtml += `<option value="${size}">${size}</option>`;
-								});
-							} else {
-								optionsHtml = `<option disabled>Talla</option>`;
-								sizeEnum.forEach((size, index) => {
-									if (size !== sizeEnum[uniform.size]) {
-										optionsHtml += `<option value="${size}">${size}</option>`;
-									}
-									else {
-										optionsHtml += `<option value="${size}" selected>${size}</option>`;
-									}
-								});
-							}
-
-							uniformList.append(`
-								<div class="col-6 uniform-item">
-									<p class="mb-1"><strong>${uniform.representativeUniformCatalog.uniformCatalog.name}:</strong></p>
-									<div class="dropdown">
-										<select name="Uniforms[${index}].Size" class="form-control">
-											${optionsHtml}
-										</select>
-									</div>
-									<input type="hidden" name="Uniforms[${index}].Id" value="${uniform.id}" />
-									<input type="hidden" name="Uniforms[${index}].RepresentativeId" value="${uniform.representativeId}" />
-									<input type="hidden" name="Uniforms[${index}].UniformCatalogId" value="${uniform.uniformCatalogId}" />
-									<input type="hidden" name="Uniforms[${index}].UniformCatalogId" value="${studentId}" />
-								</div>
-							`);
-					});
-				} else {
-					uniformList.append('<p>No se encontraron uniformes disponibles.</p>');
-				}
-			},
-			error: function () {
-				$('#uniformList').html('<p>Error al cargar los uniformes.</p>');
-			}
-		});
-
-	}
-	</script>
+	<script src="~/js/_ValidationScriptsPartial.js"></script>
 }

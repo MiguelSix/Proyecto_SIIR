@@ -18,7 +18,6 @@ namespace SIIR.Models
         [Key]
         public int Id { get; set; }
 		public Size? size { get; set; }  
-        public int? number { get; set; }
         public int StudentId { get; set; }
         [ForeignKey(nameof(StudentId))]
         public Student? Student { get; set; }

@@ -81,6 +81,9 @@ namespace SIIR.Models
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
 
+		[Display(Name = "Número del jugador")]
+		public int? numberUniform { get; set; }
+
         // Llaves foráneas
         public int? CoachId { get; set; }
 

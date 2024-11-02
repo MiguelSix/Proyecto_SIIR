@@ -85,10 +85,29 @@ namespace SIIR.Areas.Student.Controllers
 
             StudentUniformVM studentVM = new StudentUniformVM()
             {
-                student = currentUser.Student
-            };  
+                student = currentUser.Student,
+                uniforms = _contenedorTrabajo.Uniform
+				            .GetAll(u => u.StudentId == currentUser.Student.Id)
+				            .ToList()
+			};
 
-			ViewBag.SizeOptions = Enum.GetValues(typeof(Size)).Cast<Size>();
+            foreach (var uniform in studentVM.uniforms)
+            {
+
+
+                var uniformNames = _contenedorTrabajo.UniformCatalog
+                    .GetAll(uc => uc.Id == uniform.UniformCatalogId)
+                    .Select(uc => uc.Name)
+                    .ToList();
+
+                foreach (var name in uniformNames)
+                {
+                    if (name is not null)
+                        studentVM.namesUniform.Add(name);
+                }
+            }
+
+				ViewBag.SizeOptions = Enum.GetValues(typeof(Size)).Cast<Size>();
 
 			return View(studentVM);
         }
@@ -108,12 +127,25 @@ namespace SIIR.Areas.Student.Controllers
                 .Include(u => u.Student)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
 
-            if (currentUser?.Student == null || currentUser.Student.Id != studentVM.student.Id)
+            if (currentUser?.Student == null || currentUser.Student.Id != studentVM.student?.Id)
             {
                 return Forbid();
             }
 
-            if (ModelState.IsValid)
+            if (currentUser.Student.numberUniform != null && studentVM.student.numberUniform != null)
+            { 
+			    var numbersStudents = _contenedorTrabajo.Student
+		            .GetAll(s => s.TeamId == studentVM.student.TeamId && s.Id != studentVM.student.Id)
+		            .Select(s => s.numberUniform)
+		            .ToList();
+
+			    if (numbersStudents.Contains(studentVM.student.numberUniform))
+			    {
+				    ModelState.AddModelError("student.numberUniform", "Este número ya está en uso por otro jugador en el equipo.");
+			    }
+			}
+
+			if (ModelState.IsValid)
             {
                 string webRootPath = _webHostEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
@@ -148,17 +180,12 @@ namespace SIIR.Areas.Student.Controllers
 					studentVM.student.ImageUrl = currentUser.Student.ImageUrl;
                 }
 
-				// Mantener los IDs existentes
-				studentVM.student.TeamId = currentUser.Student.TeamId;
-				studentVM.student.CoachId = currentUser.Student.CoachId;
-
 				/*Agregar el numero a cada uniforme y la talla */
 
-				if (studentVM.Uniforms != null)
+				if (studentVM.uniforms != null)
 				{
-					foreach (var uniform in studentVM.Uniforms)
+					foreach (var uniform in studentVM.uniforms)
 					{
-                        uniform.number = studentVM.playerNumber;
                         _contenedorTrabajo.Uniform.Update(uniform);
 					}
 				}
@@ -168,25 +195,10 @@ namespace SIIR.Areas.Student.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-			// Recargar las relaciones para la vista
-			studentVM.student.Team = currentUser.Student.Team;
-			studentVM.student.Coach = currentUser.Student.Coach;
-            return View(studentVM);
-        }
+            studentVM.student.Coach = _contenedorTrabajo.Coach.GetById(studentVM.student.CoachId);
+            studentVM.student.Team = _contenedorTrabajo.Team.GetById(studentVM.student.TeamId);
 
-        [HttpGet]
-        public IActionResult GetAllUniform(int studentId)
-        {
-            var uniforms = _contenedorTrabajo.Uniform
-                .GetAll(u => u.StudentId == studentId, includeProperties: "RepresentativeUniformCatalog.UniformCatalog")
-                .ToList();
-
-            if(!uniforms.Any())
-			{
-				return Json(new { data = Array.Empty<object>() });
-			}
-
-			return Json(new { data = uniforms });
+			return View(studentVM);
         }
     }
 }

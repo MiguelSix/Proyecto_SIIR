@@ -26,7 +26,6 @@ namespace SIIR.DataAccess.Data.Repository
             if (objDesdeDb != null)
             {
                 objDesdeDb.size = uniform.size;
-                objDesdeDb.number = uniform.number;
             }
         }
 
