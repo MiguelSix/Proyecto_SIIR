@@ -6,29 +6,34 @@ $(document).ready(function () {
 
 function cargarDatatable() {
     dataTable = $("#tblStudents").DataTable({
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRow
+            }
+        },
         "ajax": {
             "url": "/admin/students/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id", "width": "3%" },
-            { "data": "name", "width": "12%" },
-            { "data": "lastName", "width": "8%" },
-            { "data": "secondLastName", "width": "8%" },
+            { "data": "id" },
+            { "data": "name" },
+            { "data": "lastName" },
+            { "data": "secondLastName" },
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100"/>`
+                    return `<img src="../${imagen}" width="100" class="img-fluid"/>`
                 },
-                "width": "10%"
+                "responsivePriority": 4
             },
             {
                 "data": "team",
                 "render": function (data) {
                     return data ? `${data.name}  ${data.category}` : 'N/A';
                 },
-                "width": "18%"
+                "responsivePriority": 3
             },
             {
                 "data": "coach",
@@ -38,23 +43,21 @@ function cargarDatatable() {
                     }
                     return 'N/A';
                 },
-                "width": "15%"
+                "responsivePriority": 2
             },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="text-center">
-                                <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
+                    return `<div class="d-flex justify-content-center gap-2">
+                                <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                             
-                                <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white" style="width:80px;">
+                                <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
-
                             </div>`;
                 },
-                "width": "25%"
+                "responsivePriority": 1
             }
         ],
         "language": {
@@ -77,18 +80,21 @@ function cargarDatatable() {
                 "previous": "Anterior"
             }
         },
+        "order": [[0, "desc"]],
+        "pageLength": 10,
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
         "width": "100%"
     });
 }
 
 function Delete(url) {
     swal({
-        title: "Esta seguro de borrar?",
-        text: "Este contenido no se puede recuperar!",
+        title: "¿Está seguro de borrar?",
+        text: "¡Este contenido no se puede recuperar!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Si, borrar!",
+        confirmButtonText: "¡Sí, borrar!",
         closeOnconfirm: true
     }, function () {
         $.ajax({
