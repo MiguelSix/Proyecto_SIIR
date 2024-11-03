@@ -63,6 +63,7 @@
 
             .offcanvas .dropdown-menu {
                 background-color: #15325d;
+                min-width: 180%;
                 border: none;
                 width: 100%;
             }
@@ -147,7 +148,7 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" asp-area="Admin" asp-controller="Students" asp-action="Index">Estudiantes</a>
                             <a class="dropdown-item" asp-area="Admin" asp-controller="Coach" asp-action="Index">Coaches</a>
-                            <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Administradores</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Admins" asp-action="Index">Administradores</a>
                             <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Ver Todo</a>
                         </div>
                     </li>
@@ -201,7 +202,7 @@
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="Students" asp-action="Index">Estudiantes</a>
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="Coach" asp-action="Index">Coaches</a>
-                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Admins" asp-action="Index">Administradores</a>
+                                    <a class="dropdown-item pe-3" asp-area="Admin" asp-controller="Admins" asp-action="Index">Administradores</a>
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Ver Todo</a>
                                 </div>
                             </li>
