@@ -25,20 +25,101 @@
             flex-wrap: wrap;
         }
 
-        .navbar .nav-link {
-            color: white !important;
+            .navbar .nav-link {
+                color: white !important;
+            }
+
+            .navbar .navbar-brand {
+                color: white !important;
+            }
+
+        /* Estilos para el offcanvas */
+        .offcanvas {
+            background-color: #1a3c6e;
+            text-align: left !important;
         }
 
-        .navbar .navbar-brand {
-            color: white !important;
+            .offcanvas .nav-link {
+                color: white !important;
+                text-align: left !important;
+            }
+
+            .offcanvas .dropdown-menu {
+                background-color: #15325d;
+                border: none;
+            }
+
+            .offcanvas .dropdown-item {
+                color: white;
+            }
+
+                .offcanvas .dropdown-item:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
+
+        .offcanvas-title {
+            color: white;
+        }
+
+        .btn-close-white {
+            filter: brightness(0) invert(1);
+        }
+
+        @@media (min-width: 992px) {
+            .navbar-toggler {
+                display: none;
+            }
         }
     </style>
-
 </head>
 <body>
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasMenuLabel">SIIR</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            @if (User.IsInRole("Admin"))
+            {
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">USUARIOS</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Students" asp-action="Index">Estudiantes</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Coach" asp-action="Index">Coaches</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Administradores</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Ver Todo</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="Representatives" asp-action="Index">GRUPOS REPRESENTATIVOS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="Teams" asp-action="Index">EQUIPOS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="DocumentCatalog" asp-action="Index">DOCUMENTOS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="UniformCatalog" asp-action="Index">UNIFORMES</a>
+                    </li>
+                </ul>
+            }
+        </div>
+    </div>
+
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid mx-3">
+                <!-- Botón del menú lateral -->
+                <button class="navbar-toggler border-0 p-0 me-2" type="button"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasMenu"
+                        aria-controls="offcanvasMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
                 @if (User.IsInRole("Admin"))
                 {
                     <a class="navbar-brand" asp-area="Admin" asp-controller="Home" asp-action="Index">SIIR</a>
@@ -51,10 +132,6 @@
                 {
                     <a class="navbar-brand" asp-area="Coach" asp-controller="Home" asp-action="Index">SIIR</a>
                 }
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
 
                 <div class="collapse navbar-collapse" id="navbarColor01">
                     @if (User.IsInRole("Admin"))
@@ -85,9 +162,7 @@
                     }
                 </div>
 
-                
                 <partial name="_LoginPartial" />
-                
             </div>
         </nav>
     </header>
@@ -118,6 +193,14 @@
             toastr['@TempData["Type"]']('@TempData["Message"]');
         </script>
     }
+
+    <script>
+        $(document).ready(function () {
+            $('.offcanvas .nav-link:not(.dropdown-toggle)').click(function () {
+                $('.offcanvas').offcanvas('hide');
+            });
+        });
+    </script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
