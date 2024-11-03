@@ -1,54 +1,59 @@
 ﻿var dataTable;
+
 $(document).ready(function () {
     cargarDatatable();
 });
+
 function cargarDatatable() {
-    dataTable = $("#tblTeams").DataTable({
+    dataTable = $("#tblDocumentCatalog").DataTable({
         responsive: {
             details: {
                 display: $.fn.dataTable.Responsive.display.childRow
             }
         },
         "ajax": {
-            "url": "/admin/teams/GetAll",
+            "url": "/Admin/DocumentCatalog/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id" },
-            { "data": "name" },
-            { "data": "category" },
             {
-                "data": "imageUrl",
-                "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100" class="img-fluid"/>`
-                },
-                "responsivePriority": 4
-            },
-            {
-                "data": "coach.name",
+                "data": "id",
+                "width": "5%",
                 "responsivePriority": 3
             },
             {
-                "data": "representative.name",
+                "data": "name",
+                "width": "20%",
+                "responsivePriority": 1
+            },
+            {
+                "data": "extension",
+                "width": "10%",
                 "responsivePriority": 2
             },
             {
+                "data": "description",
+                "width": "40%",
+                "responsivePriority": 4,
+                "render": function (data) {
+                    return `<div class="text-wrap" style="max-width: 300px; white-space: normal;">${data}</div>`;
+                }
+            },
+            {
                 "data": "id",
+                "width": "40%",
+                "responsivePriority": 1,
                 "render": function (data) {
                     return `<div class="d-flex justify-content-center gap-2">
-                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success btn-sm text-white">
+                                <a href="/Admin/DocumentCatalog/Edit/${data}" class="btn btn-success text-white">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger btn-sm text-white">
+                                <a onclick=Delete("/Admin/DocumentCatalog/Delete/${data}") class="btn btn-danger text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
-                                <a href="/Admin/Teams/Roster/${data}" class="btn btn-info btn-sm text-white">
-                                    <i class="fas fa-users"></i> Ver plantilla
-                                </a>
-                            </div>`;
-                },
-                "responsivePriority": 1
+                           </div>`;
+                }
             }
         ],
         "language": {
@@ -57,7 +62,6 @@ function cargarDatatable() {
             "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
             "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
             "infoFiltered": "(Filtrado de _MAX_ total entradas)",
-            "infoPostFix": "",
             "thousands": ",",
             "lengthMenu": "Mostrar _MENU_ Entradas",
             "loadingRecords": "Cargando...",
@@ -77,6 +81,7 @@ function cargarDatatable() {
         "width": "100%"
     });
 }
+
 function Delete(url) {
     swal({
         title: "¿Está seguro de borrar?",
@@ -84,7 +89,7 @@ function Delete(url) {
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "¡Sí, borrar!",
+        confirmButtonText: "Sí, borrar!",
         closeOnconfirm: true
     }, function () {
         $.ajax({
@@ -94,8 +99,7 @@ function Delete(url) {
                 if (data.success) {
                     toastr.success(data.message);
                     dataTable.ajax.reload();
-                }
-                else {
+                } else {
                     toastr.error(data.message);
                 }
             }

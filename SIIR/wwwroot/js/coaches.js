@@ -1,58 +1,51 @@
 ﻿var dataTable;
-
 $(document).ready(function () {
-    cargarDatatable();
+    cargarDataTable();
 });
-
-function cargarDatatable() {
-    dataTable = $("#tblStudents").DataTable({
+function cargarDataTable() {
+    dataTable = $("#tblCategoriasCoach").DataTable({
         responsive: {
             details: {
                 display: $.fn.dataTable.Responsive.display.childRow
             }
         },
         "ajax": {
-            "url": "/admin/students/GetAll",
+            "url": "/Admin/Coach/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id" },
-            { "data": "name" },
-            { "data": "lastName" },
-            { "data": "secondLastName" },
+            {
+                "data": "id",
+                "responsivePriority": 1
+            },
+            {
+                "data": "name",
+                "responsivePriority": 2
+            },
+            {
+                "data": "lastName",
+                "responsivePriority": 3
+            },
+            {
+                "data": "secondLastName",
+                "responsivePriority": 4
+            },
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
                     return `<img src="../${imagen}" width="100" class="img-fluid"/>`
                 },
-                "responsivePriority": 4
-            },
-            {
-                "data": "team",
-                "render": function (data) {
-                    return data ? `${data.name}  ${data.category}` : 'N/A';
-                },
-                "responsivePriority": 3
-            },
-            {
-                "data": "coach",
-                "render": function (data) {
-                    if (data && (data.name || data.lastName)) {
-                        return `${data.name || ''} ${data.lastName || ''}`.trim();
-                    }
-                    return 'N/A';
-                },
-                "responsivePriority": 2
+                "responsivePriority": 5
             },
             {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="d-flex justify-content-center gap-2">
-                                <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white">
+                                <a href="/Admin/Coach/Edit/${data}" class="btn btn-success btn-sm text-white">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                                <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white">
+                                <a onclick=Delete("/Admin/Coach/Delete/${data}") class="btn btn-danger btn-sm text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
                             </div>`;
@@ -86,7 +79,6 @@ function cargarDatatable() {
         "width": "100%"
     });
 }
-
 function Delete(url) {
     swal({
         title: "¿Está seguro de borrar?",

@@ -2,51 +2,72 @@
 $(document).ready(function () {
     cargarDatatable();
 });
+
 function cargarDatatable() {
-    dataTable = $("#tblTeams").DataTable({
+    dataTable = $("#tblStudents").DataTable({
         responsive: {
             details: {
                 display: $.fn.dataTable.Responsive.display.childRow
             }
         },
         "ajax": {
-            "url": "/admin/teams/GetAll",
+            "url": "/admin/students/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id" },
-            { "data": "name" },
-            { "data": "category" },
+            {
+                "data": "id",
+                "responsivePriority": 3
+            },
+            {
+                "data": "name",
+                "responsivePriority": 1
+            },
+            {
+                "data": "lastName",
+                "responsivePriority": 3
+            },
+            {
+                "data": "secondLastName",
+                "responsivePriority": 3
+            },
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100" class="img-fluid"/>`
+                    return ``
                 },
                 "responsivePriority": 4
             },
             {
-                "data": "coach.name",
+                "data": "team",
+                "render": function (data) {
+                    return data ? `${data.name}  ${data.category}` : 'N/A';
+                },
                 "responsivePriority": 3
             },
             {
-                "data": "representative.name",
-                "responsivePriority": 2
+                "data": "coach",
+                "render": function (data) {
+                    if (data && (data.name || data.lastName)) {
+                        return `${data.name || ''} ${data.lastName || ''}`.trim();
+                    }
+                    return 'N/A';
+                },
+                "responsivePriority": 4 
             },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="d-flex justify-content-center gap-2">
-                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success btn-sm text-white">
-                                    <i class="far fa-edit"></i> Editar
-                                </a>
-                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger btn-sm text-white">
-                                    <i class="far fa-trash-alt"></i> Borrar
-                                </a>
-                                <a href="/Admin/Teams/Roster/${data}" class="btn btn-info btn-sm text-white">
-                                    <i class="fas fa-users"></i> Ver plantilla
-                                </a>
-                            </div>`;
+                    return `
+                        <div class="text-center">
+                            <a href="/Admin/Students/Upsert/${data}" class="btn btn-success text-white" style="cursor:pointer">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
+                                <i class="fas fa-trash-alt"></i> Borrar
+                            </a>
+                        </div>`;
                 },
                 "responsivePriority": 1
             }
@@ -77,6 +98,7 @@ function cargarDatatable() {
         "width": "100%"
     });
 }
+
 function Delete(url) {
     swal({
         title: "¿Está seguro de borrar?",
