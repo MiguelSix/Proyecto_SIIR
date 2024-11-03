@@ -1,35 +1,49 @@
 ﻿var dataTable;
-
 $(document).ready(function () {
     cargarDatatable();
 });
-
-
 function cargarDatatable() {
     dataTable = $("#tblRepresentatives").DataTable({
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRow
+            }
+        },
         "ajax": {
             "url": "/admin/representatives/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id", "width": "5%" },
-            { "data": "name", "width": "40%" },
-            { "data": "category", "width": "10%" },
             {
                 "data": "id",
+                "width": "5%",
+                "responsivePriority": 4
+            },
+            {
+                "data": "name",
+                "width": "40%",
+                "responsivePriority": 1
+            },
+            {
+                "data": "category",
+                "width": "10%",
+                "responsivePriority": 4
+            },
+            {
+                "data": "id",
+                "responsivePriority": 1,
                 "render": function (data) {
-                    return `<div class="text-center">
-                                <a href="/Admin/Representatives/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer; width:140px;">
-                                <i class="far fa-edit"></i> Editar
+                    return `<div class="d-flex justify-content-center gap-2">
+                                <a href="/Admin/Representatives/Edit/${data}" class="btn btn-success btn-sm text-white">
+                                    <i class="far fa-edit"></i> Editar
                                 </a>
-                                &nbsp;
-                                <a onclick=Delete("/Admin/Representatives/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer; width:140px;">
-                                <i class="far fa-trash-alt"></i> Borrar
+                                <a onclick=Delete("/Admin/Representatives/Delete/${data}") class="btn btn-danger btn-sm text-white">
+                                    <i class="far fa-trash-alt"></i> Borrar
                                 </a>
-                          </div>
-                         `;
-                }, "width": "40%"
+                          </div>`;
+                },
+                "width": "40%"
             }
         ],
         "language": {
@@ -52,6 +66,9 @@ function cargarDatatable() {
                 "previous": "Anterior"
             }
         },
+        "order": [[0, "desc"]],
+        "pageLength": 10,
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
         "width": "100%"
     });
 }
