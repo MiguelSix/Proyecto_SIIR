@@ -34,8 +34,9 @@ function cargarDatatable() {
             },
             {
                 "data": "imageUrl",
-                "render": function (imagen) {
-                    return ``
+                "render": function (imageUrl) {
+                    if (!imageUrl) return 'Sin imagen';
+                    return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-fluid" style="max-width: 50px; max-height: 50px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
                 "responsivePriority": 4
             },
@@ -54,14 +55,14 @@ function cargarDatatable() {
                     }
                     return 'N/A';
                 },
-                "responsivePriority": 4 
+                "responsivePriority": 4
             },
             {
                 "data": "id",
                 "render": function (data) {
                     return `
                         <div class="text-center">
-                            <a href="/Admin/Students/Upsert/${data}" class="btn btn-success text-white" style="cursor:pointer">
+                            <a href="/Admin/Students/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer">
                                 <i class="fas fa-edit"></i> Editar
                             </a>
                             <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">

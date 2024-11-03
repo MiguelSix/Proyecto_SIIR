@@ -1,72 +1,71 @@
 ﻿@model SIIR.Models.ViewModels.RepresentativeVM
 @{
-	ViewData["Title"] = "Crear Representativo";
+    ViewData["Title"] = "Crear Representativo";
 }
 
 <br />
 <br />
-<h3 class="text-center">Crear un nuevo grupo representativo</h3>
+<h2 class="text-center mb-3">Crear un nuevo grupo representativo</h2>
 <form method="POST" asp-action="Create">
-	<div class="row p-xl-2 offset-1 border">
-		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row p-2 border mx-3 rounded-2">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-		<div class="col-10 offset-1 mt-4">
-			<div class="form-group row">
-				<div class="col-4">
-					<label asp-for="Representative.Name"></label>
-				</div>
-				<div class="col-8">
-					<input asp-for="Representative.Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo" />
-					<span asp-validation-for="Representative.Name" class="text-danger"></span>
-				</div>
-			</div>
+        <div class="col-12 mt-4">
+            <div class="form-group row">
+                <div class="col-md-4 col-sm-12">
+                    <label asp-for="Representative.Name"></label>
+                </div>
+                <div class="col-md-8 col-sm-12">
+                    <input asp-for="Representative.Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo" />
+                    <span asp-validation-for="Representative.Name" class="text-danger"></span>
+                </div>
+            </div>
 
-			<br />
+            <br />
 
-			<div class="form-group row">
-				<div class="col-4">
-					<label asp-for="Representative.Category"></label>
-				</div>
-				<div class="col-8">
-					<select asp-for="Representative.Category" class="form-control">
-						<option value="">Seleccione una opción</option>
-						<option value="Deportivo">Deportivo</option>
-						<option value="Cultural">Cultural</option>
-					</select>
-					<span asp-validation-for="Representative.Category" class="text-danger"></span>
-				</div>
-			</div>
+            <div class="form-group row">
+                <div class="col-md-4 col-sm-12">
+                    <label asp-for="Representative.Category"></label>
+                </div>
+                <div class="col-md-8 col-sm-12">
+                    <select asp-for="Representative.Category" class="form-control">
+                        <option value="">Seleccione una opción</option>
+                        <option value="Deportivo">Deportivo</option>
+                        <option value="Cultural">Cultural</option>
+                    </select>
+                    <span asp-validation-for="Representative.Category" class="text-danger"></span>
+                </div>
+            </div>
 
-			<br />
+            <br />
 
-			<!-- Bloque dinámico de uniformes -->
-			<div id="uniformsContainer">
-			</div>
+            <!-- Bloque dinámico de uniformes -->
+            <div id="uniformsContainer">
+            </div>
 
-			<!-- Botón para agregar un nuevo bloque de uniformes -->
-			<div class="form-group row mt-2">
-				<div class="col-4"></div>
-				<div class="col-8">
-					<button type="button" id="addUniformBtn" class="btn btn-success">
-						<i class="fas fa-plus"></i> Añadir Uniforme
-					</button>
-				</div>
-			</div>
+            <!-- Botón para agregar un nuevo bloque de uniformes -->
+            <div class="form-group row mt-2">
+                <div class="col-12 text-end">
+                    <button type="button" id="addUniformBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Añadir Uniforme
+                    </button>
+                </div>
+            </div>
 
-			<div class="form-group-row">
-				<div class="col-8">
-					<partial name="_VistaCrearVolver" />
-				</div>
-			</div>
+            <div class="row">
+                <div class="col-12">
+                    <partial name="_VistaCrearVolver" />
+                </div>
+            </div>
 
-			<br />
-		</div>
-	</div>
+            <br />
+        </div>
+    </div>
 </form>
 
 @section Scripts {
 
-	<partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             var uniformIndex = $('#uniformsContainer .uniform-item').length || 0;
@@ -101,27 +100,27 @@
             // Añadir nuevo uniforme
             $('#addUniformBtn').click(function () {
                 var newUniform = `
-                        <div class="form-group row mt-2 uniform-item">
-                            <div class="col-4">
-                                <label for="UniformCatalog">Uniforme</label>
-                            </div>
-                            <div class="col-8">
-                                <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
-                                    <option value="">Selecciona una prenda:</option>
-                                    @foreach (var item in Model.UniformCatalogList)
-                                    {
-                                        <option value="@item.Value">@item.Text</option>
-                                    }
-                                </select>
-                                <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
-                            </div>
-                            <div class="col-12 mt-2 text-end">
-                                <button type="button" class="btn btn-danger remove-uniform-btn">
-                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                                <div class="form-group row mt-2 uniform-item">
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="UniformCatalog">Uniforme</label>
+                                    </div>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
+                                            <option value="">Selecciona una prenda:</option>
+        @foreach (var item in Model.UniformCatalogList)
+        {
+                                                    <option value="@item.Value">@item.Text</option>
+        }
+                                        </select>
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-12 mt-2 text-end">
+                                        <button type="button" class="btn btn-danger remove-uniform-btn">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
                 $('#uniformsContainer').append(newUniform);
                 uniformIndex++;
                 reindexUniforms();
