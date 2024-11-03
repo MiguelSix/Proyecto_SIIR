@@ -29,7 +29,7 @@ namespace SIIR.DataAccess.Data.Repository
         public void UnlockUser(string userId)
         {
             var userFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == userId);
-            userFromDb.LockoutEnd = DateTime.Now;
+            userFromDb.LockoutEnd = null;
             _db.SaveChanges();
         }
 

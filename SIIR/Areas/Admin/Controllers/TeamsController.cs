@@ -162,17 +162,15 @@ namespace SIIR.Areas.Admin.Controllers
             }
             // Data del equipo
             team.Coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value);
+            // Obtener todos los usuarios que no están bloqueados
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
             var captain = students.FirstOrDefault(s => s.IsCaptain);
 
             TeamVM teamVM = new()
             {
                 Team = team,
-                StudentList = students.Select(s => new SelectListItem
-                {
-                    Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
-                    Value = s.Id.ToString()
-                }),
                 Captain = captain
             };
 
@@ -224,8 +222,9 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetStudentsByTeamId(int teamId)
         {
-            // Obtener los estudiantes por equipo
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
             return Json(new { data = students });
         }
 
