@@ -31,13 +31,13 @@
                             <td>
                                 @if (item.LockoutEnd == null || item.LockoutEnd < DateTime.Now)
                                 {
-                                    <a class="btn btn-warning btn-sm" asp-action="Bloquear" asp-route-id="@item.Id">
+                                    <a class="btn btn-warning btn-sm" asp-action="Lock" asp-route-id="@item.Id">
                                         <i class="fas fa-lock"></i> Bloquear
                                     </a>
                                 }
                                 else
                                 {
-                                    <a class="btn btn-success btn-sm" asp-action="Desbloquear" asp-route-id="@item.Id">
+                                    <a class="btn btn-success btn-sm" asp-action="Unlock" asp-route-id="@item.Id">
                                         <i class="fas fa-lock-open"></i> Desbloquear
                                     </a>
                                 }

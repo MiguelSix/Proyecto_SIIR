@@ -19,6 +19,20 @@ namespace SIIR.DataAccess.Data.Repository
             _db = db;
         }
 
+        public void LockUser(string userId)
+        {
+            var userFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == userId);
+            userFromDb.LockoutEnd = DateTime.Now.AddYears(1000);
+            _db.SaveChanges();
+        }
+
+        public void UnlockUser(string userId)
+        {
+            var userFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == userId);
+            userFromDb.LockoutEnd = DateTime.Now;
+            _db.SaveChanges();
+        }
+
         //Falta de implementar este metodo
         public void Update(ApplicationUser user)
         {
