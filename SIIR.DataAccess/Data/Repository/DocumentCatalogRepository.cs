@@ -39,5 +39,10 @@ namespace SIIR.DataAccess.Data.Repository
                 objDesdeDb.Extension = documentCatalog.Extension;
             }
         }
+
+        public DocumentCatalog GetById(int id)
+        {
+            return _db.DocumentCatalog.FirstOrDefault(d => d.Id == id);
+        }
     }
 }

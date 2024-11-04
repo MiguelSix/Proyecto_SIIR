@@ -13,6 +13,6 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
     {
         IEnumerable<SelectListItem> GetDocumentCatalogList();
         void Update(DocumentCatalog documentCatalog);
-
+        DocumentCatalog GetById(int id);
     }
 }
