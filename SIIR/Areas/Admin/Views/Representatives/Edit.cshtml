@@ -3,9 +3,9 @@
     ViewData["Title"] = "Editar Representativo";
 }
 <br /><br />
-<h3 class="text-center">Editar un grupo representativo</h3>
+<h2 class="text-center mn-3">Editar un grupo representativo</h2>
 <form id="representative-form" method="POST" asp-action="Edit">
-    <div class="row p-xl-2 offset-1 border">
+    <div class="row px-2 mx-3 border rounded-2">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Representative.Id" />
         <div class="col-10 offset-1 mt-4">
@@ -77,11 +77,20 @@
                 </div>
             </div>
             <br />
-            <div class="form-group-row">
-                <div class="col-8">
-                    <partial name="_VistaEditarVolver" />
+
+            <div class="row mt-4">
+                <div class="col-md-6 col-sm-12 mb-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-save me-2"></i> Guardar Cambios
+                    </button>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <a asp-action="Index" class="btn btn-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i> Volver
+                    </a>
                 </div>
             </div>
+
             <br />
         </div>
     </div>

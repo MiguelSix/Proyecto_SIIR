@@ -9,6 +9,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
 {
     public interface IContenedorTrabajo : IDisposable
     {
+        IAdminRepository Admin { get; }
         IUserRepository User { get; }
         ITeamRepository Team { get; }
         IRepresentativeRepository Representative { get; }
