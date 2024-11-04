@@ -54,6 +54,7 @@ namespace SIIR.DataAccess.Data.Repository
                 objFromDb.Nss = student.Nss;
                 objFromDb.ImageUrl = student.ImageUrl;
                 objFromDb.numberUniform = student.numberUniform;
+                objFromDb.enrollmentData = student.enrollmentData;
 
                 _db.SaveChanges();
             }
