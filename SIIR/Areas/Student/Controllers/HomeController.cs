@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 
 namespace SIIR.Areas.Student.Controllers
 {
@@ -73,7 +74,7 @@ namespace SIIR.Areas.Student.Controllers
 
             var currentUser = await _userManager.Users
                 .Include(u => u.Student)
-                    .ThenInclude(s => s.Team)
+                .ThenInclude(s => s.Team)
                 .Include(u => u.Student.Coach)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
 
@@ -82,12 +83,38 @@ namespace SIIR.Areas.Student.Controllers
                 return NotFound();
             }
 
-            return View(currentUser.Student);
+            StudentUniformVM studentVM = new StudentUniformVM()
+            {
+                student = currentUser.Student,
+                uniforms = _contenedorTrabajo.Uniform
+				            .GetAll(u => u.StudentId == currentUser.Student.Id)
+				            .ToList()
+			};
+
+            foreach (var uniform in studentVM.uniforms)
+            {
+
+
+                var uniformNames = _contenedorTrabajo.UniformCatalog
+                    .GetAll(uc => uc.Id == uniform.UniformCatalogId)
+                    .Select(uc => uc.Name)
+                    .ToList();
+
+                foreach (var name in uniformNames)
+                {
+                    if (name is not null)
+                        studentVM.namesUniform.Add(name);
+                }
+            }
+
+				ViewBag.SizeOptions = Enum.GetValues(typeof(Size)).Cast<Size>();
+
+			return View(studentVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Models.Student student)
+        public async Task<IActionResult> Edit(StudentUniformVM studentVM)
         {
             // Verificar que el usuario actual es el dueño del perfil
             var user = await _userManager.GetUserAsync(User);
@@ -100,16 +127,25 @@ namespace SIIR.Areas.Student.Controllers
                 .Include(u => u.Student)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
 
-            if (currentUser?.Student == null || currentUser.Student.Id != student.Id)
+            if (currentUser?.Student == null || currentUser.Student.Id != studentVM.student?.Id)
             {
                 return Forbid();
             }
 
-            // Quitar Coach y Team del ModelState
-            ModelState.Remove("Coach");
-            ModelState.Remove("Team");
+            if (currentUser.Student.numberUniform != null && studentVM.student.numberUniform != null)
+            { 
+			    var numbersStudents = _contenedorTrabajo.Student
+		            .GetAll(s => s.TeamId == studentVM.student.TeamId && s.Id != studentVM.student.Id)
+		            .Select(s => s.numberUniform)
+		            .ToList();
 
-            if (ModelState.IsValid)
+			    if (numbersStudents.Contains(studentVM.student.numberUniform))
+			    {
+				    ModelState.AddModelError("student.numberUniform", "Este número ya está en uso por otro jugador en el equipo.");
+			    }
+			}
+
+			if (ModelState.IsValid)
             {
                 string webRootPath = _webHostEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
@@ -121,9 +157,9 @@ namespace SIIR.Areas.Student.Controllers
                     var extension = Path.GetExtension(files[0].FileName);
 
                     // Eliminar la imagen anterior
-                    if (!string.IsNullOrEmpty(student.ImageUrl))
+                    if (!string.IsNullOrEmpty(studentVM.student.ImageUrl))
                     {
-                        var imagePath = Path.Combine(webRootPath, student.ImageUrl.TrimStart('\\'));
+                        var imagePath = Path.Combine(webRootPath, studentVM.student.ImageUrl.TrimStart('\\'));
                         if (System.IO.File.Exists(imagePath))
                         {
                             System.IO.File.Delete(imagePath);
@@ -136,27 +172,33 @@ namespace SIIR.Areas.Student.Controllers
                         files[0].CopyTo(fileStream);
                     }
 
-                    student.ImageUrl = @"\images\students\" + fileName + extension;
+					studentVM.student.ImageUrl = @"\images\students\" + fileName + extension;
                 }
                 else
                 {
-                    // Mantener la imagen actual
-                    student.ImageUrl = currentUser.Student.ImageUrl;
+					// Mantener la imagen actual
+					studentVM.student.ImageUrl = currentUser.Student.ImageUrl;
                 }
 
-                // Mantener los IDs existentes
-                student.TeamId = currentUser.Student.TeamId;
-                student.CoachId = currentUser.Student.CoachId;
+				/*Agregar el numero a cada uniforme y la talla */
 
-                _contenedorTrabajo.Student.Update(student);
+				if (studentVM.uniforms != null)
+				{
+					foreach (var uniform in studentVM.uniforms)
+					{
+                        _contenedorTrabajo.Uniform.Update(uniform);
+					}
+				}
+
+				_contenedorTrabajo.Student.Update(studentVM.student);
                 _contenedorTrabajo.Save();
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recargar las relaciones para la vista
-            student.Team = currentUser.Student.Team;
-            student.Coach = currentUser.Student.Coach;
-            return View(student);
+            studentVM.student.Coach = _contenedorTrabajo.Coach.GetById(studentVM.student.CoachId);
+            studentVM.student.Team = _contenedorTrabajo.Team.GetById(studentVM.student.TeamId);
+
+			return View(studentVM);
         }
     }
 }

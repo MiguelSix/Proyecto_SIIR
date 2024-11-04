@@ -21,6 +21,8 @@ namespace SIIR.Data
         public DbSet<UniformCatalog> UniformCatalog { get; set; }
         public DbSet<DocumentCatalog> DocumentCatalog { get; set; }
         public DbSet<Document> Document { get; set; }
+        public DbSet<RepresentativeUniformCatalog> RepresentativeUniformCatalogs { get; set; }
+        public DbSet<Uniform> Uniform { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +39,16 @@ namespace SIIR.Data
                 .WithMany()
                 .HasForeignKey(t => t.RepresentativeId)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
+
+            modelBuilder.Entity<RepresentativeUniformCatalog>()
+                .HasKey(ruc => new { ruc.RepresentativeId, ruc.UniformCatalogId });
+
+			//Borrar en cascada uniformes. 
+			modelBuilder.Entity<Uniform>()
+		        .HasOne(u => u.RepresentativeUniformCatalog)
+		        .WithMany()
+		        .HasForeignKey(u => new { u.RepresentativeId, u.UniformCatalogId })
+		        .OnDelete(DeleteBehavior.Cascade);
+		}
     }
 }

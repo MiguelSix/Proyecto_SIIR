@@ -53,6 +53,7 @@ namespace SIIR.DataAccess.Data.Repository
                 objFromDb.Allergies = student.Allergies;
                 objFromDb.Nss = student.Nss;
                 objFromDb.ImageUrl = student.ImageUrl;
+                objFromDb.numberUniform = student.numberUniform;
 
                 _db.SaveChanges();
             }

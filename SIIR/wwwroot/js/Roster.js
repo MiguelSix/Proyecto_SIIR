@@ -1,5 +1,6 @@
 ﻿let dataTable;
 let currentCaptainId;
+
 $(document).ready(function () {
     const teamId = $("#teamId").val();
 
@@ -144,6 +145,27 @@ function initializeDataTable(teamId) {
                     return data || 'Sin actualizar';
                 },
                 "width": "10%"
+            },
+            {
+                "data": null,
+                "render": function (data) {
+                    return `
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="btn-group gap-2" role="group">
+                                <a onclick=Bloquear("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
+                                    <i class="fas fa-user-minus"></i>
+                                </a>
+                                <button class="btn btn-info btn-sm" onclick="descargarInfo(${data.id})">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="descargarDocs(${data.id})">
+                                    <i class="fas fa-file-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                },
+                "width": "15%"
             }
         ],
         "language": {
@@ -229,5 +251,31 @@ function generarTarjetas(teamId) {
                 </div>
             `);
         }
+    });
+}
+
+function Bloquear(url) {
+    swal({
+        title: "¿Está seguro de dar de baja a este estudiante del equipo?",
+        text: "¡Este estudiante no se volvera a mostrar hasta que se de de alta en el equipo!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "¡Si, dar de baja!",
+        closeOnconfirm: true
+    }, function () {
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (data) {
+                if (data.success) {
+                    toastr.success(data.message);
+                    dataTable.ajax.reload();
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
     });
 }

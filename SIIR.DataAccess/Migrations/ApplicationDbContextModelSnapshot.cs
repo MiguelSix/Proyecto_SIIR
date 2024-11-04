@@ -229,21 +229,6 @@ namespace SIIR.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RepresentativeUniformCatalog", b =>
-                {
-                    b.Property<int>("RepresentativeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UniformCatalogsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RepresentativeId", "UniformCatalogsId");
-
-                    b.HasIndex("UniformCatalogsId");
-
-                    b.ToTable("RepresentativeUniformCatalog");
-                });
-
             modelBuilder.Entity("SIIR.Models.Admin", b =>
                 {
                     b.Property<int>("Id")
@@ -379,6 +364,23 @@ namespace SIIR.DataAccess.Migrations
                     b.ToTable("Representatives");
                 });
 
+            modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
+                {
+                    b.Property<int>("RepresentativeId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("UniformCatalogId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("RepresentativeId", "UniformCatalogId");
+
+                    b.HasIndex("UniformCatalogId");
+
+                    b.ToTable("RepresentativeUniformCatalogs");
+                });
+
             modelBuilder.Entity("SIIR.Models.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -455,6 +457,9 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<float?>("Weight")
                         .HasColumnType("real");
 
+                    b.Property<int?>("numberUniform")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CoachId");
@@ -499,6 +504,35 @@ namespace SIIR.DataAccess.Migrations
                     b.HasIndex("RepresentativeId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("SIIR.Models.Uniform", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RepresentativeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UniformCatalogId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("size")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("RepresentativeId", "UniformCatalogId");
+
+                    b.ToTable("Uniform");
                 });
 
             modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
@@ -597,21 +631,6 @@ namespace SIIR.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RepresentativeUniformCatalog", b =>
-                {
-                    b.HasOne("SIIR.Models.Representative", null)
-                        .WithMany()
-                        .HasForeignKey("RepresentativeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SIIR.Models.UniformCatalog", null)
-                        .WithMany()
-                        .HasForeignKey("UniformCatalogsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SIIR.Models.Document", b =>
                 {
                     b.HasOne("SIIR.Models.DocumentCatalog", "DocumentCatalog")
@@ -629,6 +648,25 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("DocumentCatalog");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SIIR.Models.RepresentativeUniformCatalog", b =>
+                {
+                    b.HasOne("SIIR.Models.Representative", "Representative")
+                        .WithMany()
+                        .HasForeignKey("RepresentativeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.UniformCatalog", "UniformCatalog")
+                        .WithMany()
+                        .HasForeignKey("UniformCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Representative");
+
+                    b.Navigation("UniformCatalog");
                 });
 
             modelBuilder.Entity("SIIR.Models.Student", b =>
@@ -663,6 +701,25 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("Coach");
 
                     b.Navigation("Representative");
+                });
+
+            modelBuilder.Entity("SIIR.Models.Uniform", b =>
+                {
+                    b.HasOne("SIIR.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.RepresentativeUniformCatalog", "RepresentativeUniformCatalog")
+                        .WithMany()
+                        .HasForeignKey("RepresentativeId", "UniformCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RepresentativeUniformCatalog");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>

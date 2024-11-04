@@ -1,49 +1,54 @@
 ﻿var dataTable;
-
 $(document).ready(function () {
     cargarDatatable();
 });
-
 function cargarDatatable() {
     dataTable = $("#tblTeams").DataTable({
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRow
+            }
+        },
         "ajax": {
             "url": "/admin/teams/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id", "width": "3%" },
-            { "data": "name", "width": "10%" },
-            { "data": "category", "width": "8%" },
+            { "data": "id" },
+            { "data": "name" },
+            { "data": "category" },
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100"/>`
+                    return `<img src="../${imagen}" width="100" class="img-fluid"/>`
                 },
-                "width": "10%"
+                "responsivePriority": 4
             },
-            { "data": "coach.name", "width": "10%" },
-            { "data": "representative.name", "width": "10%" },
-            //{ "data": "student.name", "width": "10%" },
+            {
+                "data": "coach.name",
+                "responsivePriority": 3
+            },
+            {
+                "data": "representative.name",
+                "responsivePriority": 2
+            },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="text-center">
-                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success btn-sm text-white" style="width:80px;">
+                    return `<div class="d-flex justify-content-center gap-2">
+                                <a href="/Admin/Teams/Edit/${data}" class="btn btn-success btn-sm text-white">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                             
-                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger btn-sm text-white" style="width:80px;">
+                                <a onclick=Delete("/Admin/Teams/Delete/${data}") class="btn btn-danger btn-sm text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
-
-                                <a href="/Admin/Teams/Roster/${data}" class="btn btn-info btn-sm text-white" style="width:140px;">
+                                <a href="/Admin/Teams/Roster/${data}" class="btn btn-info btn-sm text-white">
                                     <i class="fas fa-users"></i> Ver plantilla
                                 </a>
-
                             </div>`;
                 },
-                "width": "29%"
+                "responsivePriority": 1
             }
         ],
         "language": {
@@ -66,18 +71,20 @@ function cargarDatatable() {
                 "previous": "Anterior"
             }
         },
+        "order": [[0, "desc"]],
+        "pageLength": 10,
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
         "width": "100%"
     });
 }
-
 function Delete(url) {
     swal({
-        title: "Esta seguro de borrar?",
-        text: "Este contenido no se puede recuperar!",
+        title: "¿Está seguro de borrar?",
+        text: "¡Este contenido no se puede recuperar!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Si, borrar!",
+        confirmButtonText: "¡Sí, borrar!",
         closeOnconfirm: true
     }, function () {
         $.ajax({

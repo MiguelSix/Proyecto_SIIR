@@ -96,25 +96,29 @@ namespace SIIR.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(TeamVM teamVM)
         {
-            if (!ModelState.IsValid)
+            // Remover la validación de la imagen si no se selecciona una nueva imagen
+            ModelState.Remove("Team.ImageUrl");
+            if (ModelState.IsValid)
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
                 var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
 
-                if (files.Count() > 0)
+                if (files.Count > 0)
                 {
                     // Editar Imagen
                     string fileName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(webRootPath, @"images\teams");
-                    var extension = Path.GetExtension(files[0].FileName);
-
                     var extension_new = Path.GetExtension(files[0].FileName);
-                    var imagePath = Path.Combine(webRootPath, teamFromDb.ImageUrl.TrimStart('\\'));
 
-                    if (System.IO.File.Exists(imagePath))
+                    // Eliminar la imagen anterior
+                    if (!string.IsNullOrEmpty(teamFromDb.ImageUrl))
                     {
-                        System.IO.File.Delete(imagePath);
+                        var imagePath = Path.Combine(webRootPath, teamFromDb.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            System.IO.File.Delete(imagePath);
+                        }
                     }
 
                     // Subir nueva imagen
@@ -123,14 +127,12 @@ namespace SIIR.Areas.Admin.Controllers
                         files[0].CopyTo(fileStreams);
                     }
 
-                    teamVM.Team.ImageUrl = @"\images\teams\" + fileName + extension_new;
-                    _contenedorTrabajo.Team.Update(teamVM.Team);
-                    _contenedorTrabajo.Save();
-                    return RedirectToAction(nameof(Index));
+                    // Guardar la nueva ruta de la imagen
+                    teamFromDb.ImageUrl = @"\images\teams\" + fileName + extension_new;
                 }
                 else
                 {
-                    // No se seleccionó una nueva imagen
+                    // No se seleccionó una nueva imagen, mantener la imagen existente
                     teamVM.Team.ImageUrl = teamFromDb.ImageUrl;
                 }
 
@@ -138,6 +140,8 @@ namespace SIIR.Areas.Admin.Controllers
                 _contenedorTrabajo.Save();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Si el ModelState no es válido, volver a cargar las listas y retornar la vista
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
             return View(teamVM);
@@ -156,20 +160,18 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value);
-
-            // Obtener el capitán si existe
+            // Data del equipo
+            team.Coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+            // Obtener todos los usuarios que no están bloqueados
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
             var captain = students.FirstOrDefault(s => s.IsCaptain);
 
             TeamVM teamVM = new()
             {
                 Team = team,
-                StudentList = students.Select(s => new SelectListItem
-                {
-                    Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
-                    Value = s.Id.ToString()
-                }),
-                Captain = captain // Asegúrate de agregar esta propiedad al TeamVM
+                Captain = captain
             };
 
             return View(teamVM);
@@ -220,8 +222,9 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetStudentsByTeamId(int teamId)
         {
-            // Obtener los estudiantes por equipo
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
             return Json(new { data = students });
         }
 

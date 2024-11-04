@@ -19,5 +19,27 @@ namespace SIIR.Areas.Admin.Controllers
         {
             return View(_contenedorTrabajo.User.GetAll());
         }
+
+        [HttpGet]
+        public IActionResult Lock(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            _contenedorTrabajo.User.LockUser(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Unlock(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            _contenedorTrabajo.User.UnlockUser(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

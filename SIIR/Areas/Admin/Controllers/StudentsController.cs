@@ -24,6 +24,23 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        public IActionResult Lock(int id)
+        {
+            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == id);
+            if(student.IsCaptain)
+            {
+                return Json(new { success = false, message = "No se puede dar de baja al capitán" });
+            }
+            var user = _contenedorTrabajo.User.GetFirstOrDefault(u => u.StudentId == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            _contenedorTrabajo.User.LockUser(user.Id);
+            return Json(new { success = true, message = "Estudiante dado de baja con éxito" });
+        }
+
+        [HttpGet]
         public IActionResult Edit(int id)
         {
             var student = _contenedorTrabajo.Student.GetFirstOrDefault(
@@ -97,40 +114,6 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult GetAll()
         {
             return Json(new { data = _contenedorTrabajo.Student.GetAll(includeProperties: "Team,Coach") });
-        }
-
-        [HttpGet]
-        public IActionResult GetStudentsByTeamId(int teamId)
-        {
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId).ToList();
-            return Json(new { data = students });
-        }
-
-
-        [HttpPut]
-        public IActionResult AssignCaptain(int id)
-        {
-            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == id);
-            if (student == null)
-            {
-                return Json(new { success = false, message = "Error while assigning captain." });
-            }
-
-            _contenedorTrabajo.Student.AssignCaptain(student);
-            return Json(new { success = true, message = "Captain assigned." });
-        }
-
-        [HttpPut]
-        public IActionResult UnassignCaptain(int id)
-        {
-            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == id);
-            if (student == null)
-            {
-                return Json(new { success = false, message = "Error while unassigning captain." });
-            }
-
-            _contenedorTrabajo.Student.UnassignCaptain(student);
-            return Json(new { success = true, message = "Captain unassigned." });
         }
 
         [HttpDelete]
