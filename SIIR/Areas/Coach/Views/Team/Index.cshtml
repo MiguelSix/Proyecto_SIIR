@@ -89,6 +89,7 @@
 </style>
 
 <!-- Button trigger modal -->
+<p></p>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
     Launch demo modal
 </button>
@@ -131,81 +132,116 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            // Cuando se abre el modal, se carga la información de los estudiantes
-            $('#exampleModal').on('show.bs.modal', function () {
-                $('#checkboxAll').prop('checked', false);
-                var teamId = @Model.Id; // Obtén el ID del equipo desde el modelo
+      // Variable global para almacenar todos los estudiantes obtenidos
+    let allStudents = [];
 
-                $.ajax({
-                    url: '/Coach/Team/GetAllStudents',
-                    type: 'GET',
-                    data: { teamId: teamId },
-                    success: function (response) {
-                        if (response.data && response.data.length > 0) {
-                            let studentsHtml = '';
-                            $(".checkbox-div").show();
-                            $('.not-found').hide();
-                            // Iterar sobre cada estudiante para construir la tarjeta
-                            response.data.forEach(student => {
-                                let controlNumber = student.controlNumber ? student.controlNumber : '---';
-                                let studentImage = student.imageUrl
-                                    ? `<img src="${student.imageUrl}" class="card-img-top h-100" alt="Imagen del jugador" />`
-                                    : `<div class="image-placeholder">
-                                            <i class="fa-regular fa-user"></i>
-                                           </div>`;
+    $(document).ready(function () {
+        $('#exampleModal').on('show.bs.modal', function () {
+            $('#checkboxAll').prop('checked', false);
+            const teamId = @Model.Id;
 
-                                studentsHtml += `
-                                        <div class="col">
-                                            <div class="card h-100 position-relative">
-                                                ${studentImage}
-                                                <div class="position-absolute top-0 end-0 m-2">
-                                                    <input type="checkbox" class="btn-check student-checkbox" id="checkbox${student.id}" autocomplete="off">
-                                                    <label class="btn btn-sm checkbox" for="checkbox${student.id}">
-                                                        <i class="fa-solid fa-check"></i>
-                                                    </label>
-                                                </div>
-                                                <div class="card-body p-0 text-center">
-                                                    <h5 class="text-center mb-0 ps-2 pe-2 text-white title fs-6 d-flex align-items-center justify-content-center">
-                                                        ${student.name} ${student.lastName} ${student.secondLastName} <!-- Nombre del estudiante -->
-                                                    </h5>
-                                                    <p class="mb-0">${controlNumber}</p> <!-- Número de control -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                            });
+            $.ajax({
+                url: '/Coach/Team/GetAllStudents',
+                type: 'GET',
+                data: { teamId: teamId },
+                success: function (response) {
+                    if (response.data && response.data.length > 0) {
+                        allStudents = response.data;  // Guardar todos los estudiantes en la variable global
+                        let studentsHtml = '';
+                        $(".checkbox-div").show();
+                        $('.not-found').hide();
 
-                            // Insertar el HTML generado en el contenedor de tarjetas
-                            $('.students-container').html(studentsHtml);
-                        } else {
-                            // Mostrar mensaje si no hay jugadores
-                            $('.not-found').show();
-                            $(".checkbox-div").hide();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("Error al cargar los estudiantes:", error);
-                    }
-                });
+                        response.data.forEach(student => {
+                            const controlNumber = student.controlNumber ? student.controlNumber : '---';
+                            const studentImage = student.imageUrl
+                                ? `
+    <img src="${student.imageUrl}" class="card-img-top h-100" alt="Imagen del jugador" />`
+                                : `<div class="image-placeholder">
+        <i class="fa-regular fa-user"></i>
+    </div>`;
 
-                // Funcionalidad para el checkbox de "Todos"
-                $('#checkboxAll').change(function () {
-                    const isChecked = $(this).is(':checked');
-                    $('.student-checkbox').prop('checked', isChecked).trigger('change');
-                });
+                            studentsHtml += `
+    <div class="col">
+        <div class="card h-100 position-relative">
+            ${studentImage}
+            <div class="position-absolute top-0 end-0 m-2">
+                <input type="checkbox" class="btn-check student-checkbox" id="checkbox${student.id}" autocomplete="off">
+                <label class="btn btn-sm checkbox" for="checkbox${student.id}">
+                    <i class="fa-solid fa-check"></i>
+                </label>
+            </div>
+            <div class="card-body p-0 text-center">
+                <h5 class="text-center mb-0 ps-2 pe-2 text-white title fs-6 d-flex align-items-center justify-content-center">
+                    ${student.name} ${student.lastName} ${student.secondLastName}
+                </h5>
+                <p class="mb-0 control-number">${controlNumber}</p>
+            </div>
+        </div>
+    </div>
+                            `;
+                        });
 
-                // Desmarcar el checkbox de "Todos" si se desmarca uno de los checkboxes individuales
-                $(document).on('change', '.student-checkbox', function () {
-                    if (!$(this).is(':checked')) {
-                        $('#checkboxAll').prop('checked', false);
+                        $('.students-container').html(studentsHtml);
                     } else {
-                        // Verificar si todos los checkboxes están marcados
-                        const allChecked = $('.student-checkbox:checked').length === $('.student-checkbox').length;
-                        $('#checkboxAll').prop('checked', allChecked);
+                        $('.not-found').show();
+                        $(".checkbox-div").hide();
                     }
-                });
+                },
+                error: function (error) {
+                    console.log("Error al cargar los estudiantes:", error);
+                }
+            });
+
+            $('#checkboxAll').change(function () {
+                const isChecked = $(this).is(':checked');
+                $('.student-checkbox').prop('checked', isChecked).trigger('change');
+            });
+
+            $(document).on('change', '.student-checkbox', function () {
+                if (!$(this).is(':checked')) {
+                    $('#checkboxAll').prop('checked', false);
+                } else {
+                    const allChecked = $('.student-checkbox:checked').length === $('.student-checkbox').length;
+                    $('#checkboxAll').prop('checked', allChecked);
+                }
             });
         });
+
+        $('.btn-generar-cedula').click(function () {
+            const teamName = "@Model.Name"; // Asumiendo que el nombre del equipo es una propiedad 'Name' de Team
+            const coachTeam = @Html.Raw(Json.Serialize(Model.Coach));
+            // Filtra los estudiantes seleccionados a partir de la lista completa almacenada
+            const selectedStudents = allStudents.filter(student =>
+                $(`#checkbox${student.id}`).is(':checked')
+            );
+
+            if (selectedStudents.length === 0) {
+                alert("No hay estudiantes seleccionados.");
+                return;
+            }
+
+            // Envía los objetos de estudiantes seleccionados al controlador
+            $.ajax({
+                url: '/Coach/Team/GenerateCertificate',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 
+                    students: selectedStudents,
+                    team: teamName,
+                    coach: coachTeam
+                }),
+                xhrFields: { responseType: 'blob' },
+                success: function (blob) {
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "Cedula.pdf";
+                    link.click();
+                },
+                error: function (error) {
+                    console.log("Error al generar el certificado:", error);
+                }
+            });
+        });
+    });
     </script>
 }
