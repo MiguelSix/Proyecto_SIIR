@@ -35,7 +35,6 @@ function cargarDatatable() {
             {
                 "data": "imageUrl",
                 "render": function (imageUrl) {
-                    if (!imageUrl) return 'Sin imagen';
                     return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-fluid" style="max-width: 50px; max-height: 50px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
                 "responsivePriority": 4

@@ -111,7 +111,6 @@ function initializeDataTable(teamId) {
             {
                 "data": "imageUrl",
                 "render": function (imageUrl) {
-                    if (!imageUrl) return 'Sin imagen';
                     return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-thumbnail" style="width: 100px;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
                 "width": "5%",
