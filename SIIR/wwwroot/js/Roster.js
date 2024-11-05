@@ -289,12 +289,12 @@ function downloadInfo(url) {
             // Crear un enlace temporal para descargar el archivo
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = "Cedula_Estudiante.pdf"; // Nombre del archivo descargado
+            link.download = "Informacion_Estudiante.pdf"; // Nombre del archivo descargado
             link.click();
             window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
         },
         error: function (error) {
-            console.log("Error al generar la cédula del estudiante:", error);
+            toastr.error("Error al generar el documento de información del estudiante:", error);
         }
     });
 }
