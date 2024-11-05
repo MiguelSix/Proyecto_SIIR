@@ -152,12 +152,12 @@ function initializeDataTable(teamId) {
                     return `
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="btn-group gap-2" role="group">
-                                <a onclick=Bloquear("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
+                                <a onclick=Lock("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
                                     <i class="fas fa-user-minus"></i>
                                 </a>
-                                <button class="btn btn-info btn-sm" onclick="descargarInfo(${data.id})">
+                                <a onclick=downloadInfo("/Admin/Teams/GenerateStudentCertificate/${data.id}") class="btn btn-info btn-sm" style="cursor:pointer;">
                                     <i class="fas fa-download"></i>
-                                </button>
+                                </a>
                                 <button class="btn btn-secondary btn-sm" onclick="descargarDocs(${data.id})">
                                     <i class="fas fa-file-download"></i>
                                 </button>
@@ -254,7 +254,7 @@ function generarTarjetas(teamId) {
     });
 }
 
-function Bloquear(url) {
+function Lock(url) {
     swal({
         title: "¿Está seguro de dar de baja a este estudiante del equipo?",
         text: "¡Este estudiante no se volvera a mostrar hasta que se de de alta en el equipo!",
@@ -279,3 +279,23 @@ function Bloquear(url) {
         });
     });
 }
+
+function downloadInfo(url) {
+    $.ajax({
+        url: url,
+        type: 'POST',
+        xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
+        success: function (blob) {
+            // Crear un enlace temporal para descargar el archivo
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "Cedula_Estudiante.pdf"; // Nombre del archivo descargado
+            link.click();
+            window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
+        },
+        error: function (error) {
+            console.log("Error al generar la cédula del estudiante:", error);
+        }
+    });
+}
+
