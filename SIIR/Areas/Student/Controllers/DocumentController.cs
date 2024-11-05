@@ -106,8 +106,29 @@ namespace SIIR.Areas.Student.Controllers
                     return Json(new { success = false, message = "El archivo no debe exceder los 5MB." });
                 }
 
+                
+
+                // Validar extensión según el tipo de documento
                 string extension = Path.GetExtension(file.FileName).ToLower();
-                // Validaciones de extensión permanecen igual...
+                bool isValidExtension = false;
+
+                if (documentCatalog.Extension == "pdf")
+                {
+                    isValidExtension = extension == ".pdf";
+                    if (!isValidExtension)
+                    {
+                        return Json(new { success = false, message = "Solo se permiten archivos PDF." });
+                    }
+                }
+                else if (documentCatalog.Extension == "image")
+                {
+                    string[] allowedImageExtensions = { ".jpg", ".jpeg", ".png" };
+                    isValidExtension = allowedImageExtensions.Contains(extension);
+                    if (!isValidExtension)
+                    {
+                        return Json(new { success = false, message = "Solo se permiten archivos JPG, JPEG o PNG." });
+                    }
+                }
 
                 // Obtener estudiante
                 var student = await GetCurrentStudent();
@@ -204,7 +225,6 @@ namespace SIIR.Areas.Student.Controllers
         {
             try
             {
-                // Obtener el estudiante actual
                 var student = await GetCurrentStudent();
                 if (student == null)
                 {
@@ -212,7 +232,6 @@ namespace SIIR.Areas.Student.Controllers
                     return Unauthorized();
                 }
 
-                // Obtener el documento usando IQueryable en lugar de IEnumerable
                 var document = _contenedorTrabajo.Document
                     .GetFirstOrDefault(d => d.StudentId == student.Id &&
                                           d.DocumentCatalogId == documentCatalogId,
@@ -224,7 +243,6 @@ namespace SIIR.Areas.Student.Controllers
                     return NotFound("Documento no encontrado.");
                 }
 
-                // Construir la ruta del archivo
                 var filePath = Path.Combine(_hostingEnvironment.WebRootPath, document.Url.TrimStart('\\', '/'));
 
                 if (!System.IO.File.Exists(filePath))
@@ -233,7 +251,6 @@ namespace SIIR.Areas.Student.Controllers
                     return NotFound("Archivo físico no encontrado.");
                 }
 
-                // Determinar el tipo MIME
                 var extension = Path.GetExtension(filePath).ToLowerInvariant();
                 var mimeType = extension switch
                 {
@@ -243,14 +260,16 @@ namespace SIIR.Areas.Student.Controllers
                     _ => "application/octet-stream"
                 };
 
-                // Construir un nombre de archivo descriptivo para la descarga
-                var downloadFileName = $"{document.DocumentCatalog.Name}_{DateTime.Now:yyyyMMdd}{extension}";
+                var timestamp = DateTime.Now;
+                var downloadFileName = $"{document.DocumentCatalog.Name}_{student.Id}_{timestamp:yyyyMMdd_HHmmss}{extension}";
 
-                // Registrar la descarga
-                _logger.LogInformation($"Descarga iniciada - Documento: {documentCatalogId}, Usuario: {student.Id}");
-
-                // Devolver el archivo
-                return PhysicalFile(filePath, mimeType, downloadFileName);
+                // Usar FileStreamResult con ContentDisposition explícito
+                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return new FileStreamResult(stream, mimeType)
+                {
+                    FileDownloadName = downloadFileName,
+                    EnableRangeProcessing = true
+                };
             }
             catch (Exception ex)
             {

@@ -199,9 +199,17 @@
                 "closeButton": true,
                 "progressBar": true,
                 "positionClass": "toast-top-right",
-                "timeOut": "3000"
+                "timeOut": "5000", 
+                "extendedTimeOut": "2000" 
             };
-
+            // Verificar si hay un mensaje pendiente al cargar la página
+            const pendingMessage = localStorage.getItem('documentMessage');
+            const messageType = localStorage.getItem('documentMessageType');
+            if (pendingMessage) {
+                toastr[messageType || 'success'](pendingMessage);
+                localStorage.removeItem('documentMessage');
+                localStorage.removeItem('documentMessageType');
+            }
             // Constantes para mensajes y configuraciones comunes
             const MESSAGES = {
                 SELECT_FILE: 'Por favor seleccione un archivo',
@@ -271,41 +279,61 @@
                 });
             });
 
-            // Manejador para descargar documentos
             $('.btn-download-document').click(function (e) {
                 e.preventDefault();
                 const button = $(this);
                 const documentId = button.data('document-id');
                 const originalHtml = button.html();
-
                 updateButtonState(button, true, 'Descargando...', originalHtml);
-
-                $.ajax({
-                    url: '@Url.Action("DownloadDocument", "Document")',
-                    type: 'GET',
-                    data: { documentCatalogId: documentId },
-                    xhrFields: { responseType: 'blob' },
-                    success: function (response, status, xhr) {
-                        const filename = xhr.getResponseHeader('content-disposition')
-                            ? xhr.getResponseHeader('content-disposition').split('filename=')[1]
-                            : `documento_${documentId}.pdf`;
-
-                        const url = window.URL.createObjectURL(new Blob([response]));
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = filename;
-                        document.body.appendChild(link);
-                        link.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(link);
-                        toastr.success('Documento descargado exitosamente');
-                    },
-                    error: function (xhr, status, error) {
-                        handleAjaxError(xhr, status, error, 'Error al descargar el documento');
-                    },
-                    complete: function () {
-                        updateButtonState(button, false, '', originalHtml);
+    
+                fetch(`${window.location.origin}/Student/Document/DownloadDocument?documentCatalogId=${documentId}`, {
+                    method: 'GET',
+                })
+                .then(response => {
+                    // Obtener el nombre del archivo de la cabecera Content-Disposition
+                    const contentDisposition = response.headers.get('content-disposition');
+                    let filename;
+        
+                    if (contentDisposition) {
+                        // Intentar obtener el nombre del archivo de la cabecera
+                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        if (filenameMatch && filenameMatch[1]) {
+                            filename = filenameMatch[1].replace(/['"]/g, '');
+                            // Decodificar el nombre del archivo si es necesario
+                            try {
+                                filename = decodeURIComponent(filename);
+                            } catch (e) {
+                                // Si falla la decodificación, usar el nombre tal cual
+                                console.warn('Error decodificando nombre de archivo:', e);
+                            }
+                        }
                     }
+        
+                    // Si no se pudo obtener el nombre del archivo, usar uno por defecto
+                    if (!filename) {
+                        filename = `documento_${documentId}.pdf`;
+                    }
+        
+                    return response.blob().then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        // Limpiar el nombre del archivo de cualquier carácter especial adicional
+                        a.download = filename.split(';')[0].trim();
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        toastr.success('Documento descargado exitosamente');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('Error al descargar el documento');
+                })
+                .finally(() => {
+                    updateButtonState(button, false, '', originalHtml);
                 });
             });
 

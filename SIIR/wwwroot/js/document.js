@@ -22,23 +22,15 @@
         alert(errorMessage);
     }
 
-    // Función para actualizar estado del botón
-    function updateButtonState(button, isLoading, loadingText, originalHtml) {
-        button.prop('disabled', isLoading);
-        button.html(isLoading ?
-            `<i class="fa-solid fa-spinner fa-spin"></i> ${loadingText}` :
-            originalHtml
-        );
-    }
-
-    // Manejador para guardar documentos
     $('.btn-save-document').click(function (e) {
         e.preventDefault();
         const documentId = $(this).data('document-id');
         const fileInput = $(`#file_${documentId}`);
+        const documentCard = $(this).closest('.document-card');
+        const statusElement = documentCard.find('.document-status');
 
         if (fileInput[0].files.length === 0) {
-            alert(MESSAGES.SELECT_FILE);
+            toastr.warning(MESSAGES.SELECT_FILE);
             return;
         }
 
@@ -46,6 +38,10 @@
         formData.append('file', fileInput[0].files[0]);
         formData.append('documentCatalogId', documentId);
         formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
+
+        const button = $(this);
+        const originalHtml = button.html();
+        updateButtonState(button, true, 'Guardando...', originalHtml);
 
         $.ajax({
             url: '@Url.Action("SaveDocument", "Document")',
@@ -55,18 +51,55 @@
             contentType: false,
             success: function (response) {
                 if (response.success) {
-                    console.log('Documento guardado exitosamente');
-                    alert(response.message);
-                    location.reload();
+                    updateDocumentStatus(documentId, documentCard);
+                    toastr.success(response.message || 'Documento guardado exitosamente');
+
+                    // Habilitar los botones de descargar y eliminar
+                    documentCard.find('.btn-download-document, .btn-delete-document').prop('disabled', false);
                 } else {
-                    handleAjaxError(null, null, response.message, 'Error al guardar el documento');
+                    toastr.error(response.message || 'Error al guardar el documento');
                 }
             },
             error: function (xhr, status, error) {
                 handleAjaxError(xhr, status, error, 'Error al guardar el documento');
+            },
+            complete: function () {
+                updateButtonState(button, false, '', originalHtml);
             }
         });
     });
+
+    // Agregar esta nueva función para actualizar el estado
+    function updateDocumentStatus(documentId, documentCard) {
+        $.ajax({
+            url: '@Url.Action("UpdateStatus", "Document")',
+            type: 'POST',
+            data: {
+                documentCatalogId: documentId,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function (response) {
+                if (response.success) {
+                    const statusElement = documentCard.find('.document-status');
+
+                    // Remover todas las clases de estado existentes
+                    statusElement.removeClass('status-pending status-approved status-rejected');
+
+                    // Agregar la nueva clase de estado
+                    statusElement.addClass(response.statusClass);
+
+                    // Actualizar el texto del estado
+                    statusElement.html(`
+                    <i class="fa-solid fa-circle-info me-1"></i>
+                    ${response.statusText}
+                `);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al actualizar estado:', error);
+            }
+        });
+    }
 
     // Manejador para descargar documentos
     $('.btn-download-document').click(function (e) {
