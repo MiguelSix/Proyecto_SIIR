@@ -68,8 +68,18 @@
                             <div class="d-flex align-items-center">
                                 @if (!string.IsNullOrEmpty(Model.Captain.ImageUrl))
                                 {
-                                    <img src="@Model.Captain.ImageUrl" alt="Foto del Capitán"
-                                         class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover" />
+                                    <img src="@Model.Captain.ImageUrl" 
+                                    alt="Foto del Capitán"
+                                    class="rounded-circle me-3" 
+                                    style="width: 60px; height: 60px; object-fit: cover"
+                                    onerror="this.onerror=null; this.src='/images/zorro_default.png';" />
+                                }
+                                else
+                                {
+                                    <img src="/images/zorro_default.png" 
+                                    alt="Imagen por defecto"
+                                    class="rounded-circle me-3" 
+                                    style="width: 60px; height: 60px; object-fit: cover" />
                                 }
                                 <div>
                                     <h6 class="mb-1">@Model.Captain.Name @Model.Captain.LastName @Model.Captain.SecondLastName</h6>
@@ -103,7 +113,7 @@
             </div>
 
             <!-- Información del Coach -->
-            <div class="flex-grow-1">
+            <div class="flex-grow-1 mb-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title">Entrenador(a):</h5>
@@ -211,7 +221,7 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/roster.js"></script>
+    <script src="~/js/rosters.js"></script>
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
         var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';

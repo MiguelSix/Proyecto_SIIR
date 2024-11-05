@@ -110,12 +110,12 @@ function initializeDataTable(teamId) {
         "columns": [
             {
                 "data": "imageUrl",
-                "render": function (data) {
-                    return data
-                        ? `<img src="${data}" alt="Foto estudiante" class="img-thumbnail" style="width: 100px"/>`
-                        : '<img src="/images/no-image.png" alt="Sin foto" class="img-thumbnail" style="width: 100px"/>';
+                "render": function (imageUrl) {
+                    if (!imageUrl) return 'Sin imagen';
+                    return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-thumbnail" style="width: 100px;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
-                "width": "5%"
+                "width": "5%",
+                "responsivePriority": 5
             },
             {
                 "data": null,
@@ -130,21 +130,24 @@ function initializeDataTable(teamId) {
                     }
                     return `${name} ${lastName} ${secondLastName}`;
                 },
-                "width": "15%"
+                "width": "15%",
+                "responsivePriority": 1
             },
             {
                 "data": "career",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
-                "width": "25%"
+                "width": "25%",
+                "responsivePriority": 2
             },
             {
                 "data": "controlNumber",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
-                "width": "10%"
+                "width": "10%",
+                "responsivePriority": 3
             },
             {
                 "data": null,
@@ -165,7 +168,8 @@ function initializeDataTable(teamId) {
                         </div>
                     `;
                 },
-                "width": "15%"
+                "width": "15%",
+                "responsivePriority": 1
             }
         ],
         "language": {
@@ -214,18 +218,41 @@ function generarTarjetas(teamId) {
                         secondLastName === 'Sin actualizar')
                         ? 'Sin actualizar'
                         : `${name} ${lastName} ${secondLastName}`;
-
                     const card = `
                         <div class="col-md-4 col-lg-3 mb-4">
                             <div class="card h-100">
-                                <img src="${imageUrl}" class="card-img-top" alt="Foto estudiante"
-                                     style="height: 200px; object-fit: cover;">
+                                <img src="${imageUrl}" 
+                                     class="card-img-top" 
+                                     alt="Foto estudiante"
+                                     style="height: 200px; object-fit: scale-down; background-color: #f8f9fa;"
+                                     onerror="this.onerror=null; this.src='/images/zorro_default.png';">
                                 <div class="card-body">
                                     <h5 class="card-title">${fullName}</h5>
                                     <p class="card-text">
                                         <strong>No. Control:</strong> ${student.controlNumber || 'Sin actualizar'}<br>
                                         <strong>Carrera:</strong> ${student.career || 'Sin actualizar'}
                                     </p>
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <div class="btn-group gap-2" role="group">
+                                            <a onclick="Lock('/Admin/Students/Lock/${student.id}')" 
+                                               class="btn btn-danger btn-sm" 
+                                               style="cursor:pointer;"
+                                               title="Dar de baja">
+                                                <i class="fas fa-user-minus"></i>
+                                            </a>
+                                            <a onclick="downloadInfo('/Admin/Teams/GenerateStudentCertificate/${student.id}')" 
+                                               class="btn btn-info btn-sm" 
+                                               style="cursor:pointer;"
+                                               title="Descargar cédula">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button class="btn btn-secondary btn-sm" 
+                                                    onclick="descargarDocs(${student.id})"
+                                                    title="Descargar documentos">
+                                                <i class="fas fa-file-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -298,4 +325,3 @@ function downloadInfo(url) {
         }
     });
 }
-

@@ -174,6 +174,11 @@ namespace SIIR.Areas.Admin.Controllers
             TeamVM teamVM = new()
             {
                 Team = team,
+                StudentList = students.Select(s => new SelectListItem
+                {
+                    Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
+                    Value = s.Id.ToString()
+                }),
                 Captain = captain
             };
 
