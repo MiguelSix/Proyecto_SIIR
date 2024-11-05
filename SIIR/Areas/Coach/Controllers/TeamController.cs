@@ -7,6 +7,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 using System.IO;
 using System.Security.Claims;
 
@@ -25,24 +26,80 @@ namespace SIIR.Areas.Coach.Controllers
 
         // Método para mostrar la vista de generación de certificado
         [HttpGet]
-        public IActionResult Index(int id)
+        public IActionResult Roster(int? id)
         {
-            Team team = _contenedorTrabajo.Team.GetById(id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var team = _contenedorTrabajo.Team.GetById(id);
+            if (team == null)
+            {
+                return NotFound();
+            }
+
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
+            var captain = students.FirstOrDefault(s => s.IsCaptain);
+
+            TeamVM teamVM = new()
+            {
+                Team = team,
+                Captain = captain
+            };
+
             team.Coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
-            return View(team);
+            return View(teamVM);
         }
+
+        [HttpPost]
+        public IActionResult ChangeCaptain(int teamId, int newCaptainId)
+        {
+            try
+            {
+                // Get current captain if exists
+                var currentCaptain = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && s.IsCaptain).FirstOrDefault();
+
+                // Remove captain status from current captain
+                if (currentCaptain != null)
+                {
+                    currentCaptain.IsCaptain = false;
+                    _contenedorTrabajo.Student.Update(currentCaptain);
+                }
+
+                // Set new captain
+                var newCaptain = _contenedorTrabajo.Student.GetById(newCaptainId);
+                if (newCaptain == null || newCaptain.TeamId != teamId)
+                {
+                    return Json(new { success = false, message = "Estudiante no encontrado o no pertenece al equipo" });
+                }
+
+                newCaptain.IsCaptain = true;
+                _contenedorTrabajo.Student.Update(newCaptain);
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al cambiar el capitán: " + ex.Message });
+            }
+        }
+
+        #region API CALLS
 
         [HttpGet]
-        public IActionResult GetAllStudents(int teamId)
-        {
-            var students = _contenedorTrabajo.Student.GetAll(t =>
-                t.TeamId == teamId);
+		public IActionResult GetStudentsByTeamId(int teamId)
+		{
+			var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+			// Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+			var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id));
+			return Json(new { data = students });
+		}
 
-            return Json(new { data = students });
-        }
-
-        // Método para generar el PDF
-        [HttpPost]
+		// Método para generar el PDF
+		[HttpPost]
         public IActionResult GenerateCertificate([FromBody] CertificateRequest request)
         {
             if (request.Students == null || request.Students.Count == 0)
@@ -179,6 +236,8 @@ namespace SIIR.Areas.Coach.Controllers
                         column.Item().PaddingTop(10).PaddingBottom(20).Text($"{ coach.Name } { coach.LastName } { coach.SecondLastName }").FontSize(12).AlignCenter();
                 });
         }
+
+        #endregion
     }
 }
 
