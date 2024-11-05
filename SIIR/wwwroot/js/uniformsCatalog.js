@@ -12,7 +12,7 @@ function cargarDatatable() {
             "datatype": "json"
         },
         "columns": [
-            { "data": "name", "width": "50%" }, // Usamos 'name'
+            { "data": "name", "width": "25%" }, // Usamos 'name'
             { "data": "description", "width": "40%" }, // Usamos 'description'
             {
                 "data": "id",
@@ -27,7 +27,7 @@ function cargarDatatable() {
                                 </a>
                             </div>`;
                 },
-                "width": "10%" // Ajustamos el ancho
+                "width": "35%"
             }
         ],
         "language": {
