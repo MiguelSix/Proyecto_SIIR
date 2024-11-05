@@ -161,9 +161,11 @@
 
         <!-- Botones de Acción -->
         <div class="col-12 mt-3 action-buttons">
-            <button class="btn btn-primary" onclick="crearUsuario()">Crear Usuario</button>
+            <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">Crear Usuario</a>
             <button class="btn btn-success" onclick="generarCedula()">Generar Cedula</button>
-            <button class="btn btn-info" onclick="descargarTodo()">Descargar Todo</button>
+            <a onclick=downloadAllInfo("/Admin/Teams/GenerateStudentsCertificates/@Model.Team.Id") class="btn btn-info btn-sm" style="cursor:pointer;">
+                <i class="fas fa-download"></i>
+            </a>
         </div>
 
         <!-- Switch para cambiar vista -->
@@ -226,19 +228,28 @@
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
         var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';
 
-        function crearUsuario() {
-            // Implementar lógica
-            alert('Función crear usuario por implementar');
-        }
-
         function generarCedula() {
             // Implementar lógica
             alert('Función generar cédula por implementar');
         }
 
-        function descargarTodo() {
-            // Implementar lógica
-            alert('Función descargar todo por implementar');
+        function downloadAllInfo(url) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
+                success: function (blob) {
+                    // Crear un enlace temporal para descargar el archivo
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "Informacion_Estudiantes.pdf"; // Nombre del archivo descargado
+                    link.click();
+                    window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
+                },
+                error: function (error) {
+                    toastr.error("Error al generar el documento de información de los estudiantes:", error);
+                }
+            });
         }
     </script>
 }
