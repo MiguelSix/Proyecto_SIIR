@@ -22,8 +22,8 @@ namespace SIIR.Areas.Admin.Controllers
 
         public IActionResult Index(int studentId)
         {
-            var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(4);
-            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == 4);
+            var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
+            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == studentId);
             
             if (student == null)
             {
@@ -117,7 +117,7 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult DownloadAll(int studentId)
         {
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
-            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == 4);
+            var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == studentId);
 
             if (!documents.Any() || student == null)
             {
