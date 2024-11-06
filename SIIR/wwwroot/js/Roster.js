@@ -1,4 +1,5 @@
 ﻿let dataTable;
+let dataTableTarjetas;
 let currentCaptainId;
 
 $(document).ready(function () {
@@ -281,14 +282,15 @@ function generarTarjetas(teamId) {
 }
 
 function Lock(url) {
+    const teamId = $("#teamId").val();
     swal({
         title: "¿Está seguro de dar de baja a este estudiante del equipo?",
-        text: "¡Este estudiante no se volvera a mostrar hasta que se de de alta en el equipo!",
+        text: "¡Este estudiante no se volverá a mostrar hasta que se dé de alta en el equipo!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "¡Si, dar de baja!",
-        closeOnconfirm: true
+        confirmButtonText: "¡Sí, dar de baja!",
+        closeOnConfirm: true
     }, function () {
         $.ajax({
             type: 'GET',
@@ -296,15 +298,20 @@ function Lock(url) {
             success: function (data) {
                 if (data.success) {
                     toastr.success(data.message);
-                    dataTable.ajax.reload();
-                }
-                else {
+                    // Verificar la vista actual y recargar según corresponda
+                    if ($('#cardView').is(':visible')) {
+                        generarTarjetas(teamId);
+                    } else {
+                        dataTable.ajax.reload();
+                    }
+                } else {
                     toastr.error(data.message);
                 }
             }
         });
     });
 }
+
 
 function downloadInfo(url) {
     $.ajax({
@@ -321,6 +328,27 @@ function downloadInfo(url) {
         },
         error: function (error) {
             toastr.error("Error al generar el documento de información del estudiante:", error);
+        }
+    });
+}
+
+function downloadAllInfo() {
+    const teamId = $("#teamId").val();
+    console.log(`${downloadAllInfoUrl}?teamId=${teamId}`);
+    $.ajax({
+        url: `${downloadAllInfoUrl}?teamId=${teamId}`,
+        type: 'POST',
+        xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
+        success: function (blob) {
+            // Crear un enlace temporal para descargar el archivo
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "Informacion_Estudiantes.pdf"; // Nombre del archivo descargado
+            link.click();
+            window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
+        },
+        error: function (error) {
+            toastr.error("Error al generar el documento de información de los estudiantes:", error);
         }
     });
 }

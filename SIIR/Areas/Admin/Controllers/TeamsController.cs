@@ -219,6 +219,44 @@ namespace SIIR.Areas.Admin.Controllers
             }
         }
 
+        //Método para generar el PDF de todos los estudiantes de un equipo
+        [HttpPost]
+        public IActionResult GenerateStudentsCertificates(int teamId)
+        {
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
+
+            if (students.Count == 0)
+            {
+                return NotFound("No se encontraron estudiantes en el equipo");
+            }
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                foreach (var student in students)
+                {
+                    var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+                    var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+
+                    container.Page(page =>
+                    {
+                        page.Size(PageSizes.A4);
+                        page.Margin(1, Unit.Centimetre);
+
+                        // Añadir la información del estudiante a la página
+                        page.Content().Element(c => CreateStudentCell(c, student, coach, team));
+
+                        page.Footer().Text(text => text.CurrentPageNumber());
+                    });
+                }
+            });
+
+            // Convertir el documento en un archivo PDF para la respuesta
+            byte[] pdfBytes = document.GeneratePdf();
+            return File(pdfBytes, "application/pdf");
+        }
+
         // Método para generar el PDF de un solo estudiante
         [HttpPost]
         public IActionResult GenerateStudentCertificate(int id)
@@ -249,7 +287,7 @@ namespace SIIR.Areas.Admin.Controllers
 
             // Convertir el documento en un archivo PDF para la respuesta
             byte[] pdfBytes = document.GeneratePdf();
-            return File(pdfBytes, "application/pdf", $"Cedula_Estudiante_{student.Id}.pdf");
+            return File(pdfBytes, "application/pdf");
         }
 
 
@@ -262,12 +300,14 @@ namespace SIIR.Areas.Admin.Controllers
 
             imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
 
+            if(!System.IO.File.Exists(imageUrl))
+            {
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "zorro_default.png");
+            }
+
             byte[] imageBytes = Array.Empty<byte>();
 
-            if (System.IO.File.Exists(imageUrl))
-            {
-                imageBytes = System.IO.File.ReadAllBytes(imageUrl);
-            }
+            imageBytes = System.IO.File.ReadAllBytes(imageUrl);
 
             container.Padding(2)
                 .Border(1)

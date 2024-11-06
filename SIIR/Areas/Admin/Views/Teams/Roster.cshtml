@@ -161,9 +161,18 @@
 
         <!-- Botones de Acción -->
         <div class="col-12 mt-3 action-buttons">
-            <button class="btn btn-primary" onclick="crearUsuario()">Crear Usuario</button>
-            <button class="btn btn-success" onclick="generarCedula()">Generar Cedula</button>
-            <button class="btn btn-info" onclick="descargarTodo()">Descargar Todo</button>
+            <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">
+                <i class="fas fa-user-plus"></i> Crear Usuario
+            </a>
+            <button class="btn btn-success" onclick="generarCedula()">
+                <i class="fas fa-file-download"></i> Generar Cedula
+            </button>
+            <button onclick=downloadAllInfo() class="btn btn-info" style="cursor:pointer; color:white">
+                <i class="fas fa-download"></i> Descargar información del equipo
+            </button>
+            <button class="btn btn-secondary" style="cursor:pointer; color:white">
+                <i class="fas fa-file-download"></i> Descargar documentos del equipo
+            </button>
         </div>
 
         <!-- Switch para cambiar vista -->
@@ -225,20 +234,13 @@
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
         var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';
-
-        function crearUsuario() {
-            // Implementar lógica
-            alert('Función crear usuario por implementar');
-        }
+        var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
 
         function generarCedula() {
             // Implementar lógica
             alert('Función generar cédula por implementar');
         }
 
-        function descargarTodo() {
-            // Implementar lógica
-            alert('Función descargar todo por implementar');
-        }
+        
     </script>
 }

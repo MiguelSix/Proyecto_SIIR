@@ -1,33 +1,43 @@
 ﻿var dataTable;
-
 $(document).ready(function () {
     cargarDatatable();
 });
 
 function cargarDatatable() {
     dataTable = $("#tblUniformCatalog").DataTable({
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRow
+            }
+        },
         "ajax": {
-            "url": "/admin/UniformCatalog/GetAll", // Ajusta la URL según tu controlador y acción
+            "url": "/admin/UniformCatalog/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "name", "width": "50%" }, // Usamos 'name'
-            { "data": "description", "width": "40%" }, // Usamos 'description'
+            {
+                "data": "name",
+                "responsivePriority": 1
+            },
+            {
+                "data": "description",
+                "responsivePriority": 3
+            },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="text-center">
-                                <a href="/Admin/UniformCatalog/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer; width:100px;">
+                    return `<div class="d-flex justify-content-center gap-2"">
+                                <a href="/Admin/UniformCatalog/Edit/${data}" class="btn btn-success text-white btn-sm">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                                &nbsp;
-                                <a onclick=Delete("/Admin/UniformCatalog/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer; width:100px;">
+                                <a onclick=Delete("/Admin/UniformCatalog/Delete/${data}") class="btn btn-danger text-white btn-sm">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
                             </div>`;
                 },
-                "width": "10%" // Ajustamos el ancho
+                "width": "45%",
+                "responsivePriority": 1
             }
         ],
         "language": {
@@ -52,7 +62,6 @@ function cargarDatatable() {
         "width": "100%"
     });
 }
-
 function Delete(url) {
     swal({
         title: "¿Estás seguro de borrar?",
