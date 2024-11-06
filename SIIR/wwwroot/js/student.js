@@ -67,6 +67,9 @@ function cargarDatatable() {
                             <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
                                 <i class="fas fa-trash-alt"></i> Borrar
                             </a>
+                            <a href="/Admin/Document/Index?studentId=${data}" class="btn btn-info text-white" style="cursor:pointer">
+                                <i class="fas fa-file-alt"></i> Documentos
+                            </a>
                         </div>`;
                 },
                 "responsivePriority": 1
