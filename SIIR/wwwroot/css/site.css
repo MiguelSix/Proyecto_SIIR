@@ -1,23 +1,127 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    font-family: 'Montserrat', sans-serif;
 }
 
+.navbar {
+    background-color: #1a3c6e !important;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+    .navbar .nav-link {
+        color: white !important;
+    }
+
+    .navbar .navbar-brand {
+        color: white !important;
+    }
+
+.offcanvas {
+    background-color: #1a3c6e;
+    max-width: 280px;
+}
+
+    .offcanvas .navbar-nav {
+        width: 100%;
+        align-items: flex-start !important;
+    }
+
+    .offcanvas .nav-link,
+    .offcanvas .dropdown-toggle {
+        color: white !important;
+        text-align: left !important;
+        padding-left: 1rem;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .offcanvas .dropdown-menu {
+        background-color: #15325d;
+        min-width: 180%;
+        border: none;
+        width: 100%;
+    }
+
+    .offcanvas .dropdown-item {
+        color: white;
+        padding-left: 2rem;
+        text-align: left !important;
+    }
+
+        .offcanvas .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+.offcanvas-title {
+    color: white;
+}
+
+.btn-close-white {
+    filter: brightness(0) invert(1);
+}
+
+.navbar-nav .nav-link.lead,
+.navbar-nav .dropdown-toggle.lead,
+.navbar-nav .dropdown-item.lead {
+    font-size: 1.1rem;
+    font-weight: 300;
+    line-height: 1.5;
+    padding: 0.5rem 1rem;
+}
+
+.navbar .navbar-nav.ms-auto {
+    align-items: center;
+}
+
+.navbar-nav .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    margin-top: 0;
+    right: 0;
+    left: auto;
+    float: none;
+}
+
+.navbar-nav .dropdown-item.lead:hover,
+.navbar-nav .dropdown-item.lead:focus {
+    background-color: #f8f9fa;
+}
+
+.navbar-nav {
+    align-items: center;
+}
+
+    .navbar-nav .dropdown {
+        position: relative;
+    }
+
+.navbar .navbar-nav.ms-auto .nav-link,
+.navbar .navbar-nav.ms-auto .dropdown-toggle {
+    text-align: center;
+}
+
+@media (min-width: 992px) {
+    .navbar-toggler {
+        display: none;
+    }
+}
