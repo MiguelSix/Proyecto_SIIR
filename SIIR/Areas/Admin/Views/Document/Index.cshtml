@@ -1,0 +1,263 @@
+﻿@model SIIR.Models.ViewModels.DocumentVM
+
+<style>
+    /* Estilos para los diferentes estados de documentos */
+    .badge-status {
+        padding: 0.5em 1em;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    /* Estilo para documentos pendientes */
+    .badge-pending {
+        background-color: #ffd700;
+        color: #000;
+    }
+    /* Estilo para documentos aprobados */
+    .badge-approved {
+        background-color: #28a745;
+        color: #fff;
+    }
+    /* Estilo para documentos rechazados */
+    .badge-rejected {
+        background-color: #dc3545;
+        color: #fff;
+    }
+    /* Estilos para los botones de acción */
+    .action-buttons .btn {
+        margin: 0 2px;
+    }
+    /* Ajustes de tabla y tarjetas */
+    .table td {
+        vertical-align: middle;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+    /* Estilos para mostrar información del documento y estudiante */
+    .document-name {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .document-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .student-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">
+                Documentos del Estudiante
+            </h1>
+        </div>
+
+        <div class="col-md-4 text-end">
+            @if (Model.StudentDocuments.Any())
+            {
+                <a asp-action="DownloadAll"
+                   asp-route-studentId="@Model.Student.Id"
+                   class="btn btn-primary me-2">
+                    <i class="fas fa-download me-2"></i>Descargar Todo
+                </a>
+            }
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Información del Estudiante -->
+            <div class="student-info">
+                <h3 class="h5 mb-3">Información del Estudiante</h3>
+                <div class="d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(Model.Student.ImageUrl))
+                    {
+                        <img src="@Model.Student.ImageUrl"
+                             alt="Foto del Estudiante"
+                             class="rounded-circle me-3"
+                             style="width: 60px; height: 60px; object-fit: cover"
+                             onerror="this.onerror=null; this.src='/images/student_default.png';" />
+                    }
+                    else
+                    {
+                        <img src="/images/student_default.png"
+                             alt="Imagen por defecto"
+                             class="rounded-circle me-3"
+                             style="width: 60px; height: 60px; object-fit: cover" />
+                    }
+                    <div>
+                        <h6 class="mb-1">@Model.Student.Name @Model.Student.LastName</h6>
+                        <p class="mb-1 text-muted">
+                            No. Control: @Model.Student.ControlNumber<br />
+                            Carrera: @Model.Student.Career<br />
+                            Semestre: @Model.Student.Semester
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Mostrar mensaje si no hay documentos registrados -->
+    @if (!Model.StudentDocuments.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            No hay documentos registrados para este estudiante.
+        </div>
+    }
+    else
+    {
+        <!-- Mostrar los documentos en una tabla si existen -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="documentsTable">
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Fecha de Subida</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Iterar sobre los documentos del estudiante -->
+                            @foreach (var doc in Model.StudentDocuments)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="document-name">@doc.DocumentCatalog.Name</div>
+                                        @* @if (!string.IsNullOrEmpty(doc.DocumentCatalog.Description))
+                                        {
+                                            <div class="document-description">@doc.DocumentCatalog.Description</div>
+                                        } *@
+                                    </td>
+                                    <td>@doc.UploadDate</td>
+                                    <td>
+                                        <!-- Mostrar el estado del documento con un estilo visual -->
+                                        @switch (doc.Status)
+                                        {
+                                            case DocumentStatus.Pending:
+                                                <span class="badge-status badge-pending">
+                                                    <i class="fas fa-clock me-1"></i>Pendiente
+                                                </span>
+                                                break;
+                                            case DocumentStatus.Approved:
+                                                <span class="badge-status badge-approved">
+                                                    <i class="fas fa-check me-1"></i>Aprobado
+                                                </span>
+                                                break;
+                                            case DocumentStatus.Rejected:
+                                                <span class="badge-status badge-rejected">
+                                                    <i class="fas fa-times me-1"></i>Rechazado
+                                                </span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        <!-- Botones para ver detalles o descargar el documento -->
+                                        <div class="action-buttons">
+                                            <a asp-action="Details" asp-route-id="@doc.Id"
+                                               class="btn btn-info btn-sm" title="Ver Detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Download" asp-route-id="@doc.Id"
+                                               class="btn btn-primary btn-sm" title="Descargar">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            @* @if (doc.Status == DocumentStatus.Pending)
+                                            {
+                                                <button type="button" class="btn btn-success btn-sm"
+                                                        onclick="approveDocument(@doc.Id)" title="Aprobar">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="rejectDocument(@doc.Id)" title="Rechazar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            } *@
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<!-- Formulario oculto para cambiar el estado del documento -->
+<form id="statusForm" asp-action="ChangeStatus" method="post">
+    <input type="hidden" id="documentId" name="id" />
+    <input type="hidden" id="documentStatus" name="status" />
+</form>
+
+@section Scripts {
+    <script>
+        // Inicializar la tabla con DataTables
+        $(document).ready(function () {
+            $('#documentsTable').DataTable({
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+                order: [[1, 'desc']],
+                pageLength: 10,
+                columnDefs: [
+                    { orderable: false, targets: 3 } // Desactivar ordenamiento para la columna de acciones
+                ]
+            });
+        });
+        // Funciones para aprobar o rechazar un documento
+        function approveDocument(id) {
+            changeStatus(id, 'Approved');
+        }
+
+        function rejectDocument(id) {
+            if (confirm('¿Estás seguro de que deseas rechazar este documento?')) {
+                changeStatus(id, 'Rejected');
+            }
+        }
+        // Cambiar el estado de un documento mediante el formulario oculto
+        function changeStatus(id, status) {
+            document.getElementById('documentId').value = id;
+            document.getElementById('documentStatus').value = status;
+            document.getElementById('statusForm').submit();
+        }
+    </script>
+}
