@@ -64,7 +64,7 @@
         formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
 
         $.ajax({
-            url: '@Url.Action("SaveDocument", "Document")',
+            url: '/Student/Document/SaveDocument',
             type: 'POST',
             data: formData,
             processData: false,
@@ -162,7 +162,7 @@
             updateButtonState(button, true, 'Eliminando...', originalHtml);
 
             $.ajax({
-                url: '@Url.Action("DeleteDocument", "Document")',
+                url: '/Student/Document/DeleteDocument',
                 type: 'POST',
                 data: {
                     documentCatalogId: documentId,

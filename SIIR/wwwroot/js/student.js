@@ -22,15 +22,16 @@ function cargarDatatable() {
             },
             {
                 "data": "name",
-                "responsivePriority": 1
+                "responsivePriority": 1,
+                
             },
             {
                 "data": "lastName",
-                "responsivePriority": 3
+                "responsivePriority": 1
             },
             {
                 "data": "secondLastName",
-                "responsivePriority": 3
+                "responsivePriority": 1
             },
             {
                 "data": "imageUrl",
