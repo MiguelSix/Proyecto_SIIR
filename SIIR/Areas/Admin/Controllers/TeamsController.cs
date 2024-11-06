@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
@@ -96,25 +99,29 @@ namespace SIIR.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(TeamVM teamVM)
         {
-            if (!ModelState.IsValid)
+            // Remover la validación de la imagen si no se selecciona una nueva imagen
+            ModelState.Remove("Team.ImageUrl");
+            if (ModelState.IsValid)
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
                 var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
 
-                if (files.Count() > 0)
+                if (files.Count > 0)
                 {
                     // Editar Imagen
                     string fileName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(webRootPath, @"images\teams");
-                    var extension = Path.GetExtension(files[0].FileName);
-
                     var extension_new = Path.GetExtension(files[0].FileName);
-                    var imagePath = Path.Combine(webRootPath, teamFromDb.ImageUrl.TrimStart('\\'));
 
-                    if (System.IO.File.Exists(imagePath))
+                    // Eliminar la imagen anterior
+                    if (!string.IsNullOrEmpty(teamFromDb.ImageUrl))
                     {
-                        System.IO.File.Delete(imagePath);
+                        var imagePath = Path.Combine(webRootPath, teamFromDb.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            System.IO.File.Delete(imagePath);
+                        }
                     }
 
                     // Subir nueva imagen
@@ -123,14 +130,12 @@ namespace SIIR.Areas.Admin.Controllers
                         files[0].CopyTo(fileStreams);
                     }
 
-                    teamVM.Team.ImageUrl = @"\images\teams\" + fileName + extension_new;
-                    _contenedorTrabajo.Team.Update(teamVM.Team);
-                    _contenedorTrabajo.Save();
-                    return RedirectToAction(nameof(Index));
+                    // Guardar la nueva ruta de la imagen
+                    teamFromDb.ImageUrl = @"\images\teams\" + fileName + extension_new;
                 }
                 else
                 {
-                    // No se seleccionó una nueva imagen
+                    // No se seleccionó una nueva imagen, mantener la imagen existente
                     teamVM.Team.ImageUrl = teamFromDb.ImageUrl;
                 }
 
@@ -138,6 +143,8 @@ namespace SIIR.Areas.Admin.Controllers
                 _contenedorTrabajo.Save();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Si el ModelState no es válido, volver a cargar las listas y retornar la vista
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
             return View(teamVM);
@@ -156,9 +163,12 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value);
-
-            // Obtener el capitán si existe
+            // Data del equipo
+            team.Coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+            // Obtener todos los usuarios que no están bloqueados
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
             var captain = students.FirstOrDefault(s => s.IsCaptain);
 
             TeamVM teamVM = new()
@@ -169,7 +179,7 @@ namespace SIIR.Areas.Admin.Controllers
                     Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
                     Value = s.Id.ToString()
                 }),
-                Captain = captain // Asegúrate de agregar esta propiedad al TeamVM
+                Captain = captain
             };
 
             return View(teamVM);
@@ -209,6 +219,184 @@ namespace SIIR.Areas.Admin.Controllers
             }
         }
 
+        //Método para generar el PDF de todos los estudiantes de un equipo
+        [HttpPost]
+        public IActionResult GenerateStudentsCertificates(int teamId)
+        {
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
+
+            if (students.Count == 0)
+            {
+                return NotFound("No se encontraron estudiantes en el equipo");
+            }
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                foreach (var student in students)
+                {
+                    var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+                    var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+
+                    container.Page(page =>
+                    {
+                        page.Size(PageSizes.A4);
+                        page.Margin(1, Unit.Centimetre);
+
+                        // Añadir la información del estudiante a la página
+                        page.Content().Element(c => CreateStudentCell(c, student, coach, team));
+
+                        page.Footer().Text(text => text.CurrentPageNumber());
+                    });
+                }
+            });
+
+            // Convertir el documento en un archivo PDF para la respuesta
+            byte[] pdfBytes = document.GeneratePdf();
+            return File(pdfBytes, "application/pdf");
+        }
+
+        // Método para generar el PDF de un solo estudiante
+        [HttpPost]
+        public IActionResult GenerateStudentCertificate(int id)
+        {
+            // Obtener el estudiante por su ID
+            var student = _contenedorTrabajo.Student.GetById(id);
+            var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+            var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+            if (student == null)
+            {
+                return NotFound("Estudiante no encontrado");
+            }
+
+            // Crear el documento PDF usando QuestPDF con la información del estudiante
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+
+                    // Aquí puedes personalizar la estructura del PDF con los datos del estudiante
+                    page.Content().Element(c => CreateStudentCell(c, student, coach, team));
+
+                    page.Footer().Text(text => text.CurrentPageNumber());
+                });
+            });
+
+            // Convertir el documento en un archivo PDF para la respuesta
+            byte[] pdfBytes = document.GeneratePdf();
+            return File(pdfBytes, "application/pdf");
+        }
+
+
+        [HttpPost]
+        private static void CreateStudentCell(IContainer container, Models.Student student,  Models.Coach coach, Models.Team team)
+        {
+            string imageUrl = student.ImageUrl != null && student.ImageUrl.StartsWith("/")
+                ? student.ImageUrl.Substring(1)
+                : student.ImageUrl ?? "";
+
+            imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+
+            if(!System.IO.File.Exists(imageUrl))
+            {
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "zorro_default.png");
+            }
+
+            byte[] imageBytes = Array.Empty<byte>();
+
+            imageBytes = System.IO.File.ReadAllBytes(imageUrl);
+
+            container.Padding(2)
+                .Border(1)
+                .BorderColor(Colors.Black)
+                .Background(Colors.Grey.Lighten4)
+                .DefaultTextStyle(x => x.FontSize(14).LineHeight(1.5f))
+                .Column(column =>
+                {
+                    // Row for Image and Name
+                    column.Item().Padding(5).Row(row =>
+                    {
+                        // Centering the image and name
+                        row.RelativeItem().Column(innerColumn =>
+                        {
+                            innerColumn.Item()
+                                .AlignMiddle()
+                                .AlignCenter()
+                                .Width(140) // Define the width of the image
+                                .Height(140) // Define the height of the image
+                                .Image(imageBytes);
+
+                            // Name above and below the image
+                            innerColumn.Item().Text($"{student.Name ?? "Sin Actualizar"} {student.LastName ?? "Sin Actualizar"} {student.SecondLastName ?? "Sin Actualizar"}").Bold().FontSize(18).AlignCenter();
+                        });
+                    });
+
+                    // Two-column layout for the rest of the information
+                    column.Item().PaddingLeft(10).PaddingBottom(5).Row(row =>
+                    {
+                        row.RelativeItem().Column(leftColumn =>
+                        {
+                            leftColumn.Item().Text("Número de control").Bold();
+                            leftColumn.Item().Text(student.ControlNumber ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("Carrera").Bold();
+                            leftColumn.Item().Text(student.Career ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("CURP").Bold();
+                            leftColumn.Item().Text(student.Curp ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("Fecha de Nacimiento").Bold();
+                            leftColumn.Item().Text(student.BirthDate ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("Teléfono").Bold();
+                            leftColumn.Item().Text(student.Phone ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("NSS").Bold();
+                            leftColumn.Item().Text(student.Nss ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("Número de Jugador").Bold();
+                            leftColumn.Item().Text(student.numberUniform?.ToString() ?? "Sin Actualizar");
+
+                            leftColumn.Item().Text("Fecha de Ingreso").Bold();
+                            leftColumn.Item().Text(student.enrollmentData?.ToString() ?? "Sin Actualizar");
+                        });
+
+                        row.RelativeItem().Column(rightColumn =>
+                        {
+                            rightColumn.Item().Text("Edad").Bold();
+                            rightColumn.Item().Text(student.Age?.ToString() ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Tipo de Sangre").Bold();
+                            rightColumn.Item().Text(student.BloodType ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Peso").Bold();
+                            rightColumn.Item().Text(student.Weight?.ToString("0.0") ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Altura").Bold();
+                            rightColumn.Item().Text(student.Height?.ToString("0.0") ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Alergias").Bold();
+                            rightColumn.Item().Text(student.Allergies ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Entrenador").Bold();
+                            rightColumn.Item().Text(coach.Name ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Equipo").Bold();
+                            rightColumn.Item().Text(team.Name ?? "Sin Actualizar");
+
+                            rightColumn.Item().Text("Capitán").Bold();
+                            rightColumn.Item().Text(student.IsCaptain ? "Sí" : "No");
+                        });
+                    });
+                });
+        }
+
+
+
+
         #region API CALLS
 
         [HttpGet]
@@ -220,8 +408,9 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetStudentsByTeamId(int teamId)
         {
-            // Obtener los estudiantes por equipo
-            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
             return Json(new { data = students });
         }
 
@@ -259,5 +448,6 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         #endregion
+
     }
 }

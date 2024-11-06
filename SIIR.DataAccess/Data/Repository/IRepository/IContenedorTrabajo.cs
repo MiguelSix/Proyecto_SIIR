@@ -9,6 +9,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
 {
     public interface IContenedorTrabajo : IDisposable
     {
+        IAdminRepository Admin { get; }
         IUserRepository User { get; }
         ITeamRepository Team { get; }
         IRepresentativeRepository Representative { get; }
@@ -17,8 +18,8 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
         IStudentRepository Student { get; }
         IDocumentCatalogRepository DocumentCatalog { get; }
         IDocumentRepository Document { get; }
-        IRepresentativeUniformCatalog RepresentativeUniformCatalog { get;  }
-
+        IRepresentativeUniformCatalog RepresentativeUniformCatalog { get; }
+        IUniformRepository Uniform { get; }
         void Save();
     }
 }

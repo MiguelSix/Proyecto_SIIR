@@ -13,17 +13,17 @@
 
 <br />
 <br />
-<h3 class="text-center"> Crear un documento nuevo</h3>
+<h2 class="text-center"> Crear un documento nuevo</h2>
 <form method="POST" asp-action="Create" enctype="multipart/form-data">
-    <div class="row px-2 offset-1 border">
+    <div class="row px-2 border mx-3 rounded-2">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="col-10 offset-1 mt-4">
+        <div class="col-12 mt-4">
             <div class="form-group row">
-                <div class="col-4">
+                <div class="col-md-4 col-sm-12">
                     <label asp-for="Name"></label>
                 </div>
-                <div class="col-8">
+                <div class="col-md-8 col-sm-12">
                     <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
@@ -31,10 +31,10 @@
 
             <br />
             <div class="form-group row">
-                <div class="col-4">
+                <div class="col-md-4 col-sm-12">
                     <label asp-for="Extension"></label>
                 </div>
-                <div class="col-8">
+                <div class="col-md-8 col-sm-12">
                     <select asp-for="Extension" class="form-control" asp-items="ViewBag.Extensiones"></select>
                     <span asp-validation-for="Extension" class="text-danger"></span>
                 </div>
@@ -42,18 +42,18 @@
 
             <br />
             <div class="form-group row">
-                <div class="col-4">
+                <div class="col-md-4 col-sm-12">
                     <label asp-for="Description"></label>
                 </div>
-                <div class="col-8">
+                <div class="col-md-8 col-sm-12">
                     <textarea asp-for="Description" class="form-control" placeholder="Ingresa la descripción" rows="5"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div>
 
             <br />
-            <div class="form-group-row">
-                <div class="col-8">
+            <div class="row">
+                <div class="col-12">
                     <partial name="_VistaCrearVolver" />
                 </div>
             </div>
@@ -67,3 +67,4 @@
         <partial name="_ValidationScriptsPartial" />
     }
 }
+

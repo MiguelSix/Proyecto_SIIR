@@ -45,8 +45,8 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 _contenedorTrabajo.Representative.Add(representativeVM.Representative);
                 _contenedorTrabajo.Save();
-                CreateRepresentativeUniformCatalog(representativeVM);
-                return RedirectToAction(nameof(Index));
+				CreateRepresentativeUniformCatalog(representativeVM);
+				return RedirectToAction(nameof(Index));
             }
             representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
             return View(representativeVM);
@@ -64,6 +64,7 @@ namespace SIIR.Areas.Admin.Controllers
                         UniformCatalogId = uniformCatalogId
                     };
                     _contenedorTrabajo.RepresentativeUniformCatalog.Add(representativeUniformCatalog);
+                    
                 }
                 _contenedorTrabajo.Save();
             }
@@ -108,7 +109,6 @@ namespace SIIR.Areas.Admin.Controllers
                 .GetAll(ruc => ruc.RepresentativeId == representativeVM.Representative.Id)
                 .ToList();
 
-            // Remove existing entries not in the new selection
             if (representativeVM.SelectedUniformCatalogIds is null)
             {
                 foreach (var existingRUC in existingRUCs)
@@ -136,7 +136,22 @@ namespace SIIR.Areas.Admin.Controllers
                             RepresentativeId = representativeVM.Representative.Id,
                             UniformCatalogId = uniformCatalogId
                         };
-                        _contenedorTrabajo.RepresentativeUniformCatalog.Add(newRUC);
+
+						var studentsId = _contenedorTrabajo.Student
+	                        .GetAll(s => s.Team.RepresentativeId == representativeVM.Representative.Id)
+	                        .Select(s => s.Id)
+	                        .ToList();
+
+                        foreach (var studentId in studentsId)
+                        {
+							var uniform = new Uniform();
+							uniform.StudentId = studentId;
+							uniform.RepresentativeId = representativeVM.Representative.Id;
+							uniform.UniformCatalogId = uniformCatalogId;
+							_contenedorTrabajo.Uniform.Add(uniform);
+						}
+
+						_contenedorTrabajo.RepresentativeUniformCatalog.Add(newRUC);
                     }
                 }
             }

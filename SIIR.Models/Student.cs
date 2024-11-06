@@ -53,7 +53,7 @@ namespace SIIR.Models
         public string? Phone { get; set; }
 
         [Display(Name = "Edad")]
-        public int Age { get; set; }
+        public int? Age { get; set; }
 
         [StringLength(3, ErrorMessage = "El tipo de sangre no puede exceder los 3 caracteres.")]
         [Display(Name = "Tipo de Sangre")]
@@ -81,19 +81,25 @@ namespace SIIR.Models
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
 
+        [Display(Name = "Número del jugador")]
+        public int? numberUniform { get; set; }
+
+        [Display(Name = "Fecha de ingreso")]
+		public int? enrollmentData { get; set; }
+
         // Llaves foráneas
         public int? CoachId { get; set; }
 
         [ForeignKey("CoachId")]
-        public Coach Coach { get; set; }
+        public Coach? Coach { get; set; }
 
         // Equipo
         public int? TeamId { get; set; }
         [ForeignKey("TeamId")]
-        public Team Team { get; set; }
+        public Team? Team { get; set; }
 
         // Capitán
         [DefaultValue(false)]
         public bool IsCaptain { get; set; }
-    }
+	}
 }

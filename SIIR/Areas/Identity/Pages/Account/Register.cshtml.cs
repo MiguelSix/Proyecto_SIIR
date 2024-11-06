@@ -20,9 +20,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
+using SIIR.DataAccess.Data.Repository;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 using SIIR.Utilities;
+using static QuestPDF.Helpers.Colors;
 
 namespace SIIR.Areas.Identity.Pages.Account
 {
@@ -37,15 +40,18 @@ namespace SIIR.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ITeamRepository _teamRepository;
+		private readonly IContenedorTrabajo _contenedorTrabajo;
 
-        public RegisterModel(
+
+		public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
             RoleManager<IdentityRole> roleManager,
-            ITeamRepository teamRepository)
+            ITeamRepository teamRepository,
+            IContenedorTrabajo contenedorTrabajo)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -55,7 +61,8 @@ namespace SIIR.Areas.Identity.Pages.Account
             _emailSender = emailSender;
             _roleManager = roleManager;
             _teamRepository = teamRepository;
-        }
+            _contenedorTrabajo = contenedorTrabajo;
+		}
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -122,9 +129,6 @@ namespace SIIR.Areas.Identity.Pages.Account
             [StringLength(50, ErrorMessage = "El apellido materno no puede exceder los 50 caracteres.")]
             [Display(Name = "Apellido Materno")]
             public string SecondLastName { get; set; }
-            
-            [DataType(DataType.ImageUrl)]
-            public string ImageUrl {  get; set; }
             [Display(Name = "Equipo")]
             public int? TeamId { get; set; }
 
@@ -174,7 +178,6 @@ namespace SIIR.Areas.Identity.Pages.Account
                             Name = Input.Name,
                             LastName = Input.LastName,
                             SecondLastName = Input.SecondLastName,
-                            ImageUrl = "/images/zorro_default.png"
                         };
                         user.Coach = coach;
                         break;
@@ -201,10 +204,11 @@ namespace SIIR.Areas.Identity.Pages.Account
                             SecondLastName = Input.SecondLastName,
                             TeamId = Input.TeamId.Value,
                             CoachId = team.CoachId,
-                            ImageUrl = "/images/zorro_default.png"
-                        };
-                        user.Student = student;
-                        break;
+						};
+
+						user.Student = student;
+
+						break;
                     default:
                         ModelState.AddModelError(string.Empty, "Invalid role selection");
                         return Page();
@@ -218,10 +222,14 @@ namespace SIIR.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     TempData["Message"] = $"Usuario {Input.Email} registrado exitosamente como {selectedRole}";
-                    TempData["Type"] = "success";
+					TempData["Type"] = "success";
 
-                    // Redirigir al listado de usuarios
-                    return RedirectToAction("Index", "Users", new { area = "Admin" });
+                    if (user.StudentId.HasValue)
+                    {
+                        CreateUniformStudent(user.Student.Id, user.Student.Team.RepresentativeId);
+                    }
+						// Redirigir al listado de usuarios
+						return RedirectToAction("Index", "Users", new { area = "Admin" });
                 }
                 foreach (var error in result.Errors)
                 {
@@ -233,6 +241,24 @@ namespace SIIR.Areas.Identity.Pages.Account
             TeamList = _teamRepository.GetListaTeams();
             return Page();
         }
+
+        private void CreateUniformStudent(int studentId, int representativeId) 
+        {
+			var representativeUniforms = _contenedorTrabajo.RepresentativeUniformCatalog
+				.GetAll()
+		        .Where(u => u.RepresentativeId == representativeId)
+		        .ToList();
+
+            foreach(var representativeUniform in representativeUniforms)
+            {
+                var uniform = new Uniform();
+                uniform.StudentId = studentId;
+                uniform.RepresentativeId = representativeId;
+                uniform.UniformCatalogId = representativeUniform.UniformCatalogId;
+				_contenedorTrabajo.Uniform.Add(uniform);
+                _contenedorTrabajo.Save();
+			}
+		}
 
         private async Task EnsureRoleExists(string roleName)
         {

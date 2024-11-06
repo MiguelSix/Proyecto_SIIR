@@ -389,7 +389,7 @@ namespace SIIR.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Age")
+                    b.Property<int?>("Age")
                         .HasColumnType("int");
 
                     b.Property<string>("Allergies")
@@ -457,6 +457,12 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<float?>("Weight")
                         .HasColumnType("real");
 
+                    b.Property<int?>("enrollmentData")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("numberUniform")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CoachId");
@@ -501,6 +507,35 @@ namespace SIIR.DataAccess.Migrations
                     b.HasIndex("RepresentativeId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("SIIR.Models.Uniform", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RepresentativeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UniformCatalogId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("size")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("RepresentativeId", "UniformCatalogId");
+
+                    b.ToTable("Uniform");
                 });
 
             modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
@@ -627,7 +662,7 @@ namespace SIIR.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("SIIR.Models.UniformCatalog", "UniformCatalog")
-                        .WithMany("RepresentativeUniformCatalogs")
+                        .WithMany()
                         .HasForeignKey("UniformCatalogId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -671,6 +706,25 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("Representative");
                 });
 
+            modelBuilder.Entity("SIIR.Models.Uniform", b =>
+                {
+                    b.HasOne("SIIR.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SIIR.Models.RepresentativeUniformCatalog", "RepresentativeUniformCatalog")
+                        .WithMany()
+                        .HasForeignKey("RepresentativeId", "UniformCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RepresentativeUniformCatalog");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("SIIR.Models.ApplicationUser", b =>
                 {
                     b.HasOne("SIIR.Models.Admin", "Admin")
@@ -690,11 +744,6 @@ namespace SIIR.DataAccess.Migrations
                     b.Navigation("Coach");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("SIIR.Models.UniformCatalog", b =>
-                {
-                    b.Navigation("RepresentativeUniformCatalogs");
                 });
 #pragma warning restore 612, 618
         }
