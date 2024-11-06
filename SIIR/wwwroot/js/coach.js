@@ -1,10 +1,10 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
-    cargarDataTable();
+    cargarDatatable();
 });
 
-function cargarDataTable() {
+function cargarDatatable() {
     dataTable = $("#tblCategoriasCoach").DataTable({
         "ajax": {
             "url": "/Admin/Coach/GetAll",
@@ -65,13 +65,13 @@ function cargarDataTable() {
 
 function Delete(url) {
     swal({
-        title: "Esta seguro de borrar?",
-        text: "Este contenido no se puede recuperar!",
+        title: "¿Estas seguro de borrar?",
+        text: "¡Este contenido no se puede recuperar!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Si, borrar!",
-        closeOnconfirm: true
+        confirmButtonText: "Sí, borrar!",
+        closeOnConfirm: true
     }, function () {
         $.ajax({
             type: 'DELETE',
