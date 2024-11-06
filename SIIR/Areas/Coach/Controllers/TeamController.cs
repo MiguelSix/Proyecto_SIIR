@@ -87,19 +87,8 @@ namespace SIIR.Areas.Coach.Controllers
             }
         }
 
-        #region API CALLS
-
-        [HttpGet]
-		public IActionResult GetStudentsByTeamId(int teamId)
-		{
-			var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
-			// Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
-			var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id));
-			return Json(new { data = students });
-		}
-
-		// Método para generar el PDF
-		[HttpPost]
+        // Método para generar el PDF
+        [HttpPost]
         public IActionResult GenerateCertificate([FromBody] CertificateRequest request)
         {
             if (request.Students == null || request.Students.Count == 0)
@@ -126,12 +115,12 @@ namespace SIIR.Areas.Coach.Controllers
                         });
 
                         // Añadir filas para los estudiantes en un bucle
-                        for (int i = 0; i < request.Students.Count; i ++)
+                        for (int i = 0; i < request.Students.Count; i++)
                         {
-                            table.Cell().Element(c => CreateStudentCell(c, request.Students[i]));
+                            table.Cell().Element(c => CreateStudentCellCertificate(c, request.Students[i]));
                         }
-                        if(request.Coach != null)
-                            table.Cell().Element(c => CreateCoachCell(c, request.Coach, request.Team));
+                        if (request.Coach != null)
+                            table.Cell().Element(c => CreateCoachCellCertificate(c, request.Coach, request.Team));
                     });
 
                     page.Footer().Text(text => text.CurrentPageNumber());
@@ -146,7 +135,7 @@ namespace SIIR.Areas.Coach.Controllers
             return File(stream.ToArray(), "application/pdf", "Cedula.pdf");
         }
 
-        private static void CreateStudentCell(IContainer container, Models.Student student)
+        private static void CreateStudentCellCertificate(IContainer container, Models.Student student)
         {
             string imageUrl;
             if (student.ImageUrl != null)
@@ -168,50 +157,50 @@ namespace SIIR.Areas.Coach.Controllers
                 .Background(Colors.Grey.Lighten4)
                 .DefaultTextStyle(x => x.FontSize(8).LineHeight(1.5f))
                 .Column(column =>
-            {
-                
-                column.Item().Padding(5).Row(row =>
                 {
-                    row.ConstantItem(3f, Unit.Centimetre)
-                        .Height(3f, Unit.Centimetre)
-                        .Width(2.5f, Unit.Centimetre)
-                        .AlignMiddle()
-                        .AlignCenter()
-                        .Image(imageBytes)
-                        .FitArea();
 
-                    row.RelativeItem().PaddingTop(20).Column(col =>
+                    column.Item().Padding(5).Row(row =>
                     {
-                        col.Item().Text("Número de control").Bold().AlignCenter();
-                        col.Item().PaddingBottom(10).Text(student.ControlNumber ?? "Sin actualizar").AlignCenter();
-                        
-                        col.Item().Text("Semestre").Bold().AlignCenter();
-                        col.Item().Text($"{(student.Semester != null ? $"{student.Semester}° semestre" : "Sin actualizar")}").AlignCenter();
+                        row.ConstantItem(3f, Unit.Centimetre)
+                            .Height(3f, Unit.Centimetre)
+                            .Width(2.5f, Unit.Centimetre)
+                            .AlignMiddle()
+                            .AlignCenter()
+                            .Image(imageBytes)
+                            .FitArea();
+
+                        row.RelativeItem().PaddingTop(20).Column(col =>
+                        {
+                            col.Item().Text("Número de control").Bold().AlignCenter();
+                            col.Item().PaddingBottom(10).Text(student.ControlNumber ?? "Sin actualizar").AlignCenter();
+
+                            col.Item().Text("Semestre").Bold().AlignCenter();
+                            col.Item().Text($"{(student.Semester != null ? $"{student.Semester}° semestre" : "Sin actualizar")}").AlignCenter();
+                        });
                     });
+
+                    column.Item().PaddingLeft(10).PaddingBottom(5).Column(innerColumn =>
+                    {
+                        innerColumn.Item().Text("Nombre").Bold();
+                        innerColumn.Item().Text($"{student.Name ?? "Sin actualizar"} {student.LastName ?? "Sin actualizar"} {student.SecondLastName ?? "Sin actualizar"}");
+
+                        innerColumn.Item().Text("Carrera").Bold();
+                        innerColumn.Item().Text($"{student.Career ?? "Sin actualizar"}");
+
+                        innerColumn.Item().Text("Nivel Académico").Bold();
+                        innerColumn.Item().Text("Licenciatura");
+
+                        innerColumn.Item().Text("Fecha de ingreso").Bold();
+                        innerColumn.Item().Text($"{(student.enrollmentData.HasValue ? student.enrollmentData : "Sin actualizar")}");
+
+                    });
+
+                    column.Item().PaddingTop(20).PaddingHorizontal(10).LineHorizontal(1).LineColor(Colors.Black);
+                    column.Item().PaddingBottom(10).Text("Firma").AlignCenter();
                 });
-
-                column.Item().PaddingLeft(10).PaddingBottom(5).Column(innerColumn =>
-                {
-                    innerColumn.Item().Text("Nombre").Bold();
-                    innerColumn.Item().Text($"{student.Name ?? "Sin actualizar"} {student.LastName ?? "Sin actualizar"} {student.SecondLastName ?? "Sin actualizar"}");
-
-                    innerColumn.Item().Text("Carrera").Bold();
-                    innerColumn.Item().Text($"{student.Career ?? "Sin actualizar"}");
-
-                    innerColumn.Item().Text("Nivel Académico").Bold();
-                    innerColumn.Item().Text("Licenciatura");
-
-                    innerColumn.Item().Text("Fecha de ingreso").Bold();
-                    innerColumn.Item().Text($"{(student.enrollmentData.HasValue ? student.enrollmentData : "Sin actualizar")}");
-
-                });
-
-                column.Item().PaddingTop(20).PaddingHorizontal(10).LineHorizontal(1).LineColor(Colors.Black);     
-                column.Item().PaddingBottom(10).Text("Firma").AlignCenter();
-            });
         }
 
-        private static void CreateCoachCell(IContainer container, Models.Coach coach, string teamName)
+        private static void CreateCoachCellCertificate(IContainer container, Models.Coach coach, string teamName)
         {
             string imageUrl;
             if (coach.ImageUrl != null)
@@ -249,18 +238,23 @@ namespace SIIR.Areas.Coach.Controllers
                     });
 
 
-                        // Nombre del entrenador debajo de la imagen, centrado
-                        column.Item().PaddingTop(10).PaddingBottom(20).Text($"{ coach.Name } { coach.LastName } { coach.SecondLastName }").FontSize(12).AlignCenter();
+                    // Nombre del entrenador debajo de la imagen, centrado
+                    column.Item().PaddingTop(10).PaddingBottom(20).Text($"{coach.Name} {coach.LastName} {coach.SecondLastName}").FontSize(12).AlignCenter();
                 });
         }
 
+        #region API CALLS
+
+        [HttpGet]
+		public IActionResult GetStudentsByTeamId(int teamId)
+		{
+			var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+			// Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+			var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id));
+			return Json(new { data = students });
+		}
+
+
         #endregion
     }
-}
-
-public class CertificateRequest
-{
-    public List<Student>? Students { get; set; }
-    public Coach? Coach { get; set; }
-    public string? Team { get; set; }
 }
