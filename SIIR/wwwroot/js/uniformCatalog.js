@@ -18,15 +18,16 @@ function cargarDatatable() {
         "columns": [
             {
                 "data": "name",
+                "responsivePriority": 1
             },
             {
                 "data": "description",
-                "responsivePriority": 4
+                "responsivePriority": 3
             },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="button-group">
+                    return `<div class="d-flex justify-content-center gap-2"">
                                 <a href="/Admin/UniformCatalog/Edit/${data}" class="btn btn-success text-white btn-sm">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
@@ -35,7 +36,7 @@ function cargarDatatable() {
                                 </a>
                             </div>`;
                 },
-                "width": "15%",
+                "width": "45%",
                 "responsivePriority": 1
             }
         ],
