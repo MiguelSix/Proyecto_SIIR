@@ -17,10 +17,6 @@ function cargarDatatable() {
         },
         "columns": [
             {
-                "data": "id",
-                "responsivePriority": 3
-            },
-            {
                 "data": "name",
                 "responsivePriority": 1,
                 

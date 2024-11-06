@@ -1,7 +1,9 @@
 ﻿@model SIIR.Models.ViewModels.DocumentVM
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+<link rel="stylesheet" href="~/css/documentStudent.css">
 
 @{
+    ViewData["Title"] = "Documentos";
     var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
 <input type="hidden" name="__RequestVerificationToken" value="@token" />

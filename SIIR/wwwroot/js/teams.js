@@ -15,7 +15,6 @@ function cargarDatatable() {
             "datatype": "json"
         },
         "columns": [
-            { "data": "id" },
             { "data": "name" },
             { "data": "category" },
             {
