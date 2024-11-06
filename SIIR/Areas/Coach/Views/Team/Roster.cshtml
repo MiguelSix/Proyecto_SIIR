@@ -219,6 +219,7 @@
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Team", new { area = "Coach" })';
         var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Team", new { area = "Coach" })';
+        var downloadCertificate = '@Url.Action("GenerateCertificate", "Team", new { area = "Coach" })';
 
         const teamName = "@Model.Team.Name"; 
         const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));

@@ -306,8 +306,6 @@ namespace SIIR.Areas.Admin.Controllers
             return File(pdfBytes, "application/pdf");
         }
 
-
-
         [HttpPost]
         private static void CreateStudentCell(IContainer container, Models.Student student,  Models.Coach coach, Models.Team team)
         {

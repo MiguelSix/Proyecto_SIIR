@@ -397,9 +397,8 @@ function downloadAllInfo() {
 
 function loadStudentsForCertificate() {
     const teamId = $("#teamId").val();
-
     $.ajax({
-        url: '/Coach/Team/GetStudentsByTeamId',
+        url: `${getStudentsUrl}?teamId=${teamId}`,
         type: 'GET',
         data: { teamId: teamId },
         success: function (response) {
@@ -469,6 +468,7 @@ function loadStudentsForCertificate() {
 
 function generateCertificate() {
     // Filtra los estudiantes seleccionados a partir de la lista completa almacenada
+    const teamId = $("#teamId").val();
     const selectedStudents = allStudents.filter(student =>
         $(`#checkbox${student.id}`).is(':checked')
     );
@@ -480,7 +480,7 @@ function generateCertificate() {
 
     // Envía los objetos de estudiantes seleccionados al controlador
     $.ajax({
-        url: '/Coach/Team/GenerateCertificate',
+        url: `${downloadCertificate}?teamId=${teamId}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({

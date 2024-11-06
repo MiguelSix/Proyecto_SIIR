@@ -164,8 +164,8 @@
             <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">
                 <i class="fas fa-user-plus"></i> Crear Usuario
             </a>
-            <button class="btn btn-success" onclick="generarCedula()">
-                <i class="fas fa-file-download"></i> Generar Cedula
+            <button id="generateCertificateBtn" class="btn btn-success">
+                Generar Cedula
             </button>
             <button onclick=downloadAllInfo() class="btn btn-info" style="cursor:pointer; color:white">
                 <i class="fas fa-download"></i> Descargar información del equipo
@@ -229,12 +229,19 @@
     </div>
 </div>
 
+<partial name="_ModalCertificate" data-team-name="@Model.Team.Name"
+         data-coach-team='@Html.Raw(Json.Serialize(Model.Team.Coach))' />
+
 @section Scripts {
     <script src="~/js/roster.js"></script>
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
         var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';
         var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
+        var downloadCertificate = '@Url.Action("GenerateCertificate", "Teams", new { area = "Admin" })';
+
+        const teamName = "@Model.Team.Name"; 
+        const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
 
         function generarCedula() {
             // Implementar lógica
