@@ -35,8 +35,7 @@ function cargarDatatable() {
             {
                 "data": "imageUrl",
                 "render": function (imageUrl) {
-                    if (!imageUrl) return 'Sin imagen';
-                    return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-fluid" style="max-width: 50px; max-height: 50px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
+                    return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-fluid d-block mx-auto" style="max-width: 120px; max-height: 50px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
                 "responsivePriority": 4
             },
@@ -67,6 +66,9 @@ function cargarDatatable() {
                             </a>
                             <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
                                 <i class="fas fa-trash-alt"></i> Borrar
+                            </a>
+                            <a href="/Admin/Document/Index?studentId=${data}" class="btn btn-success text-white" style="cursor:pointer">
+                                <i class="fas fa-file-alt"></i> Documentos
                             </a>
                         </div>`;
                 },

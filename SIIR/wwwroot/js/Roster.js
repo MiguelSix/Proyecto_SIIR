@@ -1,4 +1,5 @@
 ﻿let dataTable;
+let dataTableTarjetas;
 let currentCaptainId;
 
 $(document).ready(function () {
@@ -110,12 +111,11 @@ function initializeDataTable(teamId) {
         "columns": [
             {
                 "data": "imageUrl",
-                "render": function (data) {
-                    return data
-                        ? `<img src="${data}" alt="Foto estudiante" class="img-thumbnail" style="width: 100px"/>`
-                        : '<img src="/images/no-image.png" alt="Sin foto" class="img-thumbnail" style="width: 100px"/>';
+                "render": function (imageUrl) {
+                    return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-thumbnail" style="width: 100px;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
-                "width": "5%"
+                "width": "5%",
+                "responsivePriority": 5
             },
             {
                 "data": null,
@@ -130,21 +130,24 @@ function initializeDataTable(teamId) {
                     }
                     return `${name} ${lastName} ${secondLastName}`;
                 },
-                "width": "15%"
+                "width": "15%",
+                "responsivePriority": 1
             },
             {
                 "data": "career",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
-                "width": "25%"
+                "width": "25%",
+                "responsivePriority": 2
             },
             {
                 "data": "controlNumber",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
-                "width": "10%"
+                "width": "10%",
+                "responsivePriority": 3
             },
             {
                 "data": null,
@@ -165,7 +168,8 @@ function initializeDataTable(teamId) {
                         </div>
                     `;
                 },
-                "width": "15%"
+                "width": "15%",
+                "responsivePriority": 1
             }
         ],
         "language": {
@@ -214,18 +218,41 @@ function generarTarjetas(teamId) {
                         secondLastName === 'Sin actualizar')
                         ? 'Sin actualizar'
                         : `${name} ${lastName} ${secondLastName}`;
-
                     const card = `
                         <div class="col-md-4 col-lg-3 mb-4">
                             <div class="card h-100">
-                                <img src="${imageUrl}" class="card-img-top" alt="Foto estudiante"
-                                     style="height: 200px; object-fit: cover;">
+                                <img src="${imageUrl}" 
+                                     class="card-img-top" 
+                                     alt="Foto estudiante"
+                                     style="height: 200px; object-fit: scale-down; background-color: #f8f9fa;"
+                                     onerror="this.onerror=null; this.src='/images/zorro_default.png';">
                                 <div class="card-body">
                                     <h5 class="card-title">${fullName}</h5>
                                     <p class="card-text">
                                         <strong>No. Control:</strong> ${student.controlNumber || 'Sin actualizar'}<br>
                                         <strong>Carrera:</strong> ${student.career || 'Sin actualizar'}
                                     </p>
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <div class="btn-group gap-2" role="group">
+                                            <a onclick="Lock('/Admin/Students/Lock/${student.id}')" 
+                                               class="btn btn-danger btn-sm" 
+                                               style="cursor:pointer;"
+                                               title="Dar de baja">
+                                                <i class="fas fa-user-minus"></i>
+                                            </a>
+                                            <a onclick="downloadInfo('/Admin/Teams/GenerateStudentCertificate/${student.id}')" 
+                                               class="btn btn-info btn-sm" 
+                                               style="cursor:pointer;"
+                                               title="Descargar cédula">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button class="btn btn-secondary btn-sm" 
+                                                    onclick="descargarDocs(${student.id})"
+                                                    title="Descargar documentos">
+                                                <i class="fas fa-file-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -255,14 +282,15 @@ function generarTarjetas(teamId) {
 }
 
 function Lock(url) {
+    const teamId = $("#teamId").val();
     swal({
         title: "¿Está seguro de dar de baja a este estudiante del equipo?",
-        text: "¡Este estudiante no se volvera a mostrar hasta que se de de alta en el equipo!",
+        text: "¡Este estudiante no se volverá a mostrar hasta que se dé de alta en el equipo!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "¡Si, dar de baja!",
-        closeOnconfirm: true
+        confirmButtonText: "¡Sí, dar de baja!",
+        closeOnConfirm: true
     }, function () {
         $.ajax({
             type: 'GET',
@@ -270,15 +298,20 @@ function Lock(url) {
             success: function (data) {
                 if (data.success) {
                     toastr.success(data.message);
-                    dataTable.ajax.reload();
-                }
-                else {
+                    // Verificar la vista actual y recargar según corresponda
+                    if ($('#cardView').is(':visible')) {
+                        generarTarjetas(teamId);
+                    } else {
+                        dataTable.ajax.reload();
+                    }
+                } else {
                     toastr.error(data.message);
                 }
             }
         });
     });
 }
+
 
 function downloadInfo(url) {
     $.ajax({
@@ -289,12 +322,37 @@ function downloadInfo(url) {
             // Crear un enlace temporal para descargar el archivo
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = "Cedula_Estudiante.pdf"; // Nombre del archivo descargado
+            link.download = "Informacion_Estudiante.pdf"; // Nombre del archivo descargado
             link.click();
             window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
         },
         error: function (error) {
-            console.log("Error al generar la cédula del estudiante:", error);
+            toastr.error("Error al generar el documento de información del estudiante:", error);
+        }
+    });
+<<<<<<< HEAD
+}
+=======
+}
+
+function downloadAllInfo() {
+    const teamId = $("#teamId").val();
+    console.log(`${downloadAllInfoUrl}?teamId=${teamId}`);
+    $.ajax({
+        url: `${downloadAllInfoUrl}?teamId=${teamId}`,
+        type: 'POST',
+        xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
+        success: function (blob) {
+            // Crear un enlace temporal para descargar el archivo
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "Informacion_Estudiantes.pdf"; // Nombre del archivo descargado
+            link.click();
+            window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
+        },
+        error: function (error) {
+            toastr.error("Error al generar el documento de información de los estudiantes:", error);
         }
     });
 }
+>>>>>>> f12545145d6365d32f0b240567a5c5b1c95ea7f2

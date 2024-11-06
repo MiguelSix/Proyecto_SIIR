@@ -129,9 +129,6 @@ namespace SIIR.Areas.Identity.Pages.Account
             [StringLength(50, ErrorMessage = "El apellido materno no puede exceder los 50 caracteres.")]
             [Display(Name = "Apellido Materno")]
             public string SecondLastName { get; set; }
-            
-            [DataType(DataType.ImageUrl)]
-            public string ImageUrl {  get; set; }
             [Display(Name = "Equipo")]
             public int? TeamId { get; set; }
 
@@ -181,7 +178,6 @@ namespace SIIR.Areas.Identity.Pages.Account
                             Name = Input.Name,
                             LastName = Input.LastName,
                             SecondLastName = Input.SecondLastName,
-                            ImageUrl = "/images/zorro_default.png"
                         };
                         user.Coach = coach;
                         break;
@@ -208,7 +204,6 @@ namespace SIIR.Areas.Identity.Pages.Account
                             SecondLastName = Input.SecondLastName,
                             TeamId = Input.TeamId.Value,
                             CoachId = team.CoachId,
-                            ImageUrl = "/images/zorro_default.png"
 						};
 
 						user.Student = student;

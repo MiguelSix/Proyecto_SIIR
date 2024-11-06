@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace SIIR.Areas.Student.Controllers
 {
     [Area("Student")]
-    [Authorize(Roles = "Student")]
+    //[Authorize(Roles = "Student")]
     public class DocumentController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -33,23 +33,6 @@ namespace SIIR.Areas.Student.Controllers
         [HttpGet]
         public async Task<IActionResult> IndexAsync()
         {
-            //var user = await _userManager.GetUserAsync(User);
-            //if (user == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //var student = await _userManager.Users
-            //    .Where(u => u.Id == user.Id)
-            //    .Select(u => u.Student)
-            //    .FirstOrDefaultAsync();
-
-            //if (student == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //var studentId = student.Id; // Suponiendo que 'Id' es el identificador del estudiante
 
             var student = await GetCurrentStudent();
 
@@ -81,6 +64,42 @@ namespace SIIR.Areas.Student.Controllers
 
             return View(docuVM);
         }
+
+        private string GenerateFileName(string documentName, string controlNumber)
+        {
+            if (string.IsNullOrEmpty(documentName))
+                throw new ArgumentNullException(nameof(documentName));
+
+            // Limpieza del nombre del documento
+            string cleanName = documentName
+                .Replace(" ", "_")
+                .Replace(",", "")
+                .Replace(".", "")
+                .Replace("/", "")
+                .Replace("\\", "")
+                .Replace("á", "a")
+                .Replace("é", "e")
+                .Replace("í", "i")
+                .Replace("ó", "o")
+                .Replace("ú", "u")
+                .Replace("ñ", "n")
+                .Replace("Á", "A")
+                .Replace("É", "E")
+                .Replace("Í", "I")
+                .Replace("Ó", "O")
+                .Replace("Ú", "U")
+                .Replace("Ñ", "N");
+
+            // Generar timestamp
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            // Construir nombre del archivo
+            string fileName = $"{cleanName}_{controlNumber}_{timestamp}";
+
+
+            return fileName;
+        }
+
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> SaveDocument(IFormFile file, int documentCatalogId)
@@ -106,8 +125,29 @@ namespace SIIR.Areas.Student.Controllers
                     return Json(new { success = false, message = "El archivo no debe exceder los 5MB." });
                 }
 
+                
+
+                // Validar extensión según el tipo de documento
                 string extension = Path.GetExtension(file.FileName).ToLower();
-                // Validaciones de extensión permanecen igual...
+                bool isValidExtension = false;
+
+                if (documentCatalog.Extension == "pdf")
+                {
+                    isValidExtension = extension == ".pdf";
+                    if (!isValidExtension)
+                    {
+                        return Json(new { success = false, message = "Solo se permiten archivos PDF." });
+                    }
+                }
+                else if (documentCatalog.Extension == "image")
+                {
+                    string[] allowedImageExtensions = { ".jpg", ".jpeg", ".png" };
+                    isValidExtension = allowedImageExtensions.Contains(extension);
+                    if (!isValidExtension)
+                    {
+                        return Json(new { success = false, message = "Solo se permiten archivos JPG, JPEG o PNG." });
+                    }
+                }
 
                 // Obtener estudiante
                 var student = await GetCurrentStudent();
@@ -123,16 +163,8 @@ namespace SIIR.Areas.Student.Controllers
                                        d.DocumentCatalogId == documentCatalogId);
 
                 string rutaPrincipal = _hostingEnvironment.WebRootPath;
-
-                // Generar el nuevo nombre del archivo
-                string fechaHora = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                // Limpiar el nombre del documento para evitar caracteres especiales
-                string documentoNombreLimpio = documentCatalog.Name.Replace(" ", "_")
-                                                             .Replace(",", "")
-                                                             .Replace(".", "")
-                                                             .Replace("/", "")
-                                                             .Replace("\\", "");
-                string nombreArchivo = $"{documentoNombreLimpio}_student{student.Id}_{fechaHora}";
+               
+                string nombreArchivo = this.GenerateFileName(documentCatalog.Name, student.ControlNumber);
 
                 var subidas = Path.Combine(rutaPrincipal, @"student\documents");
 
@@ -204,7 +236,6 @@ namespace SIIR.Areas.Student.Controllers
         {
             try
             {
-                // Obtener el estudiante actual
                 var student = await GetCurrentStudent();
                 if (student == null)
                 {
@@ -212,7 +243,6 @@ namespace SIIR.Areas.Student.Controllers
                     return Unauthorized();
                 }
 
-                // Obtener el documento usando IQueryable en lugar de IEnumerable
                 var document = _contenedorTrabajo.Document
                     .GetFirstOrDefault(d => d.StudentId == student.Id &&
                                           d.DocumentCatalogId == documentCatalogId,
@@ -224,7 +254,6 @@ namespace SIIR.Areas.Student.Controllers
                     return NotFound("Documento no encontrado.");
                 }
 
-                // Construir la ruta del archivo
                 var filePath = Path.Combine(_hostingEnvironment.WebRootPath, document.Url.TrimStart('\\', '/'));
 
                 if (!System.IO.File.Exists(filePath))
@@ -233,7 +262,6 @@ namespace SIIR.Areas.Student.Controllers
                     return NotFound("Archivo físico no encontrado.");
                 }
 
-                // Determinar el tipo MIME
                 var extension = Path.GetExtension(filePath).ToLowerInvariant();
                 var mimeType = extension switch
                 {
@@ -243,14 +271,17 @@ namespace SIIR.Areas.Student.Controllers
                     _ => "application/octet-stream"
                 };
 
-                // Construir un nombre de archivo descriptivo para la descarga
-                var downloadFileName = $"{document.DocumentCatalog.Name}_{DateTime.Now:yyyyMMdd}{extension}";
+                var timestamp = DateTime.Now;
+                var downloadFileName = this.GenerateFileName(document.DocumentCatalog.Name, student.ControlNumber);
+                //var downloadFileName = $"{document.DocumentCatalog.Name}_{student.Id}_{timestamp:yyyyMMdd_HHmmss}{extension}";
 
-                // Registrar la descarga
-                _logger.LogInformation($"Descarga iniciada - Documento: {documentCatalogId}, Usuario: {student.Id}");
-
-                // Devolver el archivo
-                return PhysicalFile(filePath, mimeType, downloadFileName);
+                // Usar FileStreamResult con ContentDisposition explícito
+                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return new FileStreamResult(stream, mimeType)
+                {
+                    FileDownloadName = downloadFileName,
+                    EnableRangeProcessing = true
+                };
             }
             catch (Exception ex)
             {

@@ -174,6 +174,11 @@ namespace SIIR.Areas.Admin.Controllers
             TeamVM teamVM = new()
             {
                 Team = team,
+                StudentList = students.Select(s => new SelectListItem
+                {
+                    Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
+                    Value = s.Id.ToString()
+                }),
                 Captain = captain
             };
 
@@ -214,12 +219,52 @@ namespace SIIR.Areas.Admin.Controllers
             }
         }
 
+        //Método para generar el PDF de todos los estudiantes de un equipo
+        [HttpPost]
+        public IActionResult GenerateStudentsCertificates(int teamId)
+        {
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
+
+            if (students.Count == 0)
+            {
+                return NotFound("No se encontraron estudiantes en el equipo");
+            }
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                foreach (var student in students)
+                {
+                    var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+                    var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+
+                    container.Page(page =>
+                    {
+                        page.Size(PageSizes.A4);
+                        page.Margin(1, Unit.Centimetre);
+
+                        // Añadir la información del estudiante a la página
+                        page.Content().Element(c => CreateStudentCell(c, student, coach, team));
+
+                        page.Footer().Text(text => text.CurrentPageNumber());
+                    });
+                }
+            });
+
+            // Convertir el documento en un archivo PDF para la respuesta
+            byte[] pdfBytes = document.GeneratePdf();
+            return File(pdfBytes, "application/pdf");
+        }
+
         // Método para generar el PDF de un solo estudiante
         [HttpPost]
         public IActionResult GenerateStudentCertificate(int id)
         {
             // Obtener el estudiante por su ID
             var student = _contenedorTrabajo.Student.GetById(id);
+            var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+            var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
             if (student == null)
             {
                 return NotFound("Estudiante no encontrado");
@@ -234,7 +279,7 @@ namespace SIIR.Areas.Admin.Controllers
                     page.Margin(1, Unit.Centimetre);
 
                     // Aquí puedes personalizar la estructura del PDF con los datos del estudiante
-                    page.Content().Element(c => CreateStudentCell(c, student));
+                    page.Content().Element(c => CreateStudentCell(c, student, coach, team));
 
                     page.Footer().Text(text => text.CurrentPageNumber());
                 });
@@ -242,110 +287,115 @@ namespace SIIR.Areas.Admin.Controllers
 
             // Convertir el documento en un archivo PDF para la respuesta
             byte[] pdfBytes = document.GeneratePdf();
-            return File(pdfBytes, "application/pdf", $"Cedula_Estudiante_{student.Id}.pdf");
+            return File(pdfBytes, "application/pdf");
         }
 
 
         [HttpPost]
-        private static void CreateStudentCell(IContainer container, Models.Student student)
+        private static void CreateStudentCell(IContainer container, Models.Student student,  Models.Coach coach, Models.Team team)
         {
-            string imageUrl = student.ImageUrl != null && student.ImageUrl.StartsWith("/") ? student.ImageUrl.Substring(1) : student.ImageUrl ?? "";
+            string imageUrl = student.ImageUrl != null && student.ImageUrl.StartsWith("/")
+                ? student.ImageUrl.Substring(1)
+                : student.ImageUrl ?? "";
+
             imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+
+            if(!System.IO.File.Exists(imageUrl))
+            {
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "zorro_default.png");
+            }
 
             byte[] imageBytes = Array.Empty<byte>();
 
-            if (System.IO.File.Exists(imageUrl))
-            {
-                imageBytes = System.IO.File.ReadAllBytes(imageUrl);
-            }
+            imageBytes = System.IO.File.ReadAllBytes(imageUrl);
 
             container.Padding(2)
                 .Border(1)
                 .BorderColor(Colors.Black)
                 .Background(Colors.Grey.Lighten4)
-                .DefaultTextStyle(x => x.FontSize(8).LineHeight(1.5f))
+                .DefaultTextStyle(x => x.FontSize(14).LineHeight(1.5f))
                 .Column(column =>
                 {
-                    // Row for Image, Control Number, and Semester
+                    // Row for Image and Name
                     column.Item().Padding(5).Row(row =>
                     {
-                        row.ConstantItem(3f, Unit.Centimetre)
-                            .Height(3f, Unit.Centimetre)
-                            .Width(2.5f, Unit.Centimetre)
-                            .AlignMiddle()
-                            .AlignCenter()
-                            .Image(imageBytes)
-                            .FitArea();
-
-                        row.RelativeItem().PaddingTop(20).Column(col =>
+                        // Centering the image and name
+                        row.RelativeItem().Column(innerColumn =>
                         {
-                            col.Item().Text("Número de control").Bold().AlignCenter();
-                            col.Item().PaddingBottom(10).Text(student.ControlNumber ?? "Sin Actualizar").AlignCenter();
+                            innerColumn.Item()
+                                .AlignMiddle()
+                                .AlignCenter()
+                                .Width(140) // Define the width of the image
+                                .Height(140) // Define the height of the image
+                                .Image(imageBytes);
 
-                            col.Item().Text("Semestre").Bold().AlignCenter();
-                            col.Item().Text($"{(student.Semester != null ? $"{student.Semester}° semestre" : "Sin Actualizar")}").AlignCenter();
+                            // Name above and below the image
+                            innerColumn.Item().Text($"{student.Name ?? "Sin Actualizar"} {student.LastName ?? "Sin Actualizar"} {student.SecondLastName ?? "Sin Actualizar"}").Bold().FontSize(18).AlignCenter();
                         });
                     });
 
-                    // Row for Personal Information
-                    column.Item().PaddingLeft(10).PaddingBottom(5).Column(innerColumn =>
+                    // Two-column layout for the rest of the information
+                    column.Item().PaddingLeft(10).PaddingBottom(5).Row(row =>
                     {
-                        innerColumn.Item().Text("Nombre").Bold();
-                        innerColumn.Item().Text($"{student.Name ?? "Sin Actualizar"} {student.LastName ?? "Sin Actualizar"} {student.SecondLastName ?? "Sin Actualizar"}");
+                        row.RelativeItem().Column(leftColumn =>
+                        {
+                            leftColumn.Item().Text("Número de control").Bold();
+                            leftColumn.Item().Text(student.ControlNumber ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Carrera").Bold();
-                        innerColumn.Item().Text(student.Career ?? "Sin Actualizar");
+                            leftColumn.Item().Text("Carrera").Bold();
+                            leftColumn.Item().Text(student.Career ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("CURP").Bold();
-                        innerColumn.Item().Text(student.Curp ?? "Sin Actualizar");
+                            leftColumn.Item().Text("CURP").Bold();
+                            leftColumn.Item().Text(student.Curp ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Fecha de Nacimiento").Bold();
-                        innerColumn.Item().Text(student.BirthDate ?? "Sin Actualizar");
+                            leftColumn.Item().Text("Fecha de Nacimiento").Bold();
+                            leftColumn.Item().Text(student.BirthDate ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Teléfono").Bold();
-                        innerColumn.Item().Text(student.Phone ?? "Sin Actualizar");
+                            leftColumn.Item().Text("Teléfono").Bold();
+                            leftColumn.Item().Text(student.Phone ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Correo Electrónico").Bold();
-                        innerColumn.Item().Text(student.Email ?? "Sin Actualizar");
+                            leftColumn.Item().Text("NSS").Bold();
+                            leftColumn.Item().Text(student.Nss ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Edad").Bold();
-                        innerColumn.Item().Text(student.Age?.ToString() ?? "Sin Actualizar");
+                            leftColumn.Item().Text("Número de Jugador").Bold();
+                            leftColumn.Item().Text(student.numberUniform?.ToString() ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Tipo de Sangre").Bold();
-                        innerColumn.Item().Text(student.BloodType ?? "Sin Actualizar");
+                            leftColumn.Item().Text("Fecha de Ingreso").Bold();
+                            leftColumn.Item().Text(student.enrollmentData?.ToString() ?? "Sin Actualizar");
+                        });
 
-                        innerColumn.Item().Text("Peso").Bold();
-                        innerColumn.Item().Text(student.Weight?.ToString("0.0") ?? "Sin Actualizar");
+                        row.RelativeItem().Column(rightColumn =>
+                        {
+                            rightColumn.Item().Text("Edad").Bold();
+                            rightColumn.Item().Text(student.Age?.ToString() ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Altura").Bold();
-                        innerColumn.Item().Text(student.Height?.ToString("0.0") ?? "Sin Actualizar");
+                            rightColumn.Item().Text("Tipo de Sangre").Bold();
+                            rightColumn.Item().Text(student.BloodType ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Alergias").Bold();
-                        innerColumn.Item().Text(student.Allergies ?? "Sin Actualizar");
+                            rightColumn.Item().Text("Peso").Bold();
+                            rightColumn.Item().Text(student.Weight?.ToString("0.0") ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("NSS").Bold();
-                        innerColumn.Item().Text(student.Nss ?? "Sin Actualizar");
+                            rightColumn.Item().Text("Altura").Bold();
+                            rightColumn.Item().Text(student.Height?.ToString("0.0") ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Número de Jugador").Bold();
-                        innerColumn.Item().Text(student.numberUniform?.ToString() ?? "Sin Actualizar");
+                            rightColumn.Item().Text("Alergias").Bold();
+                            rightColumn.Item().Text(student.Allergies ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Fecha de Ingreso").Bold();
-                        innerColumn.Item().Text(student.enrollmentData?.ToString() ?? "Sin Actualizar");
+                            rightColumn.Item().Text("Entrenador").Bold();
+                            rightColumn.Item().Text(coach.Name ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Entrenador").Bold();
-                        innerColumn.Item().Text(student.Coach?.Name ?? "Sin Actualizar");
+                            rightColumn.Item().Text("Equipo").Bold();
+                            rightColumn.Item().Text(team.Name ?? "Sin Actualizar");
 
-                        innerColumn.Item().Text("Equipo").Bold();
-                        innerColumn.Item().Text(student.Team?.Name ?? "Sin Actualizar");
-
-                        innerColumn.Item().Text("Capitán").Bold();
-                        innerColumn.Item().Text(student.IsCaptain ? "Sí" : "No");
+                            rightColumn.Item().Text("Capitán").Bold();
+                            rightColumn.Item().Text(student.IsCaptain ? "Sí" : "No");
+                        });
                     });
-
-                    column.Item().PaddingTop(20).PaddingHorizontal(10).LineHorizontal(1).LineColor(Colors.Black);
-                    column.Item().PaddingBottom(10).Text("Firma").AlignCenter();
                 });
         }
+
+
+
 
         #region API CALLS
 
