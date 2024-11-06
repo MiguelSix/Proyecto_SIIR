@@ -12,11 +12,22 @@
 
     <div class="row mt-5">
         <div class="col-md-6 mb-4">
-            <button class="btn btn-primary btn-lg w-50">Grupos Deportivos</button>
+            <!-- Agregar funcionalidad para aplicar filtros Deportivos o Culturales -->
+            <button class="btn btn-primary btn-lg w-50">
+                <a asp-area="Admin" asp-page="/Teams/Index" class="btn btn-primary">
+                    Grupos Deportivos
+                </a>
+            </button>
+            <!--<button class="btn btn-primary btn-lg w-50">Grupos Deportivos</button>-->
         </div>
 
         <div class="col-md-6 mb-4">
-            <button class="btn btn-primary btn-lg w-50">Grupos Culturales</button>
+            <button class="btn btn-primary btn-lg w-50">
+                <a asp-area="Admin" asp-page="/Teams/Index" class="btn btn-primary">
+                    Grupos Culturales
+                </a>
+            </button>
+            <!--<button class="btn btn-primary btn-lg w-50">Grupos Culturales</button>-->
         </div>
     </div>
 </main>

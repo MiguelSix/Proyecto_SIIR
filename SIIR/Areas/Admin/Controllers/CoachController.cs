@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -141,12 +143,24 @@ namespace SIIR.Areas.Admin.Controllers
 
             if (objFromDb == null)
             {
-                return Json(new { succes = false, message = "Error al borrar Coach"});
+                return Json(new { success = false, message = "Error al borrar Coach"});
             }
 
             _contenedorTrabajo.Coach.Remove(objFromDb);
-            _contenedorTrabajo.Save();
-            return Json(new { succes = true, message = "Exito al borrar Coach" });
+
+            try
+            {
+                _contenedorTrabajo.Save();
+                return Json(new { success = true, message = "Coach borrado correctamente" });
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("REFERENCE constraint"))
+                {
+                    return Json(new { success = false, message = "No se puede borrar el coach porque tiene un equipo asignado." });
+                }
+                return Json(new { success = false, message = "Ocurrió un error al borrar el coach." });
+            }
         }
         #endregion
     }

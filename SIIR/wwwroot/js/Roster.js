@@ -328,13 +328,27 @@ function downloadInfo(url) {
         url: url,
         type: 'POST',
         xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
-        success: function (blob) {
+        success: function (blob, status, xhr) {
+            // Obtener el nombre del archivo desde el encabezado 'Content-Disposition'
+            const disposition = xhr.getResponseHeader('Content-Disposition');
+            let fileName = "Informacion_Estudiantes.pdf"; // Nombre por defecto
+
+            if (disposition && disposition.includes('filename=')) {
+                const filenameRegex = /filename[^;=\n]*=(['"]?)([^'"\n]*)\1/;
+                const matches = filenameRegex.exec(disposition);
+                if (matches != null && matches[2]) {
+                    fileName = matches[2];
+                }
+            }
+
             // Crear un enlace temporal para descargar el archivo
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = "Informacion_Estudiante.pdf"; // Nombre del archivo descargado
+            link.download = fileName; // Usa el nombre del archivo extraído
             link.click();
-            window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
+            window.URL.revokeObjectURL(link.href);
+
+            toastr.success("Documento descargado correctamente.");
         },
         error: function (error) {
             toastr.error("Error al generar el documento de información del estudiante:", error);
@@ -344,24 +358,42 @@ function downloadInfo(url) {
 
 function downloadAllInfo() {
     const teamId = $("#teamId").val();
-    console.log(`${downloadAllInfoUrl}?teamId=${teamId}`);
     $.ajax({
         url: `${downloadAllInfoUrl}?teamId=${teamId}`,
         type: 'POST',
-        xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
-        success: function (blob) {
+        xhrFields: { responseType: 'blob' },
+        success: function (blob, status, xhr) {
+            // Obtener el nombre del archivo desde el encabezado 'Content-Disposition'
+            const disposition = xhr.getResponseHeader('Content-Disposition');
+            let fileName = "Informacion_Estudiantes.pdf"; // Nombre por defecto
+
+            if (disposition && disposition.includes('filename=')) {
+                const filenameRegex = /filename[^;=\n]*=(['"]?)([^'"\n]*)\1/;
+                const matches = filenameRegex.exec(disposition);
+                if (matches != null && matches[2]) {
+                    fileName = matches[2];
+                }
+            }
+
             // Crear un enlace temporal para descargar el archivo
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = "Informacion_Estudiantes.pdf"; // Nombre del archivo descargado
+            link.download = fileName; // Usa el nombre del archivo extraído
             link.click();
-            window.URL.revokeObjectURL(link.href); // Liberar el objeto URL temporal
+            window.URL.revokeObjectURL(link.href);
+
+            toastr.success("Documento descargado correctamente.");
         },
-        error: function (error) {
-            toastr.error("Error al generar el documento de información de los estudiantes:", error);
+        error: function (xhr) {
+            if (xhr.status === 404) {
+                toastr.error("No se encontraron estudiantes en el equipo");
+            } else {
+                toastr.error("Error al generar el documento de información de los estudiantes.");
+            }
         }
     });
 }
+
 
 function loadStudentsForCertificate() {
     const teamId = $("#teamId").val();
