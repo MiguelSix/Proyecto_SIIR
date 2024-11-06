@@ -130,8 +130,8 @@ namespace SIIR.Areas.Coach.Controllers
                         {
                             table.Cell().Element(c => CreateStudentCell(c, request.Students[i]));
                         }
-
-                        table.Cell().Element(c => CreateCoachCell(c, request.Coach, request.Team));
+                        if(request.Coach != null)
+                            table.Cell().Element(c => CreateCoachCell(c, request.Coach, request.Team));
                     });
 
                     page.Footer().Text(text => text.CurrentPageNumber());
@@ -148,8 +148,16 @@ namespace SIIR.Areas.Coach.Controllers
 
         private static void CreateStudentCell(IContainer container, Models.Student student)
         {
-            string imageUrl = student.ImageUrl.StartsWith("/") ? student.ImageUrl.Substring(1) : student.ImageUrl;
-            imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+            string imageUrl;
+            if (student.ImageUrl != null)
+            {
+                imageUrl = student.ImageUrl.StartsWith("/") ? student.ImageUrl.Substring(1) : student.ImageUrl;
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+            }
+            else
+            {
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/zorro_default.png");
+            }
 
             byte[] imageBytes;
             imageBytes = System.IO.File.ReadAllBytes(imageUrl);
@@ -175,26 +183,27 @@ namespace SIIR.Areas.Coach.Controllers
                     row.RelativeItem().PaddingTop(20).Column(col =>
                     {
                         col.Item().Text("Número de control").Bold().AlignCenter();
-                        col.Item().PaddingBottom(10).Text(student.ControlNumber ?? "---").AlignCenter();
+                        col.Item().PaddingBottom(10).Text(student.ControlNumber ?? "Sin actualizar").AlignCenter();
                         
                         col.Item().Text("Semestre").Bold().AlignCenter();
-                        col.Item().Text($"{(student.Semester != null ? $"{student.Semester}° semestre" : "---")}").AlignCenter();
+                        col.Item().Text($"{(student.Semester != null ? $"{student.Semester}° semestre" : "Sin actualizar")}").AlignCenter();
                     });
                 });
 
                 column.Item().PaddingLeft(10).PaddingBottom(5).Column(innerColumn =>
                 {
                     innerColumn.Item().Text("Nombre").Bold();
-                    innerColumn.Item().Text($"{student.Name ?? "---"} {student.LastName ?? "---"} {student.SecondLastName ?? "---"}");
+                    innerColumn.Item().Text($"{student.Name ?? "Sin actualizar"} {student.LastName ?? "Sin actualizar"} {student.SecondLastName ?? "Sin actualizar"}");
 
                     innerColumn.Item().Text("Carrera").Bold();
-                    innerColumn.Item().Text($"{student.Career ?? "---"}");
+                    innerColumn.Item().Text($"{student.Career ?? "Sin actualizar"}");
 
                     innerColumn.Item().Text("Nivel Académico").Bold();
                     innerColumn.Item().Text("Licenciatura");
 
                     innerColumn.Item().Text("Fecha de ingreso").Bold();
-                    innerColumn.Item().Text("2002");
+                    innerColumn.Item().Text($"{(student.enrollmentData.HasValue ? student.enrollmentData : "Sin actualizar")}");
+
                 });
 
                 column.Item().PaddingTop(20).PaddingHorizontal(10).LineHorizontal(1).LineColor(Colors.Black);     
@@ -204,8 +213,16 @@ namespace SIIR.Areas.Coach.Controllers
 
         private static void CreateCoachCell(IContainer container, Models.Coach coach, string teamName)
         {
-            string imageUrl = coach.ImageUrl.StartsWith("/") ? coach.ImageUrl.Substring(1) : coach.ImageUrl;
-            imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+            string imageUrl;
+            if (coach.ImageUrl != null)
+            {
+                imageUrl = coach.ImageUrl.StartsWith("/") ? coach.ImageUrl.Substring(1) : coach.ImageUrl;
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+            }
+            else
+            {
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/zorro_default.png");
+            }
 
             byte[] imageBytes;
             imageBytes = System.IO.File.ReadAllBytes(imageUrl);
