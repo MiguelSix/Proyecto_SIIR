@@ -224,19 +224,28 @@ namespace SIIR.Areas.Admin.Controllers
         public IActionResult GenerateStudentsCertificates(int teamId)
         {
             var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
-            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id)).ToList();
 
             if (students.Count == 0)
             {
-                return NotFound("No se encontraron estudiantes en el equipo");
+                return NotFound();
             }
+
+            // Obtener el nombre del equipo
+            var team = _contenedorTrabajo.Team.GetById(teamId);
+            if (team == null)
+            {
+                return NotFound();
+            }
+            var teamName = team.Name.Replace(" ", "_"); // Reemplaza espacios por guiones bajos para evitar problemas en el nombre del archivo
+            var teamCategory = team.Category.Replace(" ", "_");
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var fileName = $"Informacion_{teamName}_{teamCategory}_{date}.pdf";
 
             var document = QuestPDF.Fluent.Document.Create(container =>
             {
                 foreach (var student in students)
                 {
-                    var team = _contenedorTrabajo.Team.GetById(student.TeamId);
                     var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
 
                     container.Page(page =>
@@ -244,18 +253,19 @@ namespace SIIR.Areas.Admin.Controllers
                         page.Size(PageSizes.A4);
                         page.Margin(1, Unit.Centimetre);
 
-                        // Añadir la información del estudiante a la página
                         page.Content().Element(c => CreateStudentCell(c, student, coach, team));
-
                         page.Footer().Text(text => text.CurrentPageNumber());
                     });
                 }
             });
 
-            // Convertir el documento en un archivo PDF para la respuesta
             byte[] pdfBytes = document.GeneratePdf();
+
+            // Configurar el encabezado Content-Disposition con el nombre personalizado
+            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
             return File(pdfBytes, "application/pdf");
         }
+
 
         // Método para generar el PDF de un solo estudiante
         [HttpPost]
@@ -263,32 +273,39 @@ namespace SIIR.Areas.Admin.Controllers
         {
             // Obtener el estudiante por su ID
             var student = _contenedorTrabajo.Student.GetById(id);
-            var team = _contenedorTrabajo.Team.GetById(student.TeamId);
-            var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
             if (student == null)
             {
                 return NotFound("Estudiante no encontrado");
             }
 
-            // Crear el documento PDF usando QuestPDF con la información del estudiante
+            var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+            var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+
+            // Formato de fecha
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var studentName = student.Name.Replace(" ", "_"); // Reemplaza espacios por guiones bajos
+            var studentControlNumber = student.ControlNumber;
+            var fileName = $"Informacion_{studentName}_{studentControlNumber}_{date}.pdf";
+
+            // Crear el documento PDF usando QuestPDF
             var document = QuestPDF.Fluent.Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
                     page.Margin(1, Unit.Centimetre);
-
-                    // Aquí puedes personalizar la estructura del PDF con los datos del estudiante
                     page.Content().Element(c => CreateStudentCell(c, student, coach, team));
-
                     page.Footer().Text(text => text.CurrentPageNumber());
                 });
             });
 
-            // Convertir el documento en un archivo PDF para la respuesta
             byte[] pdfBytes = document.GeneratePdf();
+
+            // Configurar el encabezado Content-Disposition con el nombre personalizado
+            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
             return File(pdfBytes, "application/pdf");
         }
+
 
 
         [HttpPost]
