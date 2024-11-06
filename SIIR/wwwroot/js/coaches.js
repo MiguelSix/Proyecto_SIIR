@@ -1,49 +1,63 @@
 ﻿var dataTable;
-
 $(document).ready(function () {
-    cargarDatatable();
+    cargarDataTable();
 });
-
-function cargarDatatable() {
+function cargarDataTable() {
     dataTable = $("#tblCategoriasCoach").DataTable({
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRow
+            }
+        },
         "ajax": {
             "url": "/Admin/Coach/GetAll",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
-            { "data": "id", "width": "5%" },
-            { "data": "name", "width": "25%" },
-            { "data": "lastName", "width": "25%" },
-            { "data": "secondLastName", "width": "25%" },
+            {
+                "data": "id",
+                "responsivePriority": 1
+            },
+            {
+                "data": "name",
+                "responsivePriority": 2
+            },
+            {
+                "data": "lastName",
+                "responsivePriority": 3
+            },
+            {
+                "data": "secondLastName",
+                "responsivePriority": 4
+            },
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100"/>`
+                    return `<img src="../${imagen}" width="100" class="img-fluid"/>`
                 },
-                "width": "10%"
+                "responsivePriority": 5
             },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="text-center">
-                                <a href="/Admin/Coach/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer; width: 100px;">
+                    return `<div class="d-flex justify-content-center gap-2">
+                                <a href="/Admin/Coach/Edit/${data}" class="btn btn-success btn-sm text-white">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                            &nbsp;
-                                <a onclick=Delete("/Admin/Coach/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer; width: 100px;">
+                                <a onclick=Delete("/Admin/Coach/Delete/${data}") class="btn btn-danger btn-sm text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
-                            </div>
-                    `;
-                }, "width": "40%"
+                            </div>`;
+                },
+                "responsivePriority": 1
             }
         ],
         "language": {
             "decimal": "",
             "emptyTable": "No hay registros",
             "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-            "infoEmpty": "Mostrando 0 to 0 de 0 Entradas",
+            "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
             "infoFiltered": "(Filtrado de _MAX_ total entradas)",
             "infoPostFix": "",
             "thousands": ",",
@@ -59,19 +73,21 @@ function cargarDatatable() {
                 "previous": "Anterior"
             }
         },
+        "order": [[0, "desc"]],
+        "pageLength": 10,
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
         "width": "100%"
     });
 }
-
 function Delete(url) {
     swal({
-        title: "¿Estas seguro de borrar?",
+        title: "¿Está seguro de borrar?",
         text: "¡Este contenido no se puede recuperar!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Sí, borrar!",
-        closeOnConfirm: true
+        confirmButtonText: "¡Sí, borrar!",
+        closeOnconfirm: true
     }, function () {
         $.ajax({
             type: 'DELETE',

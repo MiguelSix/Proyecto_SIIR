@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -134,15 +136,6 @@ namespace SIIR.Areas.Admin.Controllers
 
             var user = _contenedorTrabajo.User.GetAll(u => u.CoachId == id).FirstOrDefault();
 
-            var coach = _contenedorTrabajo.Coach.GetById(id);
-
-            var coachTeams= _contenedorTrabajo.Team.GetListaCoaches();
-
-            if (coach == coachTeams)
-            {
-                return Json(new { success = false, message = "Este Coach esta asociado a un Equipo, primero delo de baja del Equipo" });
-            }
-
             if (user != null)
             {
                 _contenedorTrabajo.User.Remove(user);
@@ -154,8 +147,20 @@ namespace SIIR.Areas.Admin.Controllers
             }
 
             _contenedorTrabajo.Coach.Remove(objFromDb);
-            _contenedorTrabajo.Save();
-            return Json(new { success = true, message = "Coach borrado correctamente" });
+
+            try
+            {
+                _contenedorTrabajo.Save();
+                return Json(new { success = true, message = "Coach borrado correctamente" });
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("REFERENCE constraint"))
+                {
+                    return Json(new { success = false, message = "No se puede borrar el coach porque tiene un equipo asignado." });
+                }
+                return Json(new { success = false, message = "Ocurrió un error al borrar el coach." });
+            }
         }
         #endregion
     }
