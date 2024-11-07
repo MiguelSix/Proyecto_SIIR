@@ -478,6 +478,9 @@ function generateCertificate() {
         return;
     }
 
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
     // Envía los objetos de estudiantes seleccionados al controlador
     $.ajax({
         url: `${downloadCertificate}?teamId=${teamId}`,
@@ -492,11 +495,12 @@ function generateCertificate() {
         success: function (blob) {
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = "Cedula.pdf";
+            link.download = `Cedula_${teamName}_${formattedDate}.pdf`;
             link.click();
+            toastr.success('Cedula generada');
         },
         error: function (error) {
-            toastr.error('Error al generar el certificado');
+            toastr.error('Error al generar la cedula');
         }
     });
 } 
