@@ -59,13 +59,16 @@ function cargarDatatable() {
                     return `
                         <div class="text-center">
                             <a href="/Admin/Students/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer">
-                                <i class="fas fa-edit"></i> Editar
+                                <i class="fas fa-edit"></i><span class="d-none d-sm-inline">Editar</span>
                             </a>
                             <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
-                                <i class="fas fa-trash-alt"></i> Borrar
+                                <i class="fas fa-trash-alt"></i><span class="d-none d-sm-inline">Borrar</span>
                             </a>
-                            <a href="/Admin/Document/Index?studentId=${data}" class="btn btn-info text-white" style="cursor:pointer">
-                                <i class="fas fa-file-alt"></i> Documentos
+                            <a onclick=downloadInfo("/Admin/Students/GenerateStudentCertificate/${data}") class="btn btn-info text-white" style="cursor:pointer">
+                                <i class="fas fa-download"></i><span class="d-none d-sm-inline">Información</span>
+                            </a>
+                            <a href="/Admin/Document/Index?studentId=${data}" class="btn btn-secondary text-white" style="cursor:pointer">
+                                <i class="fas fa-file-alt"></i><span class="d-none d-sm-inline">Documentos</span>
                             </a>
                         </div>`;
                 },
@@ -122,5 +125,39 @@ function Delete(url) {
                 }
             }
         });
+    });
+}
+
+function downloadInfo(url) {
+    console.log(url);
+    $.ajax({
+        url: url,
+        type: 'POST',
+        xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
+        success: function (blob, status, xhr) {
+            // Obtener el nombre del archivo desde el encabezado 'Content-Disposition'
+            const disposition = xhr.getResponseHeader('Content-Disposition');
+            let fileName = "Informacion_Estudiantes.pdf"; // Nombre por defecto
+
+            if (disposition && disposition.includes('filename=')) {
+                const filenameRegex = /filename[^;=\n]*=(['"]?)([^'"\n]*)\1/;
+                const matches = filenameRegex.exec(disposition);
+                if (matches != null && matches[2]) {
+                    fileName = matches[2];
+                }
+            }
+
+            // Crear un enlace temporal para descargar el archivo
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName; // Usa el nombre del archivo extraído
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+
+            toastr.success("Documento descargado correctamente.");
+        },
+        error: function (error) {
+            toastr.error("Error al generar el documento de información del estudiante:", error);
+        }
     });
 }
