@@ -459,19 +459,21 @@ namespace SIIR.Areas.Admin.Controllers
 
         private static void CreateStudentCellCertificate(IContainer container, Models.Student student)
         {
-            string imageUrl;
-            if (student.ImageUrl != null)
+            string imageUrl = student.ImageUrl != null && student.ImageUrl.StartsWith("/")
+                ? student.ImageUrl.Substring(1)
+                : student.ImageUrl ?? "";
+
+            imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+
+            if (!System.IO.File.Exists(imageUrl))
             {
-                imageUrl = student.ImageUrl.StartsWith("/") ? student.ImageUrl.Substring(1) : student.ImageUrl;
-                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
-            }
-            else
-            {
-                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/zorro_default.png");
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "zorro_default.png");
             }
 
-            byte[] imageBytes;
+            byte[] imageBytes = Array.Empty<byte>();
+
             imageBytes = System.IO.File.ReadAllBytes(imageUrl);
+
 
             container.Padding(2)
                 .Border(1)
@@ -524,18 +526,19 @@ namespace SIIR.Areas.Admin.Controllers
 
         private static void CreateCoachCellCertificate(IContainer container, Models.Coach coach, string teamName)
         {
-            string imageUrl;
-            if (coach.ImageUrl != null)
+            string imageUrl = coach.ImageUrl != null && coach.ImageUrl.StartsWith("/")
+                ? coach.ImageUrl.Substring(1)
+                : coach.ImageUrl ?? "";
+
+            imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+
+            if (!System.IO.File.Exists(imageUrl))
             {
-                imageUrl = coach.ImageUrl.StartsWith("/") ? coach.ImageUrl.Substring(1) : coach.ImageUrl;
-                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
-            }
-            else
-            {
-                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/zorro_default.png");
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "zorro_default.png");
             }
 
-            byte[] imageBytes;
+            byte[] imageBytes = Array.Empty<byte>();
+
             imageBytes = System.IO.File.ReadAllBytes(imageUrl);
 
             container
