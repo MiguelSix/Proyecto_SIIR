@@ -1,0 +1,43 @@
+﻿.container {
+    height: 100%;
+}
+
+.dashboard-container {
+    height: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.img-container {
+}
+
+.student-info {
+}
+
+.profile-picture {
+    max-width: 250px;
+    width: 95%;
+    height: auto;
+    margin: 0 auto;
+    object-fit: cover;
+}
+
+.btn-primary {
+    background-color: #1a3c6e;
+    border-color: #1a3c6e;
+    max-height: 50px;
+}
+
+    .btn-primary:hover {
+        background-color: #15305a;
+        border-color: #15305a;
+    }
+
+@media (min-height: 700px) {
+    .dashboard-container {
+        height: auto;
+        display: flex;
+        align-items: center;
+    }
+}
