@@ -58,5 +58,13 @@ namespace SIIR.Areas.Coach.Controllers
 
             return Json(new { data = equipos });
         }
+
+        public IActionResult GetStudentsByTeamId(int teamId)
+        {
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            // Lista de estudiantes que pertenecen al equipo y no están bloqueados como usuarios
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId && users.Contains(s.Id));
+            return Json(new { data = students });
+        }
     }
 }

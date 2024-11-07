@@ -410,32 +410,30 @@ function loadStudentsForCertificate() {
 
                 response.data.forEach(student => {
                     const controlNumber = student.controlNumber ? student.controlNumber : '---';
+                    const defaultImage = '/images/zorro_default.png';
                     const studentImage = student.imageUrl
-                        ? `
-                                    <img src="${student.imageUrl}" class="card-img-top h-100" alt="Imagen del jugador" />`
-                        : `<div class="image-placeholder">
-                                        <i class="fa-regular fa-user"></i>
-                                    </div>`;
+                        ? `<img src="${student.imageUrl}" class="card-img-top h-100" alt="Imagen del jugador" onerror="this.onerror=null;this.src='${defaultImage}';" />`
+                        : `<img src="${defaultImage}" class="card-img-top h-100" alt="Imagen del jugador" />`;
 
                     studentsHtml += `
-                                    <div class="col">
-                                        <div class="card h-100 position-relative">
-                                            ${studentImage}
-                                            <div class="position-absolute top-0 end-0 m-2">
-                                                <input type="checkbox" class="btn-check student-checkbox" id="checkbox${student.id}" autocomplete="off">
-                                                <label class="btn btn-sm checkbox" for="checkbox${student.id}">
-                                                    <i class="fa-solid fa-check"></i>
-                                                </label>
-                                            </div>
-                                            <div class="card-body p-0 text-center">
-                                                <h5 class="text-center mb-0 ps-2 pe-2 text-white title fs-6 d-flex align-items-center justify-content-center">
-                                                    ${student.name} ${student.lastName} ${student.secondLastName}
-                                                </h5>
-                                                <p class="mb-0 control-number">${controlNumber}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
+        <div class="col">
+            <div class="card position-relative">
+                ${studentImage}
+                <div class="position-absolute top-0 end-0 m-2">
+                    <input type="checkbox" class="btn-check student-checkbox" id="checkbox${student.id}" autocomplete="off">
+                    <label class="btn btn-sm checkbox" for="checkbox${student.id}">
+                        <i class="fa-solid fa-check"></i>
+                    </label>
+                </div>
+                <div class="card-body p-0 text-center">
+                    <h5 class="text-center mb-0 ps-2 pe-2 text-white title fs-6 d-flex align-items-center justify-content-center">
+                        ${student.name} ${student.lastName} ${student.secondLastName}
+                    </h5>
+                    <p class="mb-0 control-number">${controlNumber}</p>
+                </div>
+            </div>
+        </div>
+    `;
                 });
 
                 $('.students-container').html(studentsHtml);

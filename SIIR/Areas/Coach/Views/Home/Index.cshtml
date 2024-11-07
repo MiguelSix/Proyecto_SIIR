@@ -125,7 +125,7 @@
         <div class="d-flex flex-wrap gap-2 mb-3">
             <span class="badge rounded-pill bg-secondary filter-badge">Masculino</span>
             <span class="badge rounded-pill bg-secondary filter-badge">Femenino</span>
-            <span class="badge rounded-pill bg-secondary filter-badge">Mixto</span>
+            <!--span class="badge rounded-pill bg-secondary filter-badge">Mixto</span-->
         </div>
         <hr style="border: 2px solid #1a3c6e; margin: 10px 0;">
         <p class="fs-5 mb-1">Categoría de grupo</p>
@@ -143,6 +143,8 @@
         <p class="fs-2">No se encontraron elementos</p>
     </div>
 </div>
+
+<partial name="_ModalCertificate"/>
 
 @section Scripts {
     <script>
@@ -243,14 +245,14 @@
                                         <div class="card h-100">
                                             <a href="${teamUrl}" style="text-decoration: none;">
                                                 <img src="${team.imageUrl}" class="card-img-top h-100" alt="Imagen del equipo" />
-                                                <p class="text-center fs-6 py-2 mb-0 text-white title">${team.name.toUpperCase()}</p>
+                                                <p class="text-center fs-6 py-2 mb-0 text-white title">${team.name.toUpperCase()} ${team.category.toUpperCase()}</p>
                                             </a>
                                             <div class="card-body">
                                                 <div class="d-flex flex-wrap gap-2 mb-2">
                                                     ${categoryBadges}
                                                 </div>
                                                 <div class="d-flex justify-content-end fs-5">
-                                                    <i class="fa-solid fa-eye me-3" style="color: #1a3c6e"></i>
+                                                    <i id="generateCertificateBtn" class="fa-solid fa-eye me-3" data-team-id="${team.id}" style="color: #1a3c6e"></i>
                                                     <i class="fa-solid fa-file-arrow-down" style="color: #2e8b57"></i>
                                                 </div>
                                             </div>
@@ -261,7 +263,7 @@
                         });
                     },
                     error: function (error) {
-                        console.log("Error al cargar los equipos:", error);
+                        toastr.error('Error al cargar la lista de los equipos');
                     }
                 });
             }
@@ -292,9 +294,9 @@
                     case 'cultural':
                         $this.toggleClass('bg-warning bg-secondary');
                         break;
-                    case 'mixto':
+                    /*case 'mixto':
                         $this.toggleClass('bg-info bg-secondary');
-                        break;
+                        break;*/
                     default:
                         $this.toggleClass('bg-dark bg-secondary');
                         break;
@@ -308,6 +310,10 @@
             cargarEquipos();
         });
     </script>
+    <script>
+        var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Home", new { area = "Coach" })';
+    </script>
+    <script src="~/js/rosterQuickActions.js"></script>
 
 }
 
