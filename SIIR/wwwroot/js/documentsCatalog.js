@@ -41,10 +41,10 @@ function cargarDatatable() {
                 "responsivePriority": 1,
                 "render": function (data) {
                     return `<div class="d-flex justify-content-center gap-2">
-                                <a href="/Admin/DocumentCatalog/Edit/${data}" class="btn btn-success text-white">
+                                <a href="/Admin/DocumentCatalog/Edit/${data}" class="btn btn-success btn-sm text-white">
                                     <i class="far fa-edit"></i> Editar
                                 </a>
-                                <a onclick=Delete("/Admin/DocumentCatalog/Delete/${data}") class="btn btn-danger text-white">
+                                <a onclick=Delete("/Admin/DocumentCatalog/Delete/${data}") class="btn btn-danger btn-sm text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
                            </div>`;
