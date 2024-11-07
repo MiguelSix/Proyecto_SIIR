@@ -169,7 +169,7 @@ function initializeDataTable(teamId) {
                                 <a onclick=Lock("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
                                     <i class="fas fa-user-minus"></i>
                                 </a>
-                                <a onclick=downloadInfo("/Admin/Teams/GenerateStudentCertificate/${data.id}") class="btn btn-info btn-sm" style="cursor:pointer; color:white;">
+                                <a onclick=downloadInformation(${data.id}) class="btn btn-info btn-sm" style="cursor:pointer; color:white;">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 <button class="btn btn-secondary btn-sm" onclick="descargarDocs(${data.id})">
@@ -508,3 +508,13 @@ function generateCertificate() {
         }
     });
 } 
+
+function getRoleEndpoint(endpointAdmin, endpointCoach) {
+    // Aquí se asume que tienes una variable global `userRole` o un método para obtener el rol
+    return userRole === 'Admin' ? endpointAdmin : endpointCoach;
+}
+
+function downloadInformation(id) {
+    const endpoint = getRoleEndpoint(`/Admin/Teams/GenerateStudentCertificate/${id}`, `/Coach/Team/GenerateStudentCertificate/${id}`);
+    downloadInfo(endpoint);
+}

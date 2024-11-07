@@ -151,9 +151,18 @@
 
         <!-- Botones de Acción -->
         <div class="col-12 mt-3 action-buttons">
-            <button class="btn btn-primary" onclick="crearUsuario()">Crear Usuario</button>
-            <button id="generateCertificateBtn" class="btn btn-success">Generar Cedula</button>
-            <button class="btn btn-info" onclick="descargarTodo()">Descargar Todo</button>
+            <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">
+                <i class="fas fa-user-plus"></i> Crear Usuario
+            </a>
+            <button id="generateCertificateBtn" class="btn btn-success">
+                Generar Cedula
+            </button>
+            <button onclick=downloadAllInfo() class="btn btn-info" style="cursor:pointer; color:white">
+                <i class="fas fa-download"></i> Información del equipo
+            </button>
+            <button class="btn btn-secondary" style="cursor:pointer; color:white">
+                <i class="fas fa-file-download"></i> Documentos del equipo
+            </button>
         </div>
 
         <!-- Switch para cambiar vista -->
@@ -220,18 +229,10 @@
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Team", new { area = "Coach" })';
         var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Team", new { area = "Coach" })';
         var downloadCertificate = '@Url.Action("GenerateCertificate", "Team", new { area = "Coach" })';
+        var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Team", new { area = "Coach" })';
 
         const teamName = "@Model.Team.Name"; 
         const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
-
-        function crearUsuario() {
-            // Implementar lógica
-            alert('Función crear usuario por implementar');
-        }
-
-        function descargarTodo() {
-            // Implementar lógica
-            alert('Función descargar todo por implementar');
-        }
+        const userRole = "Coach";
     </script>
 }
