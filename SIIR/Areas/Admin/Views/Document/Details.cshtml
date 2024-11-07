@@ -3,19 +3,31 @@
 <style>
     .split-layout {
         display: flex;
+        flex-wrap: wrap;
         gap: 1.5rem;
         min-height: calc(100vh - 100px);
         margin-top: 1rem;
     }
 
     .left-panel {
-        flex: 0 0 400px;
-        max-width: 400px;
+        flex: 1 1 100%;
+        max-width: 100%;
     }
 
     .right-panel {
-        flex: 1;
+        flex: 1 1 100%;
         min-width: 0;
+    }
+
+    @@media (min-width: 768px) {
+        .left-panel {
+            flex: 0 0 400px;
+            max-width: 400px;
+        }
+
+        .right-panel {
+            flex: 1;
+        }
     }
 
     .form-switch .form-check-input {

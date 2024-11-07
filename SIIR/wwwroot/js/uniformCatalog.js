@@ -27,7 +27,7 @@ function cargarDatatable() {
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="d-flex justify-content-center gap-2"">
+                    return `<div class="d-flex justify-content-center gap-2">
                                 <a href="/Admin/UniformCatalog/Edit/${data}" class="btn btn-success text-white btn-sm">
                                     <i class="far fa-edit"></i> Editar
                                 </a>

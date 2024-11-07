@@ -30,7 +30,7 @@ function cargarDataTable() {
             {
                 "data": "imageUrl",
                 "render": function (imagen) {
-                    return `<img src="../${imagen}" width="100" class="img-fluid"/>`
+                    return `<img src="../${imagen}" width="100" class="img-fluid d-block mx-auto" style="max-width: 120px; max-height: 150px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/zorro_default.png';"/>`
                 },
                 "responsivePriority": 5
             },
