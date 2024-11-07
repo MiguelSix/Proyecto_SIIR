@@ -479,7 +479,11 @@ function generateCertificate() {
     }
 
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
+    const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    const formattedTeamName = teamName.replace(/\s+/g, '_');
 
     // Envía los objetos de estudiantes seleccionados al controlador
     $.ajax({
@@ -495,7 +499,7 @@ function generateCertificate() {
         success: function (blob) {
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = `Cedula_${teamName}_${formattedDate}.pdf`;
+            link.download = `Cedula_${formattedTeamName}_${formattedDate}.pdf`;
             link.click();
             toastr.success('Cedula generada');
         },
