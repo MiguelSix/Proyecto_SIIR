@@ -1,85 +1,10 @@
 ﻿@model SIIR.Models.ViewModels.DocumentVM
 
-<style>
-    /* Estilos para los diferentes estados de documentos */
-    .badge-status {
-        padding: 0.5em 1em;
-        border-radius: 20px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5em;
-    }
-    /* Estilo para documentos pendientes */
-    .badge-pending {
-        background-color: #ffd700;
-        color: #000;
-    }
-    /* Estilo para documentos aprobados */
-    .badge-approved {
-        background-color: #28a745;
-        color: #fff;
-    }
-    /* Estilo para documentos rechazados */
-    .badge-rejected {
-        background-color: #dc3545;
-        color: #fff;
-    }
-    /* Ajustes de tabla y tarjetas */
-    .table td {
-        vertical-align: middle;
-    }
+@{
+    ViewData["Title"] = "Documentos del Estudiante";
+}
 
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-    /* Estilos para mostrar información del documento y estudiante */
-    .document-name {
-        font-weight: 500;
-        color: #2c3e50;
-    }
-
-    .document-description {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-
-    .student-info {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-    }
-
-    @@media screen and (max-width: 768px) {
-        .badge-status {
-            padding: 0.4em;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .badge-status .status-text {
-            display: none;
-        }
-
-        .badge-status .status-icon {
-            margin: 0;
-            font-size: 0.875rem;
-        }
-
-        .table td {
-            padding: 0.5rem !important;
-        }
-    }
-</style>
+<link rel="stylesheet" href="~/css/admin/documents/index.css" />
 
 <div class="container-fluid mt-4">
     <div class="row mb-4">

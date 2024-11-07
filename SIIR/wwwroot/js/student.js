@@ -57,18 +57,18 @@ function cargarDatatable() {
                 "data": "id",
                 "render": function (data) {
                     return `
-                        <div class="text-center">
-                            <a href="/Admin/Students/Edit/${data}" class="btn btn-success text-white" style="cursor:pointer">
-                                <i class="fas fa-edit"></i><span class="d-none d-sm-inline">Editar</span>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="cursor:pointer">
+                                <i class="fas fa-edit"></i><span class="d-none d-sm-inline"> Editar</span>
                             </a>
-                            <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
-                                <i class="fas fa-trash-alt"></i><span class="d-none d-sm-inline">Borrar</span>
+                            <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white" style="cursor:pointer">
+                                <i class="fas fa-trash-alt"></i><span class="d-none d-sm-inline"> Borrar</span>
                             </a>
-                            <a onclick=downloadInfo("/Admin/Students/GenerateStudentCertificate/${data}") class="btn btn-info text-white" style="cursor:pointer">
-                                <i class="fas fa-download"></i><span class="d-none d-sm-inline">Información</span>
+                            <a onclick=downloadInfo("/Admin/Students/GenerateStudentCertificate/${data}") class="btn btn-info btn-sm text-white" style="cursor:pointer">
+                                <i class="fas fa-download"></i><span class="d-none d-sm-inline"> Información</span>
                             </a>
-                            <a href="/Admin/Document/Index?studentId=${data}" class="btn btn-secondary text-white" style="cursor:pointer">
-                                <i class="fas fa-file-alt"></i><span class="d-none d-sm-inline">Documentos</span>
+                            <a href="/Admin/Document/Index?studentId=${data}" class="btn btn-secondary btn-sm text-white" style="cursor:pointer">
+                                <i class="fas fa-file-alt"></i><span class="d-none d-sm-inline"> Documentos</span>
                             </a>
                         </div>`;
                 },

@@ -1,0 +1,128 @@
+﻿.split-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    min-height: calc(100vh - 100px);
+    margin-top: 1rem;
+}
+
+.left-panel {
+    flex: 1 1 100%;
+    max-width: 100%;
+}
+
+.right-panel {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+@media (min-width: 768px) {
+    .left-panel {
+        flex: 0 0 400px;
+        max-width: 400px;
+    }
+
+    .right-panel {
+        flex: 1;
+    }
+}
+
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    margin-right: 0.5em;
+    cursor: pointer;
+}
+
+.form-switch .form-check-label {
+    cursor: pointer;
+    padding-top: 0.25em;
+}
+
+.action-buttons .btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-img-container {
+    position: relative;
+    padding-top: 100%;
+    overflow: hidden;
+}
+
+    .card-img-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    padding: 0.5rem 0;
+}
+
+.document-header {
+    padding: 1rem;
+    border-bottom: 3px solid #007bff;
+    margin-bottom: 1rem;
+}
+
+.document-title {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.document-description {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.document-status {
+    padding: 0.5em 1em;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-pending {
+    background-color: #ffd700;
+    color: #000;
+}
+
+.status-approved {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-rejected {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.preview-frame {
+    width: 100%;
+    height: calc(100vh - 120px);
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.student-info {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.preview-container {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    height: 100%;
+}
