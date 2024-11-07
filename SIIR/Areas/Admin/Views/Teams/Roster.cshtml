@@ -202,7 +202,6 @@
         var downloadCertificate = '@Url.Action("GenerateCertificate", "Teams", new { area = "Admin" })';
 
         const teamName = "@Model.Team.Name"; 
-        const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));  
-        const userRole = "Admin";
+        const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
     </script>
 }

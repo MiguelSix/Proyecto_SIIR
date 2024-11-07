@@ -11,7 +11,6 @@ using SIIR.Models.ViewModels;
 namespace SIIR.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
     public class TeamsController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
@@ -25,12 +24,14 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             TeamVM teamVM = new()
@@ -44,6 +45,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(TeamVM teamVM)
         {
             if (!ModelState.IsValid)
@@ -80,6 +82,7 @@ namespace SIIR.Areas.Admin.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int? id)
         {
             TeamVM teamVM = new()
@@ -97,6 +100,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(TeamVM teamVM)
         {
             // Remover la validación de la imagen si no se selecciona una nueva imagen
@@ -151,6 +155,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult Roster(int? id)
         {
             if (id == null)
@@ -184,8 +189,10 @@ namespace SIIR.Areas.Admin.Controllers
 
             return View(teamVM);
         }
+        #region API CALLS
 
         [HttpPost]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult ChangeCaptain(int teamId, int newCaptainId)
         {
             try
@@ -221,6 +228,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         //Método para generar el PDF de todos los estudiantes de un equipo
         [HttpPost]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult GenerateStudentsCertificates(int teamId)
         {
             var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
@@ -269,6 +277,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         // Método para generar el PDF de un solo estudiante
         [HttpPost]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult GenerateStudentCertificate(int id)
         {
             // Obtener el estudiante por su ID
@@ -306,7 +315,6 @@ namespace SIIR.Areas.Admin.Controllers
             return File(pdfBytes, "application/pdf");
         }
 
-        [HttpPost]
         private static void CreateStudentCell(IContainer container, Models.Student student,  Models.Coach coach, Models.Team team)
         {
             string imageUrl = student.ImageUrl != null && student.ImageUrl.StartsWith("/")
@@ -411,6 +419,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         // Método para generar el PDF
         [HttpPost]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult GenerateCertificate([FromBody] CertificateRequest request)
         {
             if (request.Students == null || request.Students.Count == 0)
@@ -568,15 +577,15 @@ namespace SIIR.Areas.Admin.Controllers
                 });
         }
 
-        #region API CALLS
-
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult GetAll()
         {
             return Json(new { data = _contenedorTrabajo.Team.GetAll(includeProperties: "Representative,Coach") });
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult GetStudentsByTeamId(int teamId)
         {
             var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
@@ -586,6 +595,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var objFromDb = _contenedorTrabajo.Team.GetById(id);

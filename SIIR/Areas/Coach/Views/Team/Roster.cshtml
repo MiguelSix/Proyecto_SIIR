@@ -226,13 +226,12 @@
 @section Scripts {
     <script src="~/js/roster.js"></script>
     <script>
-        var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Team", new { area = "Coach" })';
-        var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Team", new { area = "Coach" })';
-        var downloadCertificate = '@Url.Action("GenerateCertificate", "Team", new { area = "Coach" })';
-        var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Team", new { area = "Coach" })';
+        var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
+        var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';
+        var downloadCertificate = '@Url.Action("GenerateCertificate", "Teams", new { area = "Admin" })';
+        var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
 
         const teamName = "@Model.Team.Name"; 
         const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
-        const userRole = "Coach";
     </script>
 }
