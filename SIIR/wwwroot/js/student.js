@@ -23,11 +23,11 @@ function cargarDatatable() {
             },
             {
                 "data": "lastName",
-                "responsivePriority": 1
+                "responsivePriority": 4
             },
             {
                 "data": "secondLastName",
-                "responsivePriority": 1
+                "responsivePriority": 4
             },
             {
                 "data": "imageUrl",
