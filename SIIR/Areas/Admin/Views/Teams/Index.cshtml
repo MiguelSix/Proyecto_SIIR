@@ -5,7 +5,7 @@
 <div class="container-fluid mt-4">
     <div class="row">
         <div class="col-8">
-            <h1 class="display-4">Equipos</h1>
+            <h1 class="display-4">Equipos @ViewData["Category"]</h1>
         </div>
         <div class="col-4 d-flex justify-content-end align-items-center">
             <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Dar de alta nuevo Equipo</a>
@@ -34,4 +34,7 @@
 
 @section Scripts {
     <script src="~/js/teams.js"></script>
+    <script>
+        var category = "@ViewData["Category"]"; 
+    </script>
 }

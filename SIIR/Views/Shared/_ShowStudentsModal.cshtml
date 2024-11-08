@@ -1,0 +1,64 @@
+﻿<style>
+    .partial .modal-header {
+        background-color: #1a3c6e;
+        color: white;
+    }
+
+    .partial .card-img-top {
+        max-height: 150px;
+        object-fit: cover;
+        object-position: center;
+        width: 100%;
+    }
+
+    .partial .title {
+        background-color: #1a3c6e;
+        min-height: 50px;
+    }
+
+    .partial .card {
+        max-width: 200px;
+        max-height: 250px;
+        margin: 0 auto;
+    }
+
+    .partial .btn-x {
+        color: white;
+        background-color: transparent;
+        border: none;
+    }
+
+    .partial .image-placeholder {
+        height: 150px; /* Ajusta según el tamaño que quieras */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 70px;
+    }
+
+    .partial .students-container .card
+    {
+        height: 230px;
+    }
+</style>
+
+<!-- Modal -->
+<div class="partial modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Representativos</h1>
+                <button type="button" class="btn-x" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 students-container">
+                    <!-- Las tarjetas se generarán aquí -->
+                </div>
+                <div class="not-found-container">
+                    <!-- Las tarjetas se generarán aquí -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,114 +26,10 @@
         object-position: top; 
         width: 100%; 
     }
-
-    .search-container {
-        min-width: 175px;
-        background-color: rgba(0, 0, 0, 0.05);
-        border-radius: 5px;
-        color: #000;
-    }
-
-    .search-input {
-        background-color: transparent;
-        border: none;
-        outline: none;
-        box-shadow: none;
-    }
-
-    .search-input:focus {
-        background-color: transparent; 
-        outline: none;
-        box-shadow: none;
-    }
-
-    .icon-search {
-        font-size: 1.2rem; 
-        color: rgba(0, 0, 0, 0.5); 
-    }
-
-    .btn-search {
-        background-color: #1a3c6e;
-        color: white;
-        border: 1px solid #1a3c6e;
-        padding: 8px 16px;
-        border-radius: 5px; 
-    }
-
-    #popoverContent {
-        width: 500px; 
-        background-color: red;
-    }
-
-    .filter-badge {
-        cursor: pointer;
-        font-size: 0.8rem; 
-    }
-
-    .custom-popover {
-        max-width: 335px; 
-        width: 100%; 
-        border: none;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        font-family: 'Montserrat', sans-serif;
-    }
-
-    .custom-popover-sm {
-        max-width: 300px;
-        width: 100%;
-    }
-
-    .popover-header {
-        font-size: calc(1.275rem + 0.3vw); /*Font size 4 de bootstrap*/
-        background-color: #1a3c6e;
-        color: white;
-    }
-
-    .bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^=bottom] > .popover-arrow::after {
-        border-bottom-color: #1a3c6e;
-    }
-
-    .blue-header {
-        margin-bottom: 1rem !important;
-    }
-
 </style>
 
 <div class="container text-center" id="container-main">
     <h1 class="display-2 welcome-text">Bienvenido @Model.Name</h1>
-
-    <div class="search search-container p-2">
-        <div class="input-group d-flex align-items-center">
-            <i class="fa-solid fa-magnifying-glass icon-search mx-2"></i>
-            <input class="form-control search-input" placeholder="Busca un equipo...">
-            <div><button class="btn-search me-2"><i class="fa-solid fa-list"></i></button></div>
-            <div class="d-none d-sm-block">
-                <button class="btn-search" data-bs-title="Filtros" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="custom-popover d-none d-sm-block" data-bs-offset="-110,15">
-                    <i class="fa-solid fa-filter"></i> Filtrar
-                </button>
-            </div>
-
-            <div class="d-sm-none d-block" style="display:none">
-                <button class="btn-search" data-bs-title="Filtros" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="custom-popover custom-popover-sm d-sm-none d-block" data-bs-offset="-120,15">
-                    <i class="fa-solid fa-filter"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-    <div id="popoverContent" style="display:none;">
-        <p class="fs-5 mb-2" style="background-color:#1a3c6e">Categoría de género</p>
-        <div class="d-flex flex-wrap gap-2 mb-3">
-            <span class="badge rounded-pill bg-secondary filter-badge">Masculino</span>
-            <span class="badge rounded-pill bg-secondary filter-badge">Femenino</span>
-            <!--span class="badge rounded-pill bg-secondary filter-badge">Mixto</span-->
-        </div>
-        <hr style="border: 2px solid #1a3c6e; margin: 10px 0;">
-        <p class="fs-5 mb-1">Categoría de grupo</p>
-        <div class="d-flex flex-wrap gap-2 mb-2">
-            <span class="badge rounded-pill bg-secondary filter-badge">Deportivo</span>
-            <span class="badge rounded-pill bg-secondary filter-badge">Cultural</span>
-        </div>
-    </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 py-4" id="teamsContainer">
     </div>
@@ -144,7 +40,7 @@
     </div>
 </div>
 
-<partial name="_ModalCertificate"/>
+<partial name="_ShowStudentsModal"/>
 
 @section Scripts {
     <script>
@@ -253,7 +149,7 @@
                                                 </div>
                                                 <div class="d-flex justify-content-end fs-5">
                                                     <i id="generateCertificateBtn" class="fa-solid fa-eye me-3" data-team-id="${team.id}" style="color: #1a3c6e"></i>
-                                                    <i class="fa-solid fa-file-arrow-down" style="color: #2e8b57"></i>
+                                                    <i id="downloadStudentsInfo" class="fa-solid fa-file-arrow-down" data-team-id="${team.id}" style="color: #2e8b57"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -311,7 +207,8 @@
         });
     </script>
     <script>
-        var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Home", new { area = "Coach" })';
+        var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
+        var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
     </script>
     <script src="~/js/rosterQuickActions.js"></script>
 
