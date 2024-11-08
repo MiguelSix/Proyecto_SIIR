@@ -1,0 +1,290 @@
+﻿@model SIIR.Models.ViewModels.StudentUniformVM
+@{
+    ViewData["Title"] = "Información del Estudiante";
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1a3c6e;
+    }
+
+    .info-text {
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.375rem 0.75rem;
+        min-height: 38px;
+        line-height: 1.5;
+    }
+
+    .btn-primary {
+        background-color: #1a3c6e;
+        border-color: #1a3c6e;
+    }
+
+        .btn-primary:hover {
+            background-color: #15305a;
+            border-color: #15305a;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+    }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+    .info-container {
+        max-width: 800px;
+        margin: 2vw auto;
+    }
+
+    .form {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        border-radius: 10px;
+    }
+
+    .title {
+        background-color: #1a3c6e;
+        color: white;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding: 10px;
+    }
+
+    .nav-tabs .nav-link {
+        color: #1a3c6e;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #fff;
+            background-color: #1a3c6e;
+            border-color: #1a3c6e;
+        }
+
+    .tab-content {
+        border: 1px solid #dee2e6;
+        border-top: none;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-card {
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+        .info-card h6 {
+            color: #1a3c6e;
+            margin-bottom: 10px;
+        }
+
+    .number-display {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a3c6e;
+    }
+
+    /* Estilo para el listado de uniformes */
+    .uniform-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+        .uniform-item:last-child {
+            border-bottom: none;
+        }
+
+    .uniform-size {
+        font-weight: 600;
+        color: #1a3c6e;
+    }
+</style>
+
+<div class="container info-container">
+    <div class="bg-white rounded-3 shadow-sm p-4">
+        <h2 class="text-center mb-4">Estudiante</h2>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="true">Estudiante</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="uniform-tab" data-bs-toggle="tab" data-bs-target="#uniform" type="button" role="tab" aria-controls="uniform" aria-selected="false">Uniforme</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="coach-tab" data-bs-toggle="tab" data-bs-target="#coach" type="button" role="tab" aria-controls="coach" aria-selected="false">Coach</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-controls="team" aria-selected="false">Equipo</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
+                <div class="row general-data form">
+                    <h5 class="title">Datos personales</h5>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Nombre</label>
+                        <div class="info-text">@(Model.student.Name ?? "No especificado")</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Apellido paterno</label>
+                        <div class="info-text">@(Model.student.LastName ?? "No especificado")</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Apellido materno</label>
+                        <div class="info-text">@(Model.student.SecondLastName ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Número de teléfono</label>
+                        <div class="info-text">@(Model.student.Phone ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Número de control</label>
+                        <div class="info-text">@(Model.student.ControlNumber ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-9 mb-3">
+                        <label class="form-label">Correo institucional</label>
+                        <div class="info-text">@(Model.student.Email ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Edad</label>
+                        <div class="info-text">@(Model.student.Age?.ToString() ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Carrera</label>
+                        <div class="info-text">@(Model.student.Career ?? "No especificado")</div>
+                    </div>
+                </div>
+
+                <div class="row tournament-registration form">
+                    <h5 class="title">Datos para inscripción a torneos</h5>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CURP</label>
+                        <div class="info-text">@(Model.student.Curp ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tipo de sangre</label>
+                        <div class="info-text">@(Model.student.BloodType ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Semestre actual</label>
+                        <div class="info-text">@(Model.student.Semester?.ToString() ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Fecha de nacimiento</label>
+                        <div class="info-text">@(Model.student.BirthDate ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Peso (KG)</label>
+                        <div class="info-text">@(Model.student.Weight?.ToString("0.0") ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Altura (metros)</label>
+                        <div class="info-text">@(Model.student.Height?.ToString("0.0") ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">NSS</label>
+                        <div class="info-text">@(Model.student.Nss ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Alergias</label>
+                        <div class="info-text">@(Model.student.Allergies ?? "No especificado")</div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <label class="form-label">Imagen del estudiante</label>
+                        <div class="text-center">
+                            <img src="@Model.student.ImageUrl" class="img-fluid rounded" style="max-width: 300px;" alt="Imagen del estudiante" onerror="this.src='/images/zorro_default.png';" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="coach" role="tabpanel" aria-labelledby="coach-tab">
+                <div class="info-card">
+                    <h6>Coach</h6>
+                    <p><strong>Nombre:</strong> @(Model.student.Coach?.Name ?? "No especificado")</p>
+                    <p><strong>Apellidos:</strong> @(Model.student.Coach?.LastName ?? "No especificado") @(Model.student.Coach?.SecondLastName ?? "")</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+                <div class="info-card">
+                    <h6>Equipo</h6>
+                    <p><strong>Nombre:</strong> @(Model.student.Team?.Name ?? "No especificado")</p>
+                    <p><strong>Categoria:</strong> @(Model.student.Team?.Category ?? "No especificado")</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
+                <div class="info-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Uniformes</h6>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">Número:</span>
+                            <span class="number-display">@(Model.student.numberUniform ?? 0)</span>
+                        </div>
+                    </div>
+
+                    @if (Model.uniforms != null && Model.uniforms.Any())
+                    {
+                        @foreach (var uniform in Model.uniforms)
+                        {
+                            <div class="uniform-item">
+                                @for (int i = 0; i < Model.uniforms.Count; i++)
+                                {
+                                    <div class="d-flex justify-content-between">
+                                        <span>@Model.namesUniform[i]</span>
+                                        <span class="uniform-size">Talla: @(Model.uniforms[i].size?.ToString() ?? "No especificada")</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay uniformes registrados</p>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Botón de volver movido fuera de las pestañas -->
+        <div class="row">
+            <div class="col-12">
+                <a asp-action="Index" class="btn btn-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
