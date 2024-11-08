@@ -223,7 +223,7 @@ namespace SIIR.Areas.Admin.Controllers
                 // Limpiar archivos temporales
                 Directory.Delete(tempPath, true);
 
-                return File(teamZipBytes, "application/zip", $"{team.Name}.zip");
+                return File(teamZipBytes, "application/zip", $"{team.Name}_{team.Category}_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
             }
             catch (Exception ex)
             {
