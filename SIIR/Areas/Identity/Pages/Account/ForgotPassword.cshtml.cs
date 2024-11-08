@@ -61,8 +61,6 @@ namespace SIIR.Areas.Identity.Pages.Account
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
@@ -71,14 +69,88 @@ namespace SIIR.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
+                var emailTemplate = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Restablecer Contraseña</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333333;
+                        margin: 0;
+                        padding: 0;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }}
+                    .header {{
+                        background-color: #1a73e8;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                        border-radius: 5px 5px 0 0;
+                    }}
+                    .content {{
+                        background-color: #ffffff;
+                        padding: 20px;
+                        border: 1px solid #dddddd;
+                        border-radius: 0 0 5px 5px;
+                    }}
+                    .button {{
+                        display: inline-block;
+                        padding: 12px 24px;
+                        background-color: #1a73e8;
+                        color: white !important;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        margin: 20px 0;
+                    }}
+                    .footer {{
+                        text-align: center;
+                        margin-top: 20px;
+                        color: #666666;
+                        font-size: 12px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        <h1>Restablecer Contraseña</h1>
+                    </div>
+                    <div class='content'>
+                        <p>Hola,</p>
+                        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.</p>
+                        <p>Si no has solicitado este cambio, puedes ignorar este correo electrónico.</p>
+                        <p>Para continuar con el proceso de restablecimiento de contraseña, por favor haz clic en el siguiente botón:</p>
+                        <div style='text-align: center;'>
+                            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' class='button'>Restablecer Contraseña</a>
+                        </div>
+                        <p>Si el botón no funciona, también puedes copiar y pegar el siguiente enlace en tu navegador:</p>
+                        <p style='word-break: break-all;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+                        <p>Este enlace expirará en 24 horas por razones de seguridad.</p>
+                    </div>
+                    <div class='footer'>
+                        <p>Este es un correo electrónico automático, por favor no responda a este mensaje.</p>
+                        <p>© {DateTime.Now.Year} SIIR. Todos los derechos reservados.</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
+
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Restablecimiento de Contraseña",
+                    emailTemplate);
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
-
             return Page();
         }
     }
