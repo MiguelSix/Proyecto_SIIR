@@ -4,6 +4,7 @@ using SIIR.Models;
 using SIIR.Models.ViewModels;
 using System.IO.Compression;
 using System.Linq;
+using static QuestPDF.Helpers.Colors;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -169,7 +170,73 @@ namespace SIIR.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult DownloadAllByTeam(int teamId)
+        {
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
+            var team = _contenedorTrabajo.Team.GetById(teamId);
 
+            if (!students.Any() || team == null)
+            {
+                TempData["Error"] = "No hay estudiantes en el equipo o el equipo no existe.";
+                return RedirectToAction(nameof(Index), new { studentId = teamId });
+            }
+
+            var tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempPath);
+
+            try
+            {
+                // Crear archivo ZIP principal
+                var teamZipPath = Path.Combine(tempPath, $"{team.Name}.zip");
+                using (var teamZipArchive = ZipFile.Open(teamZipPath, ZipArchiveMode.Create))
+                {
+                    foreach (var student in students)
+                    {
+                        var studentDocuments = _contenedorTrabajo.Document.GetDocumentsByStudent(student.Id);
+                        if (studentDocuments.Any())
+                        {
+                            // Crear archivo ZIP individual para el estudiante
+                            var studentZipPath = Path.Combine(tempPath, $"{student.Name}_{student.LastName}_{student.ControlNumber}_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
+                            using (var studentZipArchive = ZipFile.Open(studentZipPath, ZipArchiveMode.Create))
+                            {
+                                foreach (var doc in studentDocuments)
+                                {
+                                    var filePath = Path.Combine(_hostingEnvironment.WebRootPath, doc.Url.TrimStart('\\'));
+                                    if (System.IO.File.Exists(filePath))
+                                    {
+                                        var fileName = $"{doc.DocumentCatalog.Name}_{student.ControlNumber}{Path.GetExtension(filePath)}";
+                                        studentZipArchive.CreateEntryFromFile(filePath, fileName);
+                                    }
+                                }
+                            }
+
+                            // Agregar el archivo ZIP individual al archivo ZIP principal
+                            teamZipArchive.CreateEntryFromFile(studentZipPath, Path.GetFileName(studentZipPath));
+                        }
+                    }
+                }
+
+                // Leer el archivo ZIP principal y devolverlo como FileResult
+                var teamZipBytes = System.IO.File.ReadAllBytes(teamZipPath);
+
+                // Limpiar archivos temporales
+                Directory.Delete(tempPath, true);
+
+                return File(teamZipBytes, "application/zip", $"{team.Name}.zip");
+            }
+            catch (Exception ex)
+            {
+                // Asegurarse de limpiar en caso de error
+                if (Directory.Exists(tempPath))
+                {
+                    Directory.Delete(tempPath, true);
+                }
+
+                TempData["Error"] = "Error al generar el archivo ZIP: " + ex.Message;
+                return RedirectToAction(nameof(Index), new { studentId = teamId });
+            }
+        }
 
     }
 }
