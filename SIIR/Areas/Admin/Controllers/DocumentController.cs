@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
@@ -20,7 +21,8 @@ namespace SIIR.Areas.Admin.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-
+        [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult Index(int studentId)
         {
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
@@ -44,6 +46,7 @@ namespace SIIR.Areas.Admin.Controllers
         
         // Acción para mostrar los detalles de un documento
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult Details(int id)
         {
 
@@ -78,6 +81,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult ChangeStatus(int id, string status)
         {
             var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
@@ -95,6 +99,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult Download(int id)
         {
             var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
@@ -115,6 +120,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult DownloadAll(int studentId)
         {
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
@@ -171,6 +177,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Coach")]
         public IActionResult DownloadAllByTeam(int teamId)
         {
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
