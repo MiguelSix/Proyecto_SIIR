@@ -7,6 +7,7 @@ using QuestPDF.Infrastructure;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using static QuestPDF.Helpers.Colors;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -25,10 +26,12 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public IActionResult Index(string? category)
         {
+            ViewData["Category"] = category;
             return View();
         }
+
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -579,8 +582,31 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin, Coach")]
-        public IActionResult GetAll()
+        public IActionResult GetAll(string? category)
         {
+            if (category == "deportivos")
+            {
+
+                // Filtra los equipos cuyos representantes tienen categoría "deportivo"
+                return Json (new
+                {
+                    data = _contenedorTrabajo.Team.GetAll(
+                    filter: t => t.Representative.Category == "Deportivo",
+                    includeProperties: "Representative,Coach"
+                )
+                });
+            }
+            else if (category == "culturales")
+            {
+                // Filtra los equipos cuyos representantes tienen categoría "cultural"
+                return Json(new
+                {
+                    data = _contenedorTrabajo.Team.GetAll(
+                    filter: t => t.Representative.Category == "Cultural",
+                    includeProperties: "Representative,Coach"
+                )
+                });
+            }
             return Json(new { data = _contenedorTrabajo.Team.GetAll(includeProperties: "Representative,Coach") });
         }
 

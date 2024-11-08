@@ -10,7 +10,7 @@ function cargarDatatable() {
             }
         },
         "ajax": {
-            "url": "/admin/teams/GetAll",
+            "url": `/admin/teams/GetAll?category=${category}`,
             "type": "GET",
             "datatype": "json"
         },

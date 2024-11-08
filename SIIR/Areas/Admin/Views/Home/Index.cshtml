@@ -14,7 +14,7 @@
         <div class="col-md-6 mb-4">
             <!-- Agregar funcionalidad para aplicar filtros Deportivos o Culturales -->
             <button class="btn btn-primary btn-lg w-50">
-                <a asp-area="Admin" asp-page="/Teams/Index" class="btn btn-primary">
+                <a asp-area="Admin" asp-controller="Teams" asp-action="Index" asp-route-category="deportivos" class="btn btn-primary">
                     Grupos Deportivos
                 </a>
             </button>
@@ -23,7 +23,7 @@
 
         <div class="col-md-6 mb-4">
             <button class="btn btn-primary btn-lg w-50">
-                <a asp-area="Admin" asp-page="/Teams/Index" class="btn btn-primary">
+                <a asp-area="Admin" asp-controller="Teams" asp-action="Index" asp-route-category="culturales" class="btn btn-primary">
                     Grupos Culturales
                 </a>
             </button>
