@@ -172,9 +172,9 @@ function initializeDataTable(teamId) {
                                 <a onclick=downloadInfo("/Admin/Teams/GenerateStudentCertificate/${data.id}") class="btn btn-info btn-sm" style="cursor:pointer; color:white;">
                                     <i class="fas fa-download"></i>
                                 </a>
-                                <button class="btn btn-secondary btn-sm" onclick="descargarDocs(${data.id})">
-                                    <i class="fas fa-file-download"></i>
-                                </button>
+                                <a href="/Admin/Document/Index?studentId=${data.id}" class="btn btn-secondary btn-sm text-white" style="cursor:pointer">
+                                    <i class="fas fa-file-download"></i><span class="d-none d-sm-inline"></span>
+                                </a>
                             </div>
                         </div>
                     `;
@@ -506,3 +506,43 @@ function generateCertificate() {
         }
     });
 } 
+
+function descargarDocsEquipo() {
+    const teamId = $("#teamId").val();
+    $.ajax({
+        url: `${downloadAllDocsUrl}?teamId=${teamId}`,
+        type: 'GET',
+        xhrFields: { responseType: 'blob' },
+        success: function (blob, status, xhr) {
+            // Obtener el nombre del archivo desde el encabezado 'Content-Disposition'
+            const disposition = xhr.getResponseHeader('Content-Disposition');
+            let fileName = "Documentos_Equipo.zip"; // Nombre por defecto
+
+            if (disposition) {
+                // Extraer solo el nombre del archivo, ignorando la parte de UTF-8
+                const fileNameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (fileNameMatch && fileNameMatch[1]) {
+                    fileName = fileNameMatch[1].replace(/['"]/g, '') // Remover comillas si existen
+                        .replace(/filename\*?=(.+)/i, '$1') // Remover 'filename=' si existe
+                        .replace(/UTF-8''/i, '') // Remover 'UTF-8'' si existe
+                        .replace(/^['"]*|['"]*$/g, ''); // Remover comillas extras
+                }
+            }
+
+            // Crear un enlace temporal para descargar el archivo
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+            toastr.success("Documentos descargados correctamente.");
+        },
+        error: function (xhr) {
+            if (xhr.status === 404) {
+                toastr.error("No se encontraron documentos para descargar");
+            } else {
+                toastr.error("Error al descargar los documentos del equipo");
+            }
+        }
+    });
+}

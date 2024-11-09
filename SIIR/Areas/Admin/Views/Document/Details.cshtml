@@ -65,15 +65,17 @@
                             <a asp-action="Download" asp-route-id="@Model.Document.Id" class="btn btn-primary">
                                 <i class="fas fa-download me-1"></i>Descargar
                             </a>
-
-                            @if (Model.Document.Status == DocumentStatus.Pending)
+                            @if (User.IsInRole("Admin"))
                             {
-                                <button type="button" class="btn btn-success" onclick="approveDocument(@Model.Document.Id)">
-                                    <i class="fas fa-check me-1"></i>Aprobar
-                                </button>
-                                <button type="button" class="btn btn-danger" onclick="rejectDocument(@Model.Document.Id)">
-                                    <i class="fas fa-times me-1"></i>Rechazar
-                                </button>
+                                @if (Model.Document.Status == DocumentStatus.Pending)
+                                {
+                                    <button type="button" class="btn btn-success" onclick="approveDocument(@Model.Document.Id)">
+                                        <i class="fas fa-check me-1"></i>Aprobar
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="rejectDocument(@Model.Document.Id)">
+                                        <i class="fas fa-times me-1"></i>Rechazar
+                                    </button>
+                                }
                             }
                         </div>
                     </div>

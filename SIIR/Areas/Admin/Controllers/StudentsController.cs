@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Models.ViewModels;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -44,71 +47,46 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Details(int id)
         {
-            var student = _contenedorTrabajo.Student.GetFirstOrDefault(
-                s => s.Id == id,
-                includeProperties: "Team,Coach"
-            );
+            // Obtener el estudiante con sus relaciones básicas usando Include
+            var student = _contenedorTrabajo.Student
+                .GetFirstOrDefault(
+                    s => s.Id == id,
+                    includeProperties: "Team,Coach"
+                );
 
-            if (student == null)
+            // Obtener los uniformes del estudiante
+            var uniforms = _contenedorTrabajo.Uniform
+                .GetAll(u => u.StudentId == student.Id)
+                .ToList();
+
+            // Crear el ViewModel
+            var studentVM = new StudentUniformVM
             {
-                return NotFound();
-            }
-            return View(student);
-        }
+                student = student,
+                uniforms = uniforms,
+                namesUniform = new List<string>()
+            };
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Models.Student student)
-        {
-            // Quitar Coach y Team del ModelState
-            ModelState.Remove("Coach");
-            ModelState.Remove("Team");
-
-            if (ModelState.IsValid)
+            // Obtener los nombres de los uniformes desde el catálogo
+            foreach (var uniform in studentVM.uniforms)
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-                var files = HttpContext.Request.Form.Files;
-                var studentFromDb = _contenedorTrabajo.Student.GetById(student.Id);
+                var uniformNames = _contenedorTrabajo.UniformCatalog
+                    .GetAll(uc => uc.Id == uniform.UniformCatalogId)
+                    .Select(uc => uc.Name)
+                    .ToList();
 
-                if (studentFromDb == null)
+                foreach (var name in uniformNames)
                 {
-                    return NotFound();
+                    if (name is not null)
+                        studentVM.namesUniform.Add(name);
                 }
-
-                if (files.Count > 0)
-                {
-                    string fileName = Guid.NewGuid().ToString();
-                    var uploads = Path.Combine(webRootPath, @"images\students");
-                    var extension = Path.GetExtension(files[0].FileName);
-
-                    if (!string.IsNullOrEmpty(studentFromDb.ImageUrl))
-                    {
-                        var imagePath = Path.Combine(webRootPath, studentFromDb.ImageUrl.TrimStart('\\'));
-                        if (System.IO.File.Exists(imagePath))
-                        {
-                            System.IO.File.Delete(imagePath);
-                        }
-                    }
-
-                    using (var fileStream = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
-                    {
-                        files[0].CopyTo(fileStream);
-                    }
-
-                    student.ImageUrl = @"\images\students\" + fileName + extension;
-                }
-                else
-                {
-                    student.ImageUrl = studentFromDb.ImageUrl;
-                }
-
-                _contenedorTrabajo.Student.Update(student);
-                _contenedorTrabajo.Save();
-                return RedirectToAction(nameof(Index));
             }
-            return View(student);
+
+            ViewBag.SizeOptions = Enum.GetValues(typeof(Models.Size)).Cast<Models.Size>();
+
+            return View(studentVM);
         }
 
         // Método para generar el PDF de un solo estudiante

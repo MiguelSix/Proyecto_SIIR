@@ -23,11 +23,11 @@ function cargarDatatable() {
             },
             {
                 "data": "lastName",
-                "responsivePriority": 1
+                "responsivePriority": 4
             },
             {
                 "data": "secondLastName",
-                "responsivePriority": 1
+                "responsivePriority": 4
             },
             {
                 "data": "imageUrl",
@@ -58,8 +58,8 @@ function cargarDatatable() {
                 "render": function (data) {
                     return `
                         <div class="d-flex justify-content-center gap-2">
-                            <a href="/Admin/Students/Edit/${data}" class="btn btn-success btn-sm text-white" style="cursor:pointer">
-                                <i class="fas fa-edit"></i><span class="d-none d-sm-inline"> Editar</span>
+                            <a href="/Admin/Students/Details/${data}" class="btn btn-success btn-sm text-white" style="cursor:pointer">
+                                <i class="fas fa-eye"></i><span class="d-none d-sm-inline"> Ver</span>
                             </a>
                             <a onclick=Delete("/Admin/Students/Delete/${data}") class="btn btn-danger btn-sm text-white" style="cursor:pointer">
                                 <i class="fas fa-trash-alt"></i><span class="d-none d-sm-inline"> Borrar</span>
