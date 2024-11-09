@@ -150,7 +150,7 @@
                                                 <div class="d-flex justify-content-end fs-5">
                                                     <i id="generateCertificateBtn" class="fa-solid fa-eye me-3" data-team-id="${team.id}" style="color: #1a3c6e"></i>
                                                     <i id="downloadStudentsInfo" class="fa-solid fas fa-download me-3" data-team-id="${team.id}" style="color: #b22222"></i>
-                                                    <i id="downloadDocs" class="fa-solid fa-file-download" data-team-id="${team.id}" style="color: #2e8b57"></i>
+                                                    <i id="descargarDocsEquipo" class="fa-solid fa-file-download" data-team-id="${team.id}" style="color: #2e8b57"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -210,7 +210,7 @@
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
         var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
-            var downloadAllDocsUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
+            var downloadAllDocsUrl = '@Url.Action("DownloadAllByTeam", "Document", new { area = "Admin" })';
     </script>
     <script src="~/js/rosterQuickActions.js"></script>
 
