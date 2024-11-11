@@ -25,12 +25,12 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
                     <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
+                    <label asp-for="Input.Email" class="form-label">Correo</label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3">
                     <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
+                    <label asp-for="Input.Password" class="form-label">Contraseña</label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
 
@@ -39,7 +39,7 @@
                 </div>
                 <div>
                     <p class="text-center mt-3">
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+                        <a id="forgot-password" asp-page="./ForgotPassword">Olvidaste tu contraseña?</a>
                     </p>
                 </div>
             </form>
@@ -50,4 +50,12 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $.extend($.validator.messages, {
+            required: "Este campo es obligatorio.",
+            email: "Por favor, introduce una dirección de correo válida.",
+            minlength: "Por favor, introduce al menos {0} caracteres.",
+            maxlength: "Por favor, no introduzcas más de {0} caracteres."
+        });
+    </script>
 }

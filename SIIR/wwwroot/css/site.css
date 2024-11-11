@@ -120,6 +120,17 @@ body {
     text-align: center;
 }
 
+
+.form-floating input.form-control::placeholder {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.form-floating input.form-control:focus::placeholder {
+    opacity: 1;
+    color: #6c757d;
+}
+
 @media (min-width: 992px) {
     .navbar-toggler {
         display: none;

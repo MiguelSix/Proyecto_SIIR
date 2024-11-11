@@ -88,23 +88,25 @@ namespace SIIR.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "El campo correo es obligatorio")]
+            [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido")]
+            [Display(Name = "Correo")]
             public string Email { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "El campo contraseña es obligatorio")]
             [DataType(DataType.Password)]
+            [Display(Name = "Contraseña")]
             public string Password { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Recordarme?")]
             public bool RememberMe { get; set; }
         }
 
@@ -135,7 +137,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Intento de Login Fallido!!");
                     return Page();
                 }
 
@@ -143,7 +145,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                 if (await _userManager.IsLockedOutAsync(user))
                 {
                     _logger.LogWarning("User account locked out.");
-                    ModelState.AddModelError(string.Empty, "This account has been locked out, please try again later.");
+                    ModelState.AddModelError(string.Empty, "Esta cuenta ha sido bloqueada, por favor contacte al Administrador");
                     return Page();
                 }
 
@@ -161,12 +163,12 @@ namespace SIIR.Areas.Identity.Pages.Account
 
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out. Please contact the administrator.");
+                    _logger.LogWarning("Esta cuenta ha sido bloqueada, por favor contacte al Administrador");
                     return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Intento de Login Fallido!!");
                     return Page();
                 }
             }
