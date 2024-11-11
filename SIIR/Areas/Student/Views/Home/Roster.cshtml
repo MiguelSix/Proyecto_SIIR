@@ -77,9 +77,9 @@
                                         No. Control: @Model.Captain.ControlNumber<br />
                                         Carrera: @Model.Captain.Career
                                     </p>
-                                    <button id="changeCaptainBtn" class="btn btn-primary btn-sm">
+@*                                     <button id="changeCaptainBtn" class="btn btn-primary btn-sm">
                                         Cambiar Capitán
-                                    </button>
+                                    </button> *@
                                 </div>
                             </div>
                         </div>
@@ -151,9 +151,9 @@
 
         <!-- Botones de Acción -->
         <div class="col-12 mt-3 action-buttons">
-            <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">
+@*             <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">
                 <i class="fas fa-user-plus"></i> Crear Usuario
-            </a>
+            </a> *@
             <button id="generateCertificateBtn" class="btn btn-success">
                 Generar Cedula
             </button>
@@ -227,13 +227,13 @@
     <script src="~/js/roster.js"></script>
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
-        var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';
+        //var changeCaptainUrl = '@Url.Action("ChangeCaptain", "Teams", new { area = "Admin" })';
         var downloadCertificate = '@Url.Action("GenerateCertificate", "Teams", new { area = "Admin" })';
         var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
         var downloadAllDocsUrl = '@Url.Action("DownloadAllByTeam", "Document", new { area = "Admin" })';
 
-        const teamName = "@Model.Team.Name"; 
-        const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
+        const teamName = "@Model.Team.Name";
         var userRole = '@ViewBag.UserRole';
+        const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
     </script>
 }
