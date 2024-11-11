@@ -39,6 +39,15 @@
                 <a asp-action="Edit" asp-route-id="@ViewData["StudentId"]" class="btn btn-primary mx-3 my-2">Modificar información</a>
                 <a asp-controller="Document" asp-action="Index" class="btn btn-primary mx-3 my-2">Cargar documentos</a>
             </div>
+            <div class="btn-container col-12 d-flex mt-3 justify-content-center flex-column flex-sm-row">
+                @if (ViewData["IsCaptain"] != null && (bool)ViewData["IsCaptain"])
+                {
+                    <a asp-area="Student" asp-controller="Home" asp-action="Roster"
+                       asp-route-id="@ViewData["TeamId"]" class="btn btn-success mx-3 my-2">
+                        Administrar equipo
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </div>

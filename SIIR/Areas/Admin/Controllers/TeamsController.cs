@@ -179,6 +179,9 @@ namespace SIIR.Areas.Admin.Controllers
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
             var captain = students.FirstOrDefault(s => s.IsCaptain);
 
+            // Get the userRole and put it in the ViewBag
+            ViewBag.UserRole = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Coach") ? "Coach" : "Student";
+
             TeamVM teamVM = new()
             {
                 Team = team,
@@ -187,11 +190,12 @@ namespace SIIR.Areas.Admin.Controllers
                     Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
                     Value = s.Id.ToString()
                 }),
-                Captain = captain
+                Captain = captain,
             };
 
             return View(teamVM);
         }
+
         #region API CALLS
 
         [HttpPost]
@@ -231,7 +235,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         //Método para generar el PDF de todos los estudiantes de un equipo
         [HttpPost]
-        [Authorize(Roles = "Admin, Coach")]
+        [Authorize(Roles = "Admin, Coach, Student")]
         public IActionResult GenerateStudentsCertificates(int teamId)
         {
             var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
@@ -280,7 +284,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         // Método para generar el PDF de un solo estudiante
         [HttpPost]
-        [Authorize(Roles = "Admin, Coach")]
+        [Authorize(Roles = "Admin, Coach, Student")]
         public IActionResult GenerateStudentCertificate(int id)
         {
             // Obtener el estudiante por su ID
@@ -422,7 +426,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         // Método para generar el PDF
         [HttpPost]
-        [Authorize(Roles = "Admin, Coach")]
+        [Authorize(Roles = "Admin, Coach, Student")]
         public IActionResult GenerateCertificate([FromBody] CertificateRequest request)
         {
             if (request.Students == null || request.Students.Count == 0)
@@ -581,7 +585,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
+        [Authorize(Roles = "Admin, Coach, ")]
         public IActionResult GetAll(string? category)
         {
             if (category == "deportivos")
@@ -611,7 +615,7 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
+        [Authorize(Roles = "Admin, Coach, Student")]
         public IActionResult GetStudentsByTeamId(int teamId)
         {
             var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();

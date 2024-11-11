@@ -38,6 +38,9 @@ namespace SIIR.Areas.Coach.Controllers
                 return NotFound();
             }
 
+            // Get the userRole and put it in the ViewBag
+            ViewBag.UserRole = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Coach") ? "Coach" : "Student";
+
             var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
             var captain = students.FirstOrDefault(s => s.IsCaptain);

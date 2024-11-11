@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -14,20 +15,50 @@ namespace SIIR.Areas.Admin.Controllers
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
         private readonly IWebHostEnvironment _hostingEnvironment; // Entorno de hospedaje para obtener rutas de archivos
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DocumentController(IContenedorTrabajo contenedorTrabajo, IWebHostEnvironment hostingEnvironment)
+        public DocumentController(
+            IContenedorTrabajo contenedorTrabajo,
+            IWebHostEnvironment hostingEnvironment,
+            UserManager<ApplicationUser> userManager
+            )
         {
             _contenedorTrabajo = contenedorTrabajo;
             _hostingEnvironment = hostingEnvironment;
+            _userManager = userManager;
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
-        public IActionResult Index(int studentId)
+        [Authorize(Roles = "Admin, Coach, Student")]
+        public async Task<IActionResult> Index(int studentId)
         {
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
             var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == studentId);
-            
+
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // the user is a student
+            if (user.StudentId != null)
+            {
+                // Get the student
+                student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+                // Check if the student is captain
+                if (!student.IsCaptain)
+                {
+                    return Forbid();
+                }
+            }
+
             if (student == null)
             {
                 TempData["Error"] = "Estudiante no encontrado."; // Mensaje de error si no se encuentra el estudiante
@@ -46,9 +77,33 @@ namespace SIIR.Areas.Admin.Controllers
         
         // Acción para mostrar los detalles de un documento
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
-        public IActionResult Details(int id)
+        [Authorize(Roles = "Admin, Coach, Student")]
+        public async Task<IActionResult> Details(int id)
         {
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            var stu = new Models.Student();
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // the user is a student
+            if (user.StudentId != null)
+            {
+                // Get the student
+                stu = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (stu == null)
+                {
+                    return NotFound();
+                }
+
+                // Check if the student is captain
+                if (!stu.IsCaptain)
+                {
+                    return Forbid();
+                }
+            }
 
             // Obtener el documento con su catálogo relacionado
             var document = _contenedorTrabajo.Document.GetDocumentWithCatalog(id);
@@ -99,9 +154,34 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
-        public IActionResult Download(int id)
+        [Authorize(Roles = "Admin, Coach, Student")]
+        public async Task<IActionResult> Download(int id)
         {
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            var stu = new Models.Student();
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // the user is a student
+            if (user.StudentId != null)
+            {
+                // Get the student
+                stu = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (stu == null)
+                {
+                    return NotFound();
+                }
+
+                // Check if the student is captain
+                if (!stu.IsCaptain)
+                {
+                    return Forbid();
+                }
+            }
+
             var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
             if (document == null)
             {
@@ -120,9 +200,34 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
-        public IActionResult DownloadAll(int studentId)
+        [Authorize(Roles = "Admin, Coach, Student")]
+        public async Task<IActionResult> DownloadAll(int studentId)
         {
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            var stu = new Models.Student();
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // the user is a student
+            if (user.StudentId != null)
+            {
+                // Get the student
+                stu = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (stu == null)
+                {
+                    return NotFound();
+                }
+
+                // Check if the student is captain
+                if (!stu.IsCaptain)
+                {
+                    return Forbid();
+                }
+            }
+
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
             var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == studentId);
 
@@ -177,9 +282,34 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Coach")]
-        public IActionResult DownloadAllByTeam(int teamId)
+        [Authorize(Roles = "Admin, Coach, Student")]
+        public async Task<IActionResult> DownloadAllByTeam(int teamId)
         {
+            // Get the current user
+            var user = await _userManager.GetUserAsync(User);
+            var stu = new Models.Student();
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // the user is a student
+            if (user.StudentId != null)
+            {
+                // Get the student
+                stu = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (stu == null)
+                {
+                    return NotFound();
+                }
+
+                // Check if the student is captain
+                if (!stu.IsCaptain)
+                {
+                    return Forbid();
+                }
+            }
+
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == teamId);
             var team = _contenedorTrabajo.Team.GetById(teamId);
 
@@ -223,7 +353,6 @@ namespace SIIR.Areas.Admin.Controllers
                         }
                     }
                 }
-
                 // Leer el archivo ZIP principal y devolverlo como FileResult
                 var teamZipBytes = System.IO.File.ReadAllBytes(teamZipPath);
 

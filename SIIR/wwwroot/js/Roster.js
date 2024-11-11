@@ -5,6 +5,7 @@ let allStudents = [];
 
 $(document).ready(function () {
     const teamId = $("#teamId").val();
+    console.log('userRole:', userRole);
 
     // Store current captain ID if exists
     currentCaptainId = $("#captainId").val();
@@ -163,21 +164,39 @@ function initializeDataTable(teamId) {
             {
                 "data": null,
                 "render": function (data) {
-                    return `
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="btn-group gap-2" role="group">
-                                <a onclick=Lock("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
-                                    <i class="fas fa-user-minus"></i>
-                                </a>
-                                <a onclick=downloadInfo("/Admin/Teams/GenerateStudentCertificate/${data.id}") class="btn btn-info btn-sm" style="cursor:pointer; color:white;">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                                <a href="/Admin/Document/Index?studentId=${data.id}" class="btn btn-secondary btn-sm text-white" style="cursor:pointer">
-                                    <i class="fas fa-file-download"></i><span class="d-none d-sm-inline"></span>
-                                </a>
+                    if (userRole == 'Admin' || userRole == 'Coach')
+                    {
+                        return `
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="btn-group gap-2" role="group">
+                                    <a onclick=Lock("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
+                                        <i class="fas fa-user-minus"></i>
+                                    </a>
+                                    <a onclick=downloadInfo("/Admin/Teams/GenerateStudentCertificate/${data.id}") class="btn btn-info btn-sm" style="cursor:pointer; color:white;">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <a href="/Admin/Document/Index?studentId=${data.id}" class="btn btn-secondary btn-sm text-white" style="cursor:pointer">
+                                        <i class="fas fa-file-download"></i>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }
+                    else
+                    {
+                        return `
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <div class="btn-group gap-2" role="group">
+                                    <a onclick=downloadInfo("/Admin/Teams/GenerateStudentCertificate/${data.id}") class="btn btn-info btn-sm" style="cursor:pointer; color:white;">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <a href="/Admin/Document/Index?studentId=${data.id}" class="btn btn-secondary btn-sm text-white" style="cursor:pointer">
+                                        <i class="fas fa-file-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }
                 },
                 "width": "15%",
                 "responsivePriority": 1
@@ -229,6 +248,54 @@ function generarTarjetas(teamId) {
                         secondLastName === 'Sin actualizar')
                         ? 'Sin actualizar'
                         : `${name} ${lastName} ${secondLastName}`;
+
+                    let buttons = '';
+                    if (userRole === 'Coach' || userRole === 'Admin') {
+                        buttons = `
+                            <div class="d-flex justify-content-center mt-3">
+                                <div class="btn-group gap-2" role="group">
+                                    <a onclick="Lock('/Admin/Students/Lock/${student.id}')" 
+                                       class="btn btn-danger btn-sm" 
+                                       style="cursor:pointer;"
+                                       title="Dar de baja">
+                                        <i class="fas fa-user-minus"></i>
+                                    </a>
+                                    <a onclick="downloadInfo('/Admin/Teams/GenerateStudentCertificate/${student.id}')" 
+                                       class="btn btn-info btn-sm" 
+                                       style="cursor:pointer;"
+                                       title="Descargar cédula">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <a href="/Admin/Document/Index?studentId=${student.id}" 
+                                       class="btn btn-secondary btn-sm text-white" 
+                                       style="cursor:pointer"
+                                       title="Descargar documentos">
+                                        <i class="fas fa-file-download"></i>
+                                    </a>
+                                </div>
+                        </div>
+                        `;
+                    } else {
+                        buttons = `
+                        <div class="d-flex justify-content-center mt-3">
+                            <div class="btn-group gap-2" role="group">
+                                <a onclick="downloadInfo('/Admin/Teams/GenerateStudentCertificate/${student.id}')" 
+                                    class="btn btn-info btn-sm" 
+                                    style="cursor:pointer;"
+                                    title="Descargar cédula">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <a href="/Admin/Document/Index?studentId=${student.id}" 
+                                       class="btn btn-secondary btn-sm text-white" 
+                                       style="cursor:pointer"
+                                       title="Descargar documentos">
+                                        <i class="fas fa-file-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        `;
+                    }
+
                     const card = `
                         <div class="col-md-4 col-lg-3 mb-4">
                             <div class="card h-100">
@@ -245,23 +312,7 @@ function generarTarjetas(teamId) {
                                     </p>
                                     <div class="d-flex justify-content-center mt-3">
                                         <div class="btn-group gap-2" role="group">
-                                            <a onclick="Lock('/Admin/Students/Lock/${student.id}')" 
-                                               class="btn btn-danger btn-sm" 
-                                               style="cursor:pointer;"
-                                               title="Dar de baja">
-                                                <i class="fas fa-user-minus"></i>
-                                            </a>
-                                            <a onclick="downloadInfo('/Admin/Teams/GenerateStudentCertificate/${student.id}')" 
-                                               class="btn btn-info btn-sm" 
-                                               style="cursor:pointer;"
-                                               title="Descargar cédula">
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                            <button class="btn btn-secondary btn-sm" 
-                                                    onclick="descargarDocs(${student.id})"
-                                                    title="Descargar documentos">
-                                                <i class="fas fa-file-download"></i>
-                                            </button>
+                                            ${buttons}
                                         </div>
                                     </div>
                                 </div>

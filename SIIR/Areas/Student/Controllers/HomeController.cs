@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using System.Security.Claims;
 
 namespace SIIR.Areas.Student.Controllers
 {
@@ -59,6 +60,10 @@ namespace SIIR.Areas.Student.Controllers
             ViewData["Career"] = student.Career;
             ViewData["TeamName"] = teamName;
             ViewData["ImageUrl"] = imageUrl;
+
+            // Datos para el capitan
+            ViewData["TeamId"] = student.TeamId;
+            ViewData["IsCaptain"] = student.IsCaptain;
 
             return View();
         }
@@ -199,6 +204,56 @@ namespace SIIR.Areas.Student.Controllers
             studentVM.student.Team = _contenedorTrabajo.Team.GetById(studentVM.student.TeamId);
 
 			return View(studentVM);
+        }
+
+        [HttpGet]
+        public IActionResult Roster(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var team = _contenedorTrabajo.Team.GetById(id);
+            if (team == null)
+            {
+                return NotFound();
+            }
+
+            // Verificar que el usuario actual es el capitan del equipo
+            var user = _userManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = _userManager.Users
+                .Include(u => u.Student)
+                .FirstOrDefault(u => u.Id == user.Id);
+            if (currentUser == null) {
+                return NotFound();
+            }
+
+            if (currentUser.Student.TeamId != id || !currentUser.Student.IsCaptain)
+            {
+                return Forbid();
+            }
+
+            // Get the userRole and put it in the ViewBag
+            ViewBag.UserRole = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Coach") ? "Coach" : "Student";
+
+            var users = _contenedorTrabajo.User.GetAll(u => u.LockoutEnd == null && u.StudentId != null).Select(u => u.StudentId).ToList();
+            var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
+            var captain = students.FirstOrDefault(s => s.IsCaptain);
+
+            TeamVM teamVM = new()
+            {
+                Team = team,
+                Captain = captain
+            };
+
+            team.Coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+            return View(teamVM);
         }
     }
 }
