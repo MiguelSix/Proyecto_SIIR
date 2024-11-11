@@ -129,7 +129,10 @@ function Delete(url) {
 }
 
 function downloadInfo(url) {
-    console.log(url);
+    toastr.options = {
+        newestOnTop: false
+    };
+    toastr.info("Preparando descarga...");
     $.ajax({
         url: url,
         type: 'POST',

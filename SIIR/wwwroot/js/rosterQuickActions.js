@@ -75,6 +75,8 @@ function loadStudentsForCertificate(teamId) {
 }
 
 function downloadAllInfo(teamId) {
+    toastrConfiguration();
+    toastr.info("Preparando descarga...");
     $.ajax({
         url: `${downloadAllInfoUrl}?teamId=${teamId}`,
         type: 'POST',
@@ -110,7 +112,10 @@ function downloadAllInfo(teamId) {
         }
     });
 }
+
 function descargarDocsEquipo(teamId) {
+    toastrConfiguration();
+    toastr.info("Preparando descarga...");
     $.ajax({
         url: `${downloadAllDocsUrl}?teamId=${teamId}`,
         type: 'GET',
@@ -147,4 +152,10 @@ function descargarDocsEquipo(teamId) {
             }
         }
     });
+}
+
+function toastrConfiguration() {
+    toastr.options = {
+        newestOnTop: false 
+    };
 }
