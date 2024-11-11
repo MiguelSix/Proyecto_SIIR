@@ -45,52 +45,15 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            var content = $('#popoverContent').html();
-            var isPopoverVisible = false; // Variable global para verificar si el popover está visible
-
-            var genderCategories = [];
-            var groupCategories = [];
-
-            // Inicializar el popover con contenido HTML
-            $('[data-bs-toggle="popover"]').popover({
-                html: true,
-                content: content
-            });
-
-            // Eventos de Bootstrap para saber cuándo el popover se muestra y oculta
-            $('[data-bs-toggle="popover"]').on('shown.bs.popover', function () {
-                isPopoverVisible = true;
-            });
-
-            $('[data-bs-toggle="popover"]').on('hidden.bs.popover', function () {
-                isPopoverVisible = false;
-            });
-
+            
             // Función para cargar los equipos mediante AJAX
             function cargarEquipos() {
-                var searchTerm = $(".search-input").val(); // Obtener el valor de búsqueda
-
-                if (isPopoverVisible) {
-                    // Obtener los filtros seleccionados para género (masculino, femenino)
-                    genderCategories = $(".filter-badge.bg-primary, .filter-badge.bg-danger")
-                        .map(function () {
-                            return $(this).text().toLowerCase();
-                        }).get();
-
-                    // Obtener los filtros seleccionados para grupos (deportivo, cultural)
-                    groupCategories = $(".filter-badge.bg-success, .filter-badge.bg-warning")
-                        .map(function () {
-                            return $(this).text().toLowerCase();
-                        }).get();
-                }
-
+                
                 $.ajax({
                     url: '/Coach/Home/GetAllTeams',
                     type: 'GET',
                     data: {
-                        genderCategories: JSON.stringify(genderCategories),
-                        groupCategories: JSON.stringify(groupCategories),
-                        searchTerm: searchTerm
+                        coachId: @Model.Id
                     },
                     success: function (data) {
                         var teamsContainer = $("#teamsContainer");
@@ -165,44 +128,6 @@
                 });
             }
 
-            // Capturar el evento de búsqueda y filtrar los equipos
-            $(".search-input").on("input", function () {
-                cargarEquipos(); // Llamar a la función con filtros y búsqueda
-            });
-
-            // Manejo de los filtros
-            $(document).on('click', '.filter-badge', function () {
-                var $this = $(this);
-
-                // Definir colores según el filtro
-                var filterType = $this.text().toLowerCase();
-
-                // Cambiar color según el filtro seleccionado
-                switch (filterType) {
-                    case 'masculino':
-                        $this.toggleClass('bg-primary bg-secondary');
-                        break;
-                    case 'femenino':
-                        $this.toggleClass('bg-danger bg-secondary');
-                        break;
-                    case 'deportivo':
-                        $this.toggleClass('bg-success bg-secondary');
-                        break;
-                    case 'cultural':
-                        $this.toggleClass('bg-warning bg-secondary');
-                        break;
-                    /*case 'mixto':
-                        $this.toggleClass('bg-info bg-secondary');
-                        break;*/
-                    default:
-                        $this.toggleClass('bg-dark bg-secondary');
-                        break;
-                }
-
-                // Llamar a cargarEquipos() también cuando se modifiquen los filtros
-                cargarEquipos();
-            });
-
             // Llamar a la función al cargar la página para mostrar los equipos iniciales
             cargarEquipos();
         });
@@ -210,7 +135,7 @@
     <script>
         var getStudentsUrl = '@Url.Action("GetStudentsByTeamId", "Teams", new { area = "Admin" })';
         var downloadAllInfoUrl = '@Url.Action("GenerateStudentsCertificates", "Teams", new { area = "Admin" })';
-            var downloadAllDocsUrl = '@Url.Action("DownloadAllByTeam", "Document", new { area = "Admin" })';
+        var downloadAllDocsUrl = '@Url.Action("DownloadAllByTeam", "Document", new { area = "Admin" })';
     </script>
     <script src="~/js/rosterQuickActions.js"></script>
 

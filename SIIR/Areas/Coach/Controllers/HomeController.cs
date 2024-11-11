@@ -29,31 +29,27 @@ namespace SIIR.Areas.Coach.Controllers
         public async Task <IActionResult> Index()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            { 
+                return NotFound();
+            }
             ApplicationUser user = await _userManager.FindByIdAsync(userId); 
             Models.Coach coach = new Models.Coach();
+            if (user.CoachId == null)
+            { 
+                return NotFound();
+            }
             coach = _contenedorTrabajo.Coach.GetById((int) user.CoachId);
             return View(coach);
         }
 
         [HttpGet]
-        public IActionResult GetAllTeams(string genderCategories = null, string groupCategories = null, string searchTerm = null)
+        public IActionResult GetAllTeams(int coachId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            ApplicationUser user = _userManager.FindByIdAsync(userId).Result;
-            int coachId = (int)user.CoachId;
-
-            List<string> genderList = !string.IsNullOrEmpty(genderCategories) ?
-                JsonConvert.DeserializeObject<List<string>>(genderCategories) : new List<string>();
-
-            List<string> groupList = !string.IsNullOrEmpty(groupCategories) ?
-                JsonConvert.DeserializeObject<List<string>>(groupCategories) : new List<string>();
 
             // Filtrar los equipos con las listas de filtros y el término de búsqueda
             var equipos = _contenedorTrabajo.Team.GetAll(t =>
-                t.CoachId == coachId &&
-                (genderList.Count == 0 || genderList.Contains(t.Category)) &&
-                (groupList.Count == 0 || groupList.Contains(t.Representative.Category)) &&
-                (string.IsNullOrEmpty(searchTerm) || t.Name.ToLower().Contains(searchTerm.ToLower())), // Filtrar por nombre (LIKE)
+                t.CoachId == coachId,
                 includeProperties: "Representative");
 
             return Json(new { data = equipos });
