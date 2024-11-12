@@ -81,6 +81,7 @@ namespace SIIR.Areas.Student.Controllers
                 .Include(u => u.Student)
                 .ThenInclude(s => s.Team)
                 .Include(u => u.Student.Coach)
+                .Include(r => r.Student.Team.Representative)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
 
             if (currentUser?.Student == null)

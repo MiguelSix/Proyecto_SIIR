@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="~/css/student/edit.css" />
 
 <div class="container info-container">
-	
 		<div class="bg-white rounded-3 shadow-sm p-4">
 		<form asp-action="Edit" method="post" enctype="multipart/form-data">
 			<input type="hidden" asp-for="student.Id" />
@@ -191,11 +190,14 @@
 						<div class="d-flex flex-wrap align-items-center justify-content-between">
 							<h6 class="me-5"><strong>Uniformes del alumno</strong></h6>
 
-							<div class="d-flex align-items-center gap-2">
-								<label asp-for="student.numberUniform" class="form-label mb-0">Número:</label>
-								<input asp-for="student.numberUniform" class="form-control numberInput text-center" placeholder=""/>
-								<span asp-validation-for="student.numberUniform" class="text-danger"></span>
-							</div>
+							@if (@Model.student.Team.Representative.Category == "Deportivo")
+							{
+								<div class="d-flex align-items-center gap-2">
+									<label asp-for="student.numberUniform" class="form-label mb-0">Número:</label>
+									<input asp-for="student.numberUniform" class="form-control numberInput text-center" placeholder="" />
+									<span asp-validation-for="student.numberUniform" class="text-danger"></span>
+								</div>
+							}
 						</div>
 						<div id="uniformList" class="row g-3">
 							@for (int i = 0; i < Model.uniforms.Count; i++)
