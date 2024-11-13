@@ -68,7 +68,8 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 student = student,
                 uniforms = uniforms,
-                namesUniform = new List<string>()
+                namesUniform = new List<string>(),
+                availableTeams = _contenedorTrabajo.Team.GetListaTeams()
             };
 
             // Obtener los nombres de los uniformes desde el catálogo
@@ -232,6 +233,39 @@ namespace SIIR.Areas.Admin.Controllers
                     });
                 });
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult ChangeTeam(int studentId, int teamId)
+        {
+            try
+            {
+                var student = _contenedorTrabajo.Student.GetById(studentId);
+
+                var team = _contenedorTrabajo.Team.GetById(teamId);
+                if (team == null)
+                {
+                    return Json(new { success = false, message = "Equipo no encontrado." });
+                }
+
+                if (student.IsCaptain)
+                {
+                    return Json(new { success = false, message = "No se puede cambiar de equipo al capitán. Primero cambie de capitán en el equipo actual" });
+                }
+
+                student.TeamId = teamId;
+                _contenedorTrabajo.Student.Update(student);
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true, message = "Equipo actualizado exitosamente." });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al actualizar el equipo: " + ex.Message });
+            }
+        }
+
 
 
         #region API CALLS
