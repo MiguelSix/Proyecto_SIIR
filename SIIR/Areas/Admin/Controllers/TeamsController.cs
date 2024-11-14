@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json.Linq;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using SIIR.DataAccess.Data.Repository;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
@@ -170,6 +172,7 @@ namespace SIIR.Areas.Admin.Controllers
             }
 
             var team = _contenedorTrabajo.Team.GetById(id.Value);
+            team.Representative = _contenedorTrabajo.Representative.GetById(team.RepresentativeId);
             if (team == null)
             {
                 return NotFound();
@@ -629,7 +632,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult GenerateUniformInfoPdf([FromBody] List<StudentInfo> students)
+        public IActionResult GenerateUniformInfoPdf([FromBody] List<StudentInfo> students, [FromQuery] string category)
         {
             // IDs de los estudiantes
             var studentIds = students.Select(s => s.Id).ToList();
@@ -683,8 +686,9 @@ namespace SIIR.Areas.Admin.Controllers
                                     ? "Sin actualizar"
                                     : $"{student.Name} {student.LastName} {student.SecondLastName}"
                                 ).FontSize(12).Bold();
-
-                                row.RelativeItem().AlignRight().Text(student.Number.HasValue ? $"Número: {student.Number}" : " Número sin actualizar").FontSize(12);
+                                    
+                                    if(category.ToUpper() == "DEPORTIVO")
+                                        row.RelativeItem().AlignRight().Text(student.Number.HasValue ? $"Número: {student.Number}" : " Número sin actualizar").FontSize(12);
                             });
 
 

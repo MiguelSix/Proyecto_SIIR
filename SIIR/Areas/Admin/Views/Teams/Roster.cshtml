@@ -205,7 +205,8 @@
         var downloadCertificate = '@Url.Action("GenerateCertificate", "Teams", new { area = "Admin" })';
         var downloadAllDocsUrl = '@Url.Action("DownloadAllByTeam", "Document", new { area = "Admin" })';
 
-        const teamName = "@Model.Team.Name"; 
+        const teamName = "@Model.Team.Name";
+        const category = "@Model.Team.Representative.Category";
         const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
         var userRole = '@ViewBag.UserRole';
     </script>

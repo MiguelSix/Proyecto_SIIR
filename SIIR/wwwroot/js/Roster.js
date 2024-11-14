@@ -654,7 +654,7 @@ function downloadUniformInfo() {
     }));
 
     $.ajax({
-        url: '/Admin/Teams/GenerateUniformInfoPdf',
+        url: `/Admin/Teams/GenerateUniformInfoPdf?category=${encodeURIComponent(category)}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(studentData), 
