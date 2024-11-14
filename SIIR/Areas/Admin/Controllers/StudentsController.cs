@@ -214,10 +214,10 @@ namespace SIIR.Areas.Admin.Controllers
                             rightColumn.Item().Text(student.BloodType ?? "Sin Actualizar");
 
                             rightColumn.Item().Text("Peso").Bold();
-                            rightColumn.Item().Text(student.Weight?.ToString("0.0") ?? "Sin Actualizar");
+                            rightColumn.Item().Text(student.Weight ?? "Sin Actualizar");
 
                             rightColumn.Item().Text("Altura").Bold();
-                            rightColumn.Item().Text(student.Height?.ToString("0.0") ?? "Sin Actualizar");
+                            rightColumn.Item().Text(student.Height ?? "Sin Actualizar");
 
                             rightColumn.Item().Text("Alergias").Bold();
                             rightColumn.Item().Text(student.Allergies ?? "Sin Actualizar");

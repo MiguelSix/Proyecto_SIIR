@@ -199,12 +199,12 @@
 
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Peso (KG)</label>
-                        <div class="info-text">@(Model.student.Weight?.ToString("0.0") ?? "No especificado")</div>
+                        <div class="info-text">@(Model.student.Weight ?? "No especificado")</div>
                     </div>
 
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Altura (metros)</label>
-                        <div class="info-text">@(Model.student.Height?.ToString("0.0") ?? "No especificado")</div>
+                        <div class="info-text">@(Model.student.Height ?? "No especificado")</div>
                     </div>
 
                     <div class="col-md-6 mb-3">

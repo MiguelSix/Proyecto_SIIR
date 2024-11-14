@@ -63,13 +63,17 @@ namespace SIIR.Models
         [Display(Name = "Correo Electrónico")]
         public string? Email { get; set; }
 
-        [Display(Name = "Peso")]
-        public float? Weight { get; set; }
+		[Display(Name = "Peso")]
+		[StringLength(6, ErrorMessage = "El peso no puede tener más de 6 caracteres.")]
+		[RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Formato incorrecto.")]
+		public string? Weight { get; set; }
 
-        [Display(Name = "Altura")]
-        public float? Height { get; set; }
+		[Display(Name = "Altura")]
+		[StringLength(4, ErrorMessage = "La altura no puede tener más de 4 caracteres.")]
+		[RegularExpression(@"^\d(\.\d{1,2})?$", ErrorMessage = "Formato incorrecto.")]
+		public string? Height { get; set; }
 
-        [StringLength(250, ErrorMessage = "Las alergias no pueden exceder los 250 caracteres.")]
+		[StringLength(250, ErrorMessage = "Las alergias no pueden exceder los 250 caracteres.")]
         [Display(Name = "Alergias")]
         public string? Allergies { get; set; }
 

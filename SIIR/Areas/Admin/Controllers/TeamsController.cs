@@ -10,6 +10,7 @@ using SIIR.DataAccess.Data.Repository;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using SIIR.Utilities;
 using System.Drawing;
 using System.Security.Policy;
 using static QuestPDF.Helpers.Colors;
@@ -409,10 +410,10 @@ namespace SIIR.Areas.Admin.Controllers
                             rightColumn.Item().Text(student.BloodType ?? "Sin Actualizar");
 
                             rightColumn.Item().Text("Peso").Bold();
-                            rightColumn.Item().Text(student.Weight?.ToString("0.0") ?? "Sin Actualizar");
+                            rightColumn.Item().Text(student.Weight ?? "Sin Actualizar");
 
                             rightColumn.Item().Text("Altura").Bold();
-                            rightColumn.Item().Text(student.Height?.ToString("0.0") ?? "Sin Actualizar");
+                            rightColumn.Item().Text(student.Height ?? "Sin Actualizar");
 
                             rightColumn.Item().Text("Alergias").Bold();
                             rightColumn.Item().Text(student.Allergies ?? "Sin Actualizar");
@@ -687,7 +688,7 @@ namespace SIIR.Areas.Admin.Controllers
                                     : $"{student.Name} {student.LastName} {student.SecondLastName}"
                                 ).FontSize(12).Bold();
                                     
-                                    if(category.ToUpper() == "DEPORTIVO")
+                                    if(category == Categorys.Deportivo)
                                         row.RelativeItem().AlignRight().Text(student.Number.HasValue ? $"Número: {student.Number}" : " Número sin actualizar").FontSize(12);
                             });
 
