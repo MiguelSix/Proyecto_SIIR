@@ -8,6 +8,7 @@ using QuestPDF.Infrastructure;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using SIIR.Utilities;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -266,7 +267,17 @@ namespace SIIR.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetCareers()
+        {
+            var careers = Careers.CareerList;
 
+            // Return only the careers that have students in the database
+            var studentsCareers = _contenedorTrabajo.Student.GetAll().Select(s => s.Career).Distinct();
+            careers = careers.Where(c => studentsCareers.Contains(c)).ToList();
+
+            return Json(careers);
+        }
 
         #region API CALLS
         [HttpGet]

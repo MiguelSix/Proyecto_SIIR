@@ -8,7 +8,7 @@ namespace SIIR.Models.ViewModels
 		public List<Uniform>? uniforms { get; set; }
 
 		public List<string> namesUniform { get; set; } = new List<string>();
-        public IEnumerable<SelectListItem> availableTeams { get; set; }
+        public IEnumerable<SelectListItem>? availableTeams { get; set; }
 
     }
 }

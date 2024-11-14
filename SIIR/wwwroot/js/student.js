@@ -1,7 +1,28 @@
 ﻿var dataTable;
 $(document).ready(function () {
+    loadCareers();
     cargarDatatable();
+
+    $('#careerFilter').on('change', function () {
+        dataTable.ajax.reload();
+    });
 });
+
+function loadCareers() {
+    $.ajax({
+        url: '/admin/students/GetCareers',
+        type: 'GET',
+        success: function (careers) {
+            var select = $('#careerFilter');
+            careers.forEach(function (career) {
+                select.append(new Option(career, career));
+            });
+        },
+        error: function (error) {
+            toastr.error("Error al cargar las carreras");
+        }
+    });
+}
 
 function cargarDatatable() {
     dataTable = $("#tblStudents").DataTable({
@@ -13,7 +34,17 @@ function cargarDatatable() {
         "ajax": {
             "url": "/admin/students/GetAll",
             "type": "GET",
-            "datatype": "json"
+            "datatype": "json",
+            "dataSrc": function (json) {
+                var careerFilter = $('#careerFilter').val();
+
+                if (careerFilter) {
+                    return json.data.filter(function (item) {
+                        return item.career === careerFilter;
+                    });
+                }
+                return json.data;
+            }
         },
         "columns": [
             {
@@ -51,7 +82,14 @@ function cargarDatatable() {
                     }
                     return 'N/A';
                 },
-                "responsivePriority": 4
+                "responsivePriority": 5
+            },
+            {
+                "data": "career",
+                "render": function (data) {
+                    return data || 'Sin actualizar';
+                },
+                "responsivePriority": 5
             },
             {
                 "data": "id",

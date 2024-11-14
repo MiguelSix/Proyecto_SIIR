@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using SIIR.Utilities;
 using System.Security.Claims;
 
 namespace SIIR.Areas.Student.Controllers
@@ -76,6 +78,14 @@ namespace SIIR.Areas.Student.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.CareerOptions = Careers.CareerList
+                .Select(c => new SelectListItem
+                {
+                    Text = c,
+                    Value = c
+                })
+                .ToList();
 
             var currentUser = await _userManager.Users
                 .Include(u => u.Student)

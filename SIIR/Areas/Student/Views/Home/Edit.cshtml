@@ -96,7 +96,9 @@
 
 						<div class="col-12 mb-3">
 							<label asp-for="student.Career" class="form-label">Carrera</label>
-							<input asp-for="student.Career" class="form-control" placeholder="Introduce tu carrera" />
+							<select asp-for="student.Career" asp-items="ViewBag.CareerOptions" class="form-control">
+								<option value="">Selecciona una carrera</option>
+							</select>
 							<span asp-validation-for="student.Career" class="text-danger"></span>
 						</div>
 
