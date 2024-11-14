@@ -242,6 +242,25 @@
                     <p><strong>Nombre:</strong> @(Model.student.Team?.Name ?? "No especificado")</p>
                     <p><strong>Categoria:</strong> @(Model.student.Team?.Category ?? "No especificado")</p>
                 </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="mt-3">
+                        <div class="row">
+                            <div class="col-md-8">
+                                @Html.DropDownList("teamSelect",
+                                         new SelectList(Model.availableTeams, "Value", "Text", Model.student.TeamId),
+                                         new { @class = "form-select" })
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="changeTeam()" class="btn btn-primary w-100">
+                                    Cambiar Equipo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
             </div>
 
             <div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
@@ -288,3 +307,60 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function changeTeam() {
+            const teamId = document.getElementById('teamSelect').value;
+            const studentId = @Model.student.Id;
+            const button = event.target;
+
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+
+            $.ajax({
+                url: '@Url.Action("ChangeTeam", "Students")',
+                type: 'POST',
+                data: {
+                    studentId: studentId,
+                    teamId: teamId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: response.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.message,
+                            icon: 'error'
+                        }).finally(() => {
+                            // Restaurar el botón
+                            button.disabled = false;
+                            button.innerHTML = 'Cambiar Equipo';
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Hubo un error al procesar la solicitud: ' + error,
+                        icon: 'error'
+                    }).finally(() => {
+                        // Restaurar el botón
+                        button.disabled = false;
+                        button.innerHTML = 'Cambiar Equipo';
+                    });
+                }
+            });
+        }
+    </script>
+}
