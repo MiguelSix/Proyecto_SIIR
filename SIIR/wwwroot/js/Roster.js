@@ -5,7 +5,11 @@ let allStudents = [];
 
 $(document).ready(function () {
     const teamId = $("#teamId").val();
+
     console.log('userRole:', userRole);
+
+    loadStudents();
+    console.log(allStudents)
 
     // Store current captain ID if exists
     currentCaptainId = $("#captainId").val();
@@ -458,6 +462,7 @@ function loadStudentsForCertificate() {
         success: function (response) {
             if (response.data && response.data.length > 0) {
                 allStudents = response.data;  // Guardar todos los estudiantes en la variable global
+                console.log(allStudents);
                 let studentsHtml = '';
                 $(".checkbox-div").show();
                 $('.not-found').hide();
@@ -604,6 +609,75 @@ function descargarDocsEquipo() {
         }
     });
 }
+
+function loadStudents()
+{
+    const teamId = $("#teamId").val();
+    $.ajax({
+        url: `${getStudentsUrl}?teamId=${teamId}`,
+        type: 'GET',
+        data: { teamId: teamId },
+        success: function (response) {
+            allStudents = response.data;
+            console.log(allStudents);
+        },
+        error: function (error) {
+            toastr.error('Error al cargar la lista de estudiantes');
+        }
+    });
+}
+
+function downloadUniformInfo() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
+    const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    const formattedTeamName = teamName.replace(/\s+/g, '_');
+
+    if (!allStudents || allStudents.length === 0)
+    {
+        toastr.error("No hay estudiantes en el equipo");
+        return;
+    }
+
+    toastrConfiguration();
+    toastr.info("Preparando descarga...");
+
+    // Obtener los IDs de los estudiantes del array allStudents
+    const studentData = allStudents.map(student => ({
+        id: student.id,
+        name: student.name,
+        lastName: student.lastName,
+        secondLastName: student.secondLastName,
+        number: student.age
+    }));
+
+    $.ajax({
+        url: '/Admin/Teams/GenerateUniformInfoPdf',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(studentData), 
+        xhrFields: { responseType: 'blob' },
+        success: function (blob) {
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Uniformes_${formattedTeamName}_${formattedDate}.pdf`;
+            link.click();
+            toastr.success('Información de los uniformes generada y lista para descargar');
+        },
+        error: function (xhr) {
+            if (xhr.status == 404) {
+                toastr.error("No hay uniformes disponibles");
+            }
+            else
+            {
+                toastr.error("Error al generar el pdf");
+            }
+        }
+    });
+}
+
 
 function toastrConfiguration() {
     toastr.options = {

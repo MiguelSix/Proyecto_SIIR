@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
 using SIIR.Models.ViewModels;
+using System.Drawing;
+using System.Security.Policy;
 using static QuestPDF.Helpers.Colors;
 
 namespace SIIR.Areas.Admin.Controllers
@@ -624,6 +627,161 @@ namespace SIIR.Areas.Admin.Controllers
             return Json(new { data = students });
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GenerateUniformInfoPdf([FromBody] List<StudentInfo> students)
+        {
+            // IDs de los estudiantes
+            var studentIds = students.Select(s => s.Id).ToList();
+
+            // Obtener uniformes según los IDs de estudiantes proporcionados, ordenados
+            var uniforms = _contenedorTrabajo.Uniform.GetAll(
+                filter: u => studentIds.Contains(u.StudentId),
+                orderBy: q => q.OrderBy(u => u.StudentId).ThenBy(u => u.Id),
+                includeProperties: "RepresentativeUniformCatalog.UniformCatalog"
+            )
+            .Select(u => new
+            {
+                u.Id,
+                u.StudentId,
+                u.size,
+                UniformCatalogName = u.RepresentativeUniformCatalog.UniformCatalog.Name 
+            }).ToList();
+
+            if (uniforms == null || !uniforms.Any())
+            {
+                return new ObjectResult(new { success = false, message = "Error al generar el archivo PDF" })
+                {
+                    StatusCode = 404 
+                };
+            } 
+            // Crear el documento PDF
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var fileName = $"Uniformes_{date}.pdf";
+            var uniformCount = new Dictionary<string, Dictionary<string, int>>();
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+                    page.Content().Column(col =>
+                    {
+                        // Título
+                        col.Item().PaddingBottom(15).Text($"Información de Uniformes").FontSize(18).Bold().AlignCenter();
+
+                        foreach (var student in students)
+                        {
+                            col.Item()
+                                .Background(Blue.Lighten3)
+                                .PaddingHorizontal(2)
+                                .Row(row =>
+                            {
+                                row.RelativeItem().Text(
+                                    string.IsNullOrWhiteSpace($"{student.Name} {student.LastName} {student.SecondLastName}")
+                                    ? "Sin actualizar"
+                                    : $"{student.Name} {student.LastName} {student.SecondLastName}"
+                                ).FontSize(12).Bold();
+
+                                row.RelativeItem().AlignRight().Text(student.Number.HasValue ? $"Número: {student.Number}" : " Número sin actualizar").FontSize(12);
+                            });
+
+
+                            // Tabla de uniformes
+                            col.Item().PaddingLeft(2).PaddingBottom(10).Table(table =>
+                            {
+                                // Encabezados
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.RelativeColumn(); 
+                                    columns.RelativeColumn(); 
+                                });
+
+                                table.Header(header =>
+                                {
+                                    header.Cell().Text("Prenda").Bold();
+                                    header.Cell().Text("Talla").Bold();
+                                });
+
+                                foreach (var uniform in uniforms.Where(u => u.StudentId == student.Id))
+                                {
+                                    table.Cell().Text(uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado");
+                                    table.Cell().Text(uniform.size?.ToString() ?? "Sin actualizar");
+
+                                    if (!uniformCount.ContainsKey(uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado"))
+                                    {
+                                        uniformCount[uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado"] = new Dictionary<string, int>();
+                                    }
+
+                                    if (uniformCount[uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado"].ContainsKey(uniform.size?.ToString() ?? "Sin actualizar"))
+                                    {
+                                        uniformCount[uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado"][uniform.size?.ToString() ?? "Sin actualizar"]++;
+                                    }
+                                    else
+                                    {
+                                        uniformCount[uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado"][uniform.size?.ToString() ?? "Sin actualizar"] = 1;
+                                    }
+                                }
+                            });
+                        }
+
+
+                        //Contador para el resumen
+                        col.Item().PaddingBottom(10).PaddingTop(20).Text("Resumen").AlignCenter().FontSize(16).Bold();
+
+                        foreach (var uniformEntry in uniformCount)
+                        {
+                            // Título de la prenda
+                            col.Item().Background(Orange.Lighten3).PaddingLeft(5).Text(uniformEntry.Key).FontSize(14).Bold();
+                            
+                            // Tabla para las tallas y cantidades
+                            col.Item().PaddingBottom(10).PaddingLeft(10).Table(sizeTable =>
+                            {
+                                // Definir columnas
+                                sizeTable.ColumnsDefinition(columns =>
+                                {
+                                    columns.RelativeColumn(); // Talla
+                                    columns.RelativeColumn(); // Cantidad
+                                });
+
+                                // Encabezados
+                                sizeTable.Header(header =>
+                                {
+                                    header.Cell().Text("Talla").Bold();
+                                    header.Cell().Text("Cantidad").Bold();
+                                });
+
+                                // Agregar datos del diccionario secundario
+                                foreach (var sizeEntry in uniformEntry.Value.OrderBy(entry => GetSizeOrder(entry.Key)))
+                                {
+                                    sizeTable.Cell().Text(sizeEntry.Key); // Talla
+                                    sizeTable.Cell().Text(sizeEntry.Value.ToString()); // Cantidad
+                                }
+                            });
+                        }
+                    });
+
+                    page.Footer().AlignRight().Text(text =>
+                    {
+                        text.CurrentPageNumber();
+                    });
+                });
+            });
+
+            byte[] pdfBytes = document.GeneratePdf();
+
+            // Configurar el encabezado Content-Disposition con el nombre personalizado
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
+        // Método auxiliar para obtener el índice de la talla según el enum
+        private int GetSizeOrder(string size)
+        {
+            return Enum.TryParse(size, out Models.Size parsedSize) ? (int)parsedSize : int.MaxValue;
+        }
+
+
         [HttpDelete]
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
@@ -661,4 +819,14 @@ namespace SIIR.Areas.Admin.Controllers
         #endregion
 
     }
+}
+
+
+public class StudentInfo
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? LastName { get; set; }
+    public string? SecondLastName { get; set; }
+    public int? Number { get; set; }
 }
