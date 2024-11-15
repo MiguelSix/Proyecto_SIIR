@@ -1,0 +1,63 @@
+﻿@model SIIR.Models.Coach
+@{
+    ViewData["Title"] = "Información del Coach";
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="bg-white rounded-3 shadow-sm p-4">
+                <h2 class="text-center mb-4 display-4">Información del Coach</h2>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre</label>
+                            <input class="form-control" value="@Model.Name" readonly />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Apellido Paterno</label>
+                            <input class="form-control" value="@Model.LastName" readonly />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Apellido Materno</label>
+                            <input class="form-control" value="@Model.SecondLastName" readonly />
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.CVUrl))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">CV</label>
+                                <div class="mt-2">
+                                    <a href="@Model.CVUrl" target="_blank" class="btn btn-info">
+                                        <i class="fas fa-file-pdf me-2"></i>Ver CV
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Imagen</label>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" class="img-fluid rounded border p-1" alt="Imagen del Coach" />
+                            }
+                            else
+                            {
+                                <div class="text-center p-3 border rounded">
+                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                    <p class="mt-2 text-muted">Sin imagen</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Volver
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

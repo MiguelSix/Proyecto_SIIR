@@ -1,0 +1,128 @@
+﻿@model SIIR.Models.Coach
+@{
+    ViewData["Title"] = "Editar mi Información";
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="bg-white rounded-3 shadow-sm p-4">
+                <h2 class="text-center mb-4 display-4">Editar mi Información</h2>
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-bold">Nombre</label>
+                                <input asp-for="Name" class="form-control" placeholder="Ingresa el nombre del Coach" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="LastName" class="form-label fw-bold">Apellido Paterno</label>
+                                <input asp-for="LastName" class="form-control" placeholder="Ingresa el Apellido Paterno" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="SecondLastName" class="form-label fw-bold">Apellido Materno</label>
+                                <input asp-for="SecondLastName" class="form-control" placeholder="Ingresa el Apellido Materno" />
+                                <span asp-validation-for="SecondLastName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ImageUrl" class="form-label fw-bold">Imagen</label>
+                                <input type="file" class="form-control" name="subidaArchivo" id="subidaArchivo" accept="image/*" />
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                                <small class="text-muted d-block mt-1">Formatos permitidos: JPG, JPEG, PNG. Tamaño máximo: 5MB</small>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CVUrl" class="form-label fw-bold">CV</label>
+                                <input type="file" class="form-control" name="subidaCV" id="subidaCV" accept=".pdf,.doc,.docx" />
+                                <span asp-validation-for="CVUrl" class="text-danger"></span>
+                                @if (!string.IsNullOrEmpty(Model.CVUrl))
+                                {
+                                    <div class="mt-2">
+                                        <span class="text-muted">CV actual:</span>
+                                        <a href="@Model.CVUrl" target="_blank" class="ms-2">
+                                            <i class="fas fa-file-pdf me-1"></i>Ver CV actual
+                                        </a>
+                                    </div>
+                                }
+                                <small class="text-muted d-block mt-1">Formatos permitidos: PDF. Tamaño máximo: 5MB</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Vista previa de la imagen</label>
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img src="@Model.ImageUrl" class="img-fluid rounded border p-1" alt="Vista previa" />
+                                }
+                                else
+                                {
+                                    <div class="text-center p-3 border rounded">
+                                        <i class="fas fa-user fa-3x text-muted"></i>
+                                        <p class="mt-2 text-muted">Sin imagen</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-save me-2"></i> Guardar Cambios
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <a asp-action="Index" class="btn btn-secondary w-100">
+                                <i class="fas fa-arrow-left me-2"></i> Volver
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('subidaArchivo').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Por favor, seleccione una imagen en formato JPG, JPEG o PNG.');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('La imagen no debe exceder los 5MB.');
+                    this.value = '';
+                    return;
+                }
+            }
+        });
+
+        document.getElementById('subidaCV').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const validTypes = ['.pdf'];
+                const extension = '.' + file.name.split('.').pop().toLowerCase();
+
+                if (!validTypes.includes(extension)) {
+                    alert('Por favor, seleccione un archivo PDF.');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('El CV no debe exceder los 5MB.');
+                    this.value = '';
+                    return;
+                }
+            }
+        });
+    </script>
+}

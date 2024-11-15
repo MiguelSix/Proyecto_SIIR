@@ -35,13 +35,20 @@ function cargarDataTable() {
                 "responsivePriority": 5
             },
             {
-                "data": "id",
+                "data": null,
                 "render": function (data) {
+                    let cvButton = '';
+                    if (data.cvUrl) {
+                        cvButton = `<a href="${data.cvUrl}" target="_blank" class="btn btn-info btn-sm text-white">
+                                    <i class="fas fa-file-pdf"></i> Ver CV
+                                  </a>`;
+                    }
                     return `<div class="d-flex justify-content-center gap-2">
-                                <a href="/Admin/Coach/Edit/${data}" class="btn btn-success btn-sm text-white">
-                                    <i class="far fa-edit"></i> Editar
+                                <a href="/Admin/Coach/Details/${data.id}" class="btn btn-primary btn-sm text-white">
+                                    <i class="far fa-eye"></i> Ver Info
                                 </a>
-                                <a onclick=Delete("/Admin/Coach/Delete/${data}") class="btn btn-danger btn-sm text-white">
+                                ${cvButton}
+                                <a onclick=Delete("/Admin/Coach/Delete/${data.id}") class="btn btn-danger btn-sm text-white">
                                     <i class="far fa-trash-alt"></i> Borrar
                                 </a>
                             </div>`;
@@ -75,6 +82,7 @@ function cargarDataTable() {
         "width": "100%"
     });
 }
+
 function Delete(url) {
     swal({
         title: "¿Está seguro de borrar?",
