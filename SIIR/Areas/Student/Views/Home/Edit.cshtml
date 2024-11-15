@@ -96,10 +96,27 @@
 
 						<div class="col-12 mb-3">
 							<label asp-for="student.Career" class="form-label">Carrera</label>
-							<select asp-for="student.Career" asp-items="ViewBag.CareerOptions" class="form-control">
-								<option value="">Selecciona una carrera</option>
-							</select>
+							<div class="input-group">
+								<span class="input-group-text">
+									<i class="fas fa-graduation-cap"></i>
+								</span>
+								<select asp-for="student.Career" asp-items="ViewBag.CareerOptions" class="form-select">
+									<option value="">Selecciona una carrera</option>
+								</select>
+							</div>
 							<span asp-validation-for="student.Career" class="text-danger"></span>
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.emergencyContact" class="form-label">Contacto de emergencia</label>
+							<input asp-for="student.emergencyContact" class="form-control" placeholder="Nombre del contacto de emergencia" />
+							<span asp-validation-for="student.emergencyContact" class="text-danger"></span>
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label asp-for="student.emergencyPhone" class="form-label">Teléfono de emergencia</label>
+							<input asp-for="student.emergencyPhone" class="form-control" placeholder="Número de teléfono de emergencia" />
+							<span asp-validation-for="student.emergencyPhone" class="text-danger"></span>
 						</div>
 
 					</div>
@@ -121,7 +138,30 @@
 
 						<div class="col-md-6 mb-3">
 							<label asp-for="student.Semester" class="form-label">Semestre actual</label>
-							<input asp-for="student.Semester" class="form-control" placeholder="Introduce tu semestre actual" />
+							<div class="input-group">
+								<span class="input-group-text">
+									<i class="fa-brands fa-google-scholar"></i>
+								</span>
+								<select asp-for="student.Semester" class="form-select">
+									<option value="">Selecciona un semestre</option>
+									<option value="Primer">Primer semestre</option>
+									<option value="Segundo">Segundo semestre</option>
+									<option value="Tercer">Tercer semestre</option>
+									<option value="Cuarto">Cuarto semestre</option>
+									<option value="Quinto">Quinto semestre</option>
+									<option value="Sexto">Sexto semestre</option>
+									<option value="Séptimo">Séptimo semestre</option>
+									<option value="Octavo">Octavo semestre</option>
+									<option value="Noveno">Noveno semestre</option>
+									<option value="Décimo">Décimo semestre</option>
+									<option value="Undécimo">Undécimo semestre</option>
+									<option value="Duodécimo">Duodécimo semestre</option>
+									<option value="Decimotercer">Decimotercer semestre</option>
+									<option value="Decimocuarto">Decimocuarto semestre</option>
+									<option value="Decimoquinto">Decimoquinto semestre</option>
+									<option value="Egresado">Egresado</option>
+								</select>
+							</div>
 							<span asp-validation-for="student.Semester" class="text-danger"></span>
 						</div>
 
