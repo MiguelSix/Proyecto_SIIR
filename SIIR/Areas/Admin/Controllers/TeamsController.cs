@@ -125,11 +125,28 @@ namespace SIIR.Areas.Admin.Controllers
         {
             // Remover la validación de la imagen si no se selecciona una nueva imagen
             ModelState.Remove("Team.ImageUrl");
+            ModelState.Remove("Team.Name");
             if (ModelState.IsValid)
             {
+                var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
+                teamVM.Team.Representative = _contenedorTrabajo.Representative.GetById(teamVM.Team.RepresentativeId);
+                teamVM.Team.Name = teamVM.Team.Representative.Name + " " + teamVM.Team.Category;
+
+                if (teamFromDb.Name != teamVM.Team.Name)
+                {
+                    var existingTeam = _contenedorTrabajo.Team.GetFirstOrDefault(t => t.Name == teamVM.Team.Name);
+                    if (existingTeam != null)
+                    {
+                        ModelState.AddModelError("Team.RepresentativeId", "El equipo " + teamVM.Team.Name + " ya existe");
+                        teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
+                        teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
+                        return View(teamVM);
+                    }
+                }
+
                 string webRootPath = _hostingEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
-                var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
+                
 
                 if (files.Count > 0)
                 {
@@ -271,9 +288,8 @@ namespace SIIR.Areas.Admin.Controllers
                 return NotFound();
             }
             var teamName = team.Name.Replace(" ", "_"); // Reemplaza espacios por guiones bajos para evitar problemas en el nombre del archivo
-            var teamCategory = team.Category.Replace(" ", "_");
             var date = DateTime.Now.ToString("yyyy-MM-dd");
-            var fileName = $"Informacion_{teamName}_{teamCategory}_{date}.pdf";
+            var fileName = $"Informacion_{teamName}_{date}.pdf";
 
             var document = QuestPDF.Fluent.Document.Create(container =>
             {

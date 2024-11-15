@@ -17,9 +17,9 @@
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-3">
-                                <label asp-for="Team.Name" class="form-label fw-bold">Nombre</label>
-                                <input asp-for="Team.Name" class="form-control" placeholder="Ingresa el nombre del equipo" />
-                                <span asp-validation-for="Team.Name" class="text-danger"></span>
+                                <label for="Representativo" class="form-label fw-bold">Representativo</label>
+                                @Html.DropDownListFor(m => m.Team.RepresentativeId, Model.RepresentativeList, "Selecciona un Grupo Representativo:", new { @class = "form-select" })
+                                <span asp-validation-for="Team.RepresentativeId" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
@@ -42,12 +42,6 @@
                                 <label for="Coach" class="form-label fw-bold">Coach</label>
                                 @Html.DropDownListFor(m => m.Team.CoachId, Model.CoachList, "Selecciona un Coach:", new { @class = "form-select" })
                                 <span asp-validation-for="Team.CoachId" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="Representativo" class="form-label fw-bold">Representativo</label>
-                                @Html.DropDownListFor(m => m.Team.RepresentativeId, Model.RepresentativeList, "Selecciona un Grupo Representativo:", new { @class = "form-select" })
-                                <span asp-validation-for="Team.RepresentativeId" class="text-danger"></span>
                             </div>
 
                         </div>
