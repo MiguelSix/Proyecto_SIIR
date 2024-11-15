@@ -44,7 +44,6 @@ namespace SIIR.Models
         [Display(Name = "Carrera")]
         public string? Career { get; set; }
 
-        [Range(1, 12, ErrorMessage = "El semestre debe estar entre 1 y 12.")]
         [Display(Name = "Semestre")]
         public string? Semester { get; set; }
 
@@ -90,6 +89,14 @@ namespace SIIR.Models
 
         [Display(Name = "Fecha de ingreso")]
 		public int? enrollmentData { get; set; }
+
+        [Display(Name = "Nombre del Contacto de emergencia")]
+        [StringLength(50, ErrorMessage = "El nombre del contacto de emergencia no puede exceder los 50 caracteres.")]
+        public string? emergencyContact { get; set; }
+
+        [Phone(ErrorMessage = "El número de teléfono de emergencia no es válido.")]
+        [Display(Name = "Teléfono de emergencia")]
+        public string? emergencyPhone { get; set; }
 
         // Llaves foráneas
         public int? CoachId { get; set; }

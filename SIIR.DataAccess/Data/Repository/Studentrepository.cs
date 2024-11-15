@@ -55,8 +55,10 @@ namespace SIIR.DataAccess.Data.Repository
                 objFromDb.ImageUrl = student.ImageUrl;
                 objFromDb.numberUniform = student.numberUniform;
                 objFromDb.enrollmentData = student.enrollmentData;
+                objFromDb.emergencyContact = student.emergencyContact;
+                objFromDb.emergencyPhone = student.emergencyPhone;
 
-                _db.SaveChanges();
+				_db.SaveChanges();
             }
         }
 

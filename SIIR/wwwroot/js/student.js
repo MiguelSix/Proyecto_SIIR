@@ -2,8 +2,7 @@
 $(document).ready(function () {
     loadCareers();
     cargarDatatable();
-
-    $('#careerFilter').on('change', function () {
+    $('#careerFilter, #semesterFilter').on('change', function () {
         dataTable.ajax.reload();
     });
 });
@@ -37,13 +36,12 @@ function cargarDatatable() {
             "datatype": "json",
             "dataSrc": function (json) {
                 var careerFilter = $('#careerFilter').val();
-
-                if (careerFilter) {
-                    return json.data.filter(function (item) {
-                        return item.career === careerFilter;
-                    });
-                }
-                return json.data;
+                var semesterFilter = $('#semesterFilter').val();
+                return json.data.filter(function (item) {
+                    var matchesCareer = !careerFilter || item.career === careerFilter;
+                    var matchesSemester = !semesterFilter || item.semester === semesterFilter;
+                    return matchesCareer && matchesSemester;
+                });
             }
         },
         "columns": [
@@ -86,6 +84,13 @@ function cargarDatatable() {
             },
             {
                 "data": "career",
+                "render": function (data) {
+                    return data || 'Sin actualizar';
+                },
+                "responsivePriority": 5
+            },
+            {
+                "data": "semester",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
