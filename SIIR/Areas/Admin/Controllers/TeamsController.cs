@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json.Linq;
@@ -57,11 +58,24 @@ namespace SIIR.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create(TeamVM teamVM)
         {
-            if (!ModelState.IsValid)
+            ModelState.Remove("Team.ImageUrl");
+            ModelState.Remove("Team.Name");
+            
+            if (ModelState.IsValid)
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
-                if (teamVM.Team.Id == 0 && files.Count() > 0)
+
+                teamVM.Team.Representative = _contenedorTrabajo.Representative.GetById(teamVM.Team.RepresentativeId);
+                teamVM.Team.Name = teamVM.Team.Representative.Name + " " + teamVM.Team.Category;
+
+                var existingTeam = _contenedorTrabajo.Team.GetFirstOrDefault(t => t.Name == teamVM.Team.Name);
+                if (existingTeam != null)
+                {
+                    // Agrega un error personalizado al ModelState
+                    ModelState.AddModelError("Team.RepresentativeId", "El equipo " + teamVM.Team.Name + " ya existe");
+                }
+                else if (teamVM.Team.Id == 0 && files.Count() > 0)
                 {
                     // Nuevo equipo
                     string fileName = Guid.NewGuid().ToString();
@@ -78,11 +92,8 @@ namespace SIIR.Areas.Admin.Controllers
                     _contenedorTrabajo.Save();
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    ModelState.AddModelError("Imagen", "Debes seleccionar una imagen");
-                }
             }
+            ModelState.AddModelError("Team.ImageUrl", "Debes seleccionar una imagen");
             teamVM.RepresentativeList = _contenedorTrabajo.Representative.GetRepresentativesList();
             teamVM.CoachList = _contenedorTrabajo.Coach.GetCoachesList();
 
