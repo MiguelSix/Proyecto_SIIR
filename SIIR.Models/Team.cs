@@ -13,11 +13,11 @@ namespace SIIR.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El nombre del equipo es obligatorio.")]
         [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La categoria del equipo es obligatoria.")]
         [StringLength(20)]
         public string Category { get; set; }
 
