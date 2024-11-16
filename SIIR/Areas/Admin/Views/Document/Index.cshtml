@@ -113,8 +113,8 @@
                                                 break;
                                             case DocumentStatus.Rejected:
                                                 <span class="badge-status badge-rejected">
-                                                    <i class="fas fa-times status-icon"></i>
-                                                    <span class="status-text">Rechazado</span>
+                                                    @* <i class="fas fa-times status-icon"></i> *@
+                                                    
                                                     @if (!string.IsNullOrEmpty(doc.RejectionReason))
                                                     {
                                                         <i class="fas fa-info-circle ms-1"
@@ -122,6 +122,7 @@
                                                            data-bs-placement="top"
                                                            title="@doc.RejectionReason"></i>
                                                     }
+                                                    <span class="status-text">Rechazado</span>
                                                 </span>
                                                 break;
                                         }
