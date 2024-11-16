@@ -68,8 +68,15 @@ namespace SIIR.Areas.Admin.Controllers
                 var files = HttpContext.Request.Form.Files;
 
                 teamVM.Team.Representative = _contenedorTrabajo.Representative.GetById(teamVM.Team.RepresentativeId);
-                teamVM.Team.Name = teamVM.Team.Representative.Name + " " + teamVM.Team.Category;
-
+                if (teamVM.Team.Category.ToLower() == "mixto")
+                {
+                    teamVM.Team.Name = teamVM.Team.Representative.Name;
+                }
+                else
+                {
+                    teamVM.Team.Name = teamVM.Team.Representative.Name + " " + teamVM.Team.Category;
+                }
+                
                 var existingTeam = _contenedorTrabajo.Team.GetFirstOrDefault(t => t.Name == teamVM.Team.Name);
                 if (existingTeam != null)
                 {
@@ -131,7 +138,14 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 var teamFromDb = _contenedorTrabajo.Team.GetById(teamVM.Team.Id);
                 teamVM.Team.Representative = _contenedorTrabajo.Representative.GetById(teamVM.Team.RepresentativeId);
-                teamVM.Team.Name = teamVM.Team.Representative.Name + " " + teamVM.Team.Category;
+                if (teamVM.Team.Category.ToLower() == "mixto")
+                {
+                    teamVM.Team.Name = teamVM.Team.Representative.Name;
+                }
+                else
+                {
+                    teamVM.Team.Name = teamVM.Team.Representative.Name + " " + teamVM.Team.Category;
+                }
 
                 if (teamFromDb.Name != teamVM.Team.Name)
                 {
