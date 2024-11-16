@@ -59,6 +59,10 @@ namespace SIIR.Areas.Admin.Controllers
                     includeProperties: "Team,Coach"
                 );
 
+            if (student.Team != null)
+                student.Team.Representative = _contenedorTrabajo.Representative.GetFirstOrDefault(r => r.Id == student.Team.RepresentativeId);
+
+
             // Obtener los uniformes del estudiante
             var uniforms = _contenedorTrabajo.Uniform
                 .GetAll(u => u.StudentId == student.Id)
@@ -242,7 +246,11 @@ namespace SIIR.Areas.Admin.Controllers
             try
             {
                 var student = _contenedorTrabajo.Student.GetById(studentId);
-
+                if (student.TeamId == teamId)
+                {
+                    return Json(new { success = false, message = "El estudiante ya se encuentra en este equipo" });
+                }
+                
                 var team = _contenedorTrabajo.Team.GetById(teamId);
                 if (team == null)
                 {
@@ -255,7 +263,10 @@ namespace SIIR.Areas.Admin.Controllers
                 }
 
                 student.TeamId = teamId;
+                student.numberUniform = null;
                 _contenedorTrabajo.Student.Update(student);
+                ChangeUniforms(student.Id, team);
+
                 _contenedorTrabajo.Save();
 
                 return Json(new { success = true, message = "Equipo actualizado exitosamente." });
@@ -265,6 +276,28 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Error al actualizar el equipo: " + ex.Message });
             }
+        }
+
+        private void ChangeUniforms(int studentId, Team team)
+        {
+            var representativeUniformCatalog = _contenedorTrabajo.RepresentativeUniformCatalog.GetAll(ruc => ruc.RepresentativeId == team.RepresentativeId);
+
+            var deleteUniforms = _contenedorTrabajo.Uniform.GetAll(u => u.StudentId == studentId);
+
+            foreach (var deleteUniform in deleteUniforms)
+            {
+                _contenedorTrabajo.Uniform.Remove(deleteUniform);
+            }
+
+            foreach (var ruc in representativeUniformCatalog)
+            {
+                var uniform = new Uniform();
+                uniform.StudentId = studentId;
+                uniform.RepresentativeId = ruc.RepresentativeId;
+                uniform.UniformCatalogId = ruc.UniformCatalogId;
+                _contenedorTrabajo.Uniform.Add(uniform);
+            }
+            _contenedorTrabajo.Save();
         }
 
         [HttpGet]
