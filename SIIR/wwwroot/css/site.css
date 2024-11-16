@@ -131,6 +131,11 @@ body {
     color: #6c757d;
 }
 
+.validation-summary-errors ul {
+    list-style-type: none;
+    padding: 0;
+}
+
 @media (min-width: 992px) {
     .navbar-toggler {
         display: none;

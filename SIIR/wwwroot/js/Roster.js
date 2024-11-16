@@ -6,10 +6,7 @@ let allStudents = [];
 $(document).ready(function () {
     const teamId = $("#teamId").val();
 
-    console.log('userRole:', userRole);
-
     loadStudents();
-    console.log(allStudents)
 
     // Store current captain ID if exists
     currentCaptainId = $("#captainId").val();
@@ -650,11 +647,11 @@ function downloadUniformInfo() {
         name: student.name,
         lastName: student.lastName,
         secondLastName: student.secondLastName,
-        number: student.age
+        number: student.numberUniform
     }));
 
     $.ajax({
-        url: `/Admin/Teams/GenerateUniformInfoPdf?category=${encodeURIComponent(category)}`,
+        url: `/Admin/Teams/GenerateUniformInfoPdf?category=${encodeURIComponent(category)}&teamName=${encodeURIComponent(teamName)}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(studentData), 
@@ -678,6 +675,40 @@ function downloadUniformInfo() {
     });
 }
 
+function downloadListStudents() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
+    const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    const formattedTeamName = teamName.replace(/\s+/g, '_');
+
+    if (!allStudents || allStudents.length === 0) {
+        toastr.error("No hay estudiantes en el equipo");
+        return;
+    }
+
+    toastrConfiguration();
+    toastr.info("Preparando descarga...");
+
+    $.ajax({
+        url: `/Admin/Teams/GenerateListStudentPdf?teamName=${encodeURIComponent(teamName)}`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(allStudents),
+        xhrFields: { responseType: 'blob' },
+        success: function (blob) {
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Lista_estudiante_${formattedTeamName}_${formattedDate}.pdf`;
+            link.click();
+            toastr.success('Lista de los uniformes generado exitosamente');
+        },
+        error: function (xhr) {
+            toastr.error("Error al generar el pdf");
+        }
+    });
+}
 
 function toastrConfiguration() {
     toastr.options = {

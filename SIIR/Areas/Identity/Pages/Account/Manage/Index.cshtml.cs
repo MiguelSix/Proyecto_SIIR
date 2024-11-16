@@ -65,6 +65,10 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             public IFormFile ImageFile { get; set; }
 
             public string ImageUrl { get; set; }
+
+            [Display(Name = "CV")]
+            public IFormFile CVFile { get; set; }
+            public string CVUrl { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -104,6 +108,7 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                         Input.LastName = coach.LastName;
                         Input.SecondLastName = coach.SecondLastName;
                         Input.ImageUrl = coach.ImageUrl;
+                        Input.CVUrl = coach.CVUrl;
                     }
                     break;
 
@@ -202,7 +207,35 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                             coach.ImageUrl = $"/images/coaches/{fileName}";
                         }
 
-                        _context.Coaches.Update(coach);
+                        if (Input.CVFile != null)
+                        {
+                            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(Input.CVFile.FileName)}";
+                            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "documents", "cv");
+
+                            if (!Directory.Exists(uploadsFolder))
+                            {
+                                Directory.CreateDirectory(uploadsFolder);
+                            }
+
+                            if (!string.IsNullOrEmpty(coach.CVUrl))
+                            {
+                                var oldCVPath = Path.Combine(_webHostEnvironment.WebRootPath,
+                                    coach.CVUrl.TrimStart('/'));
+                                if (System.IO.File.Exists(oldCVPath))
+                                {
+                                    System.IO.File.Delete(oldCVPath);
+                                }
+                            }
+
+                            var filePath = Path.Combine(uploadsFolder, fileName);
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await Input.CVFile.CopyToAsync(fileStream);
+                            }
+
+                            coach.CVUrl = $"/documents/cv/{fileName}";
+                        }
+                            _context.Coaches.Update(coach);
                     }
                     break;
 

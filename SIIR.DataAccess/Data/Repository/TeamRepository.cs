@@ -50,7 +50,7 @@ namespace SIIR.DataAccess.Data.Repository
         {
             return _db.Teams.Select(i => new SelectListItem
             {
-                Text = i.Name + " " + i.Category,
+                Text = i.Name,
                 Value = i.Id.ToString()
             });
         }

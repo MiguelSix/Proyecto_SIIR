@@ -150,19 +150,57 @@
         </div>
 
         <!-- Botones de Acción -->
-        <div class="col-12 mt-3 action-buttons">
-            <a class="btn btn-primary" asp-area="Identity" asp-controller="Account" asp-action="Register">
-                <i class="fas fa-user-plus"></i> Crear Usuario
-            </a>
-            <button id="generateCertificateBtn" class="btn btn-success">
-                Generar Cedula
-            </button>
-            <button onclick=downloadAllInfo() class="btn btn-info" style="cursor:pointer; color:white">
-                <i class="fas fa-download"></i> Información del equipo
-            </button>
-            <button onclick="descargarDocsEquipo()" class="btn btn-secondary" style="cursor:pointer; color:white">
-                <i class="fas fa-file-download"></i> Documentos del equipo
-            </button>
+        <div class="container">
+            <div class="row g-3">
+                <!-- Contenedor Izquierdo (30%) -->
+                <div class="col-12 col-md-4">
+                    <div class="card bg-light h-100">
+                        <div class="card-body">
+                            <!-- Grupo de botones: Acciones -->
+                            <div class="d-flex flex-column justify-content-center align-items-center h-100">
+                                <h5 class="card-title text-center">Acciones</h5>
+                                <div class="row g-1 mt-3">
+                                    <a class="btn btn-primary mt-0 w-100" asp-area="Identity" asp-controller="Account" asp-action="Register">
+                                        <i class="fas fa-user-plus"></i> Crear Usuario
+                                    </a>
+                                    <button id="generateCertificateBtn" class="btn btn-success w-100">
+                                        <i class="fa-solid fa-address-card"></i> Generar Cédula
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenedor Derecho (70%) -->
+                <div class="col-12 col-md-8">
+                    <div class="card bg-light h-100">
+                        <div class="card-body">
+                            <!-- Grupo de botones: Descargar Información -->
+                            <h5 class="card-title text-center">Descargar Información</h5>
+                            <div class="row g-1 mt-3">
+                                <div class="col-6">
+                                    <button onclick="downloadAllInfo()" class="btn btn-info w-100 h-100" style="color:white">
+                                        <i class="fas fa-download"></i> Equipo
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button onclick="descargarDocsEquipo()" class="btn btn-success w-100 h-100">
+                                        <i class="fas fa-file-download"></i> Documentos
+                                    </button>
+                                </div>
+
+                                <div class="col-12">
+                                    <button onclick="downloadListStudents()" class="btn btn-primary w-100 h-100">
+                                        <i class="fas fa-table-list"></i> Estudiantes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <!-- Switch para cambiar vista -->

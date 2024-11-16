@@ -268,25 +268,25 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Uniformes</h6>
                         <div class="d-flex align-items-center">
-                            <span class="me-2">Número:</span>
-                            <span class="number-display">@(Model.student.numberUniform ?? 0)</span>
+                            @if (@Model.student.Team?.Representative?.Category == "Deportivo")
+                            {
+                                <span class="me-2">Número:</span>
+                                <span class="number-display">@(Model.student.numberUniform?.ToString() ?? "No especificado")</span>
+                            }
                         </div>
                     </div>
 
                     @if (Model.uniforms != null && Model.uniforms.Any())
                     {
-                        @foreach (var uniform in Model.uniforms)
-                        {
-                            <div class="uniform-item">
-                                @for (int i = 0; i < Model.uniforms.Count; i++)
-                                {
-                                    <div class="d-flex justify-content-between">
-                                        <span>@Model.namesUniform[i]</span>
-                                        <span class="uniform-size">Talla: @(Model.uniforms[i].size?.ToString() ?? "No especificada")</span>
-                                    </div>
-                                }
-                            </div>
-                        }
+                        <div class="uniform-item">
+                            @for (int i = 0; i < Model.uniforms.Count; i++)
+                            {
+                                <div class="d-flex justify-content-between">
+                                    <span>@Model.namesUniform[i]</span>
+                                    <span class="uniform-size">Talla: @(Model.uniforms[i].size?.ToString() ?? "No especificada")</span>
+                                </div>
+                            }
+                        </div>
                     }
                     else
                     {
