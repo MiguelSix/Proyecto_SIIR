@@ -660,7 +660,7 @@ namespace SIIR.Areas.Admin.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult GenerateUniformInfoPdf([FromBody] List<StudentInfo> students, [FromQuery] string category)
+        public IActionResult GenerateUniformInfoPdf([FromBody] List<StudentInfo> students, [FromQuery] string category, [FromQuery] string teamName)
         {
             // IDs de los estudiantes
             var studentIds = students.Select(s => s.Id).ToList();
@@ -696,32 +696,37 @@ namespace SIIR.Areas.Admin.Controllers
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Margin(1, Unit.Centimetre);
+                    page.Margin(2, Unit.Centimetre);
+                    page.MarginTop(0);
+
+                    HeaderPdf(page);
+
                     page.Content().Column(col =>
                     {
                         // Título
-                        col.Item().PaddingBottom(15).Text($"Información de Uniformes").FontSize(18).Bold().AlignCenter();
+                        col.Item().PaddingBottom(15).Text($"Uniformes {teamName}").FontSize(18).Bold().AlignCenter();
 
                         foreach (var student in students)
                         {
                             col.Item()
-                                .Background(Blue.Lighten3)
-                                .PaddingHorizontal(2)
+                                .Border(0.5f)
+                                .Background("#1A3C6E")
+                                .PaddingHorizontal(2.5f)
                                 .Row(row =>
                             {
                                 row.RelativeItem().Text(
                                     string.IsNullOrWhiteSpace($"{student.Name} {student.LastName} {student.SecondLastName}")
                                     ? "Sin actualizar"
                                     : $"{student.Name} {student.LastName} {student.SecondLastName}"
-                                ).FontSize(12).Bold();
+                                ).FontSize(12).FontColor(White).Bold();
                                     
                                     if(category == Categorys.Deportivo)
-                                        row.RelativeItem().AlignRight().Text(student.Number.HasValue ? $"Número: {student.Number}" : " Número sin actualizar").FontSize(12);
+                                        row.RelativeItem().AlignRight().Text(student.Number.HasValue ? $"Número: {student.Number}" : " Número sin actualizar").FontColor(White).FontSize(12);
                             });
 
 
                             // Tabla de uniformes
-                            col.Item().PaddingLeft(2).PaddingBottom(10).Table(table =>
+                            col.Item().PaddingBottom(10).Table(table =>
                             {
                                 // Encabezados
                                 table.ColumnsDefinition(columns =>
@@ -732,14 +737,14 @@ namespace SIIR.Areas.Admin.Controllers
 
                                 table.Header(header =>
                                 {
-                                    header.Cell().Text("Prenda").Bold();
-                                    header.Cell().Text("Talla").Bold();
+                                    header.Cell().Border(0.5f).PaddingLeft(2.5f).Text("Prenda").Bold();
+                                    header.Cell().Border(0.5f).PaddingLeft(2.5f).Text("Talla").Bold();
                                 });
 
                                 foreach (var uniform in uniforms.Where(u => u.StudentId == student.Id))
                                 {
-                                    table.Cell().Text(uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado");
-                                    table.Cell().Text(uniform.size?.ToString() ?? "Sin actualizar");
+                                    table.Cell().Border(0.5f).PaddingLeft(2.5f).Text(uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado");
+                                    table.Cell().Border(0.5f).PaddingLeft(2.5f).Text(uniform.size?.ToString() ?? "Sin actualizar");
 
                                     if (!uniformCount.ContainsKey(uniform.UniformCatalogName?.ToString() ?? "Uniforme no identificado"))
                                     {
@@ -765,10 +770,10 @@ namespace SIIR.Areas.Admin.Controllers
                         foreach (var uniformEntry in uniformCount)
                         {
                             // Título de la prenda
-                            col.Item().Background(Orange.Lighten3).PaddingLeft(5).Text(uniformEntry.Key).FontSize(14).Bold();
+                            col.Item().Background("#1A3C6E").Border(0.5f).PaddingLeft(2.5f).Text(uniformEntry.Key).FontColor(White).FontSize(14).Bold();
                             
                             // Tabla para las tallas y cantidades
-                            col.Item().PaddingBottom(10).PaddingLeft(10).Table(sizeTable =>
+                            col.Item().PaddingBottom(10).Table(sizeTable =>
                             {
                                 // Definir columnas
                                 sizeTable.ColumnsDefinition(columns =>
@@ -780,15 +785,15 @@ namespace SIIR.Areas.Admin.Controllers
                                 // Encabezados
                                 sizeTable.Header(header =>
                                 {
-                                    header.Cell().Text("Talla").Bold();
-                                    header.Cell().Text("Cantidad").Bold();
+                                    header.Cell().Border(0.5f).PaddingLeft(2.5f).Text("Talla").Bold();
+                                    header.Cell().Border(0.5f).PaddingLeft(2.5f).Text("Cantidad").Bold();
                                 });
 
                                 // Agregar datos del diccionario secundario
                                 foreach (var sizeEntry in uniformEntry.Value.OrderBy(entry => GetSizeOrder(entry.Key)))
                                 {
-                                    sizeTable.Cell().Text(sizeEntry.Key); // Talla
-                                    sizeTable.Cell().Text(sizeEntry.Value.ToString()); // Cantidad
+                                    sizeTable.Cell().Border(0.5f).PaddingLeft(2.5f).Text(sizeEntry.Key); // Talla
+                                    sizeTable.Cell().Border(0.5f).PaddingLeft(2.5f).Text(sizeEntry.Value.ToString()); // Cantidad
                                 }
                             });
                         }
@@ -813,8 +818,124 @@ namespace SIIR.Areas.Admin.Controllers
             return Enum.TryParse(size, out Models.Size parsedSize) ? (int)parsedSize : int.MaxValue;
         }
 
+        public void HeaderPdf(PageDescriptor page)
+        {
+            page.Header().Row(row =>
+            {
+                var logoSEP = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "SEP-LOGO.png");
+                var logoTecNM = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "Logo_TECNM_AZUL.png");
 
-        [HttpDelete]
+                if (System.IO.File.Exists(logoSEP) && System.IO.File.Exists(logoTecNM))
+                {
+                    // Leer la imagen de SEP
+                    byte[] imageSEPBytes = System.IO.File.ReadAllBytes(logoSEP);
+
+                    // Leer la imagen de TecNM
+                    byte[] imageTecNMBytes = System.IO.File.ReadAllBytes(logoTecNM);
+
+                    // Imagen de SEP en contenedor alineado
+                    row.ConstantItem(7f, Unit.Centimetre)
+                       .AlignMiddle() // Alinea todo el contenedor verticalmente al centro
+                       .Element(container =>
+                       {
+                           container
+                               .Height(3.5f, Unit.Centimetre) // Altura específica para la imagen de SEP
+                               .AlignMiddle() // Centra la imagen dentro del contenedor
+                               .Image(imageSEPBytes)
+                               .FitArea();
+                       });
+
+                    // Espacio relativo para mantener separación entre imágenes
+                    row.RelativeItem();
+
+                    // Imagen de TecNM en contenedor alineado
+                    row.ConstantItem(5f, Unit.Centimetre)
+                       .AlignMiddle() // Alinea todo el contenedor verticalmente al centro
+                       .Element(container =>
+                       {
+                           container
+                               .Height(2f, Unit.Centimetre) // Altura específica para la imagen de TecNM
+                               .AlignMiddle() // Centra la imagen dentro del contenedor
+                               .Image(imageTecNMBytes)
+                               .FitArea();
+                       });
+                }
+
+            });
+        }
+
+        [HttpPost]
+        public IActionResult GenerateListStudentPdf([FromBody] List<Models.Student> students, [FromQuery] string teamName)
+        {
+
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var fileName = $"Lista_Estudiantes_{date}.pdf";
+
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(2f, Unit.Centimetre);
+                    page.MarginTop(0);
+
+
+                    HeaderPdf(page);
+
+                    page.Content().Column(col =>
+                    {
+                        // Título
+                        col.Item().PaddingBottom(15).Text($"Lista de estudiantes {teamName.ToLower()}").FontSize(18).Bold().AlignCenter();
+
+                        // Tabla de estudiantes
+                        col.Item().Border(0.5f).Table(table =>
+                        {
+                            // Definir las columnas
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1); // Semestre
+                                columns.RelativeColumn(4); // Nombre completo
+                                columns.RelativeColumn(2); // Número de control
+                            });
+
+                            // Encabezados
+                            table.Header(header =>
+                            {
+                                header.Cell().Border(0.5f).Background("#1A3C6E").PaddingLeft(2.5f).Text("Semestre").Bold().FontColor(White).FontSize(12);
+                                header.Cell().Border(0.5f).Background("#1A3C6E").PaddingLeft(2.5f).Text("Nombre completo").Bold().FontColor(White).FontSize(12);
+                                header.Cell().Border(0.5f).Background("#1A3C6E").PaddingLeft(2f).Text("No. Control").Bold().FontColor(White).FontSize(12);
+                            });
+
+                            // Agregar filas de estudiantes
+                            foreach (var student in students)
+                            {
+                                table.Cell().Border(0.5f).PaddingLeft(2.5f).Text(!string.IsNullOrWhiteSpace(student.Semester) ? student.Semester : "Sin actualizar").FontSize(10);
+                                table.Cell().Border(0.5f).PaddingLeft(2.5f).Text(
+                                    !string.IsNullOrWhiteSpace($"{student.Name} {student.LastName} {student.SecondLastName}")
+                                    ? $"{student.Name} {student.LastName} {student.SecondLastName}"
+                                    : "Sin actualizar"
+                                ).FontSize(10);
+                                table.Cell().Border(0.5f).PaddingLeft(2.5f).Text(!string.IsNullOrWhiteSpace(student.ControlNumber) ? student.ControlNumber : "Sin actualizar").FontSize(10);
+                            }
+                        });
+                    });
+
+                    // Pie de página
+                    page.Footer().AlignRight().Text(text =>
+                    {
+                        text.CurrentPageNumber();
+                    });
+                });
+            });
+
+            byte[] pdfBytes = document.GeneratePdf();
+
+            // Configurar el encabezado Content-Disposition con el nombre personalizado
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
+
+    [HttpDelete]
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
