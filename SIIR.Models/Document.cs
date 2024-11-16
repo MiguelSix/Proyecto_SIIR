@@ -31,5 +31,8 @@ namespace SIIR.Models
 
         public DocumentStatus Status { get; set; } = DocumentStatus.Pending;
 
+        [Display(Name ="Motivo de Rechazo")]
+        public string RejectionReason {  get; set; } = string.Empty;
+
     }
 }

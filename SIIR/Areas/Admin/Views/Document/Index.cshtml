@@ -115,6 +115,13 @@
                                                 <span class="badge-status badge-rejected">
                                                     <i class="fas fa-times status-icon"></i>
                                                     <span class="status-text">Rechazado</span>
+                                                    @if (!string.IsNullOrEmpty(doc.RejectionReason))
+                                                    {
+                                                        <i class="fas fa-info-circle ms-1"
+                                                           data-bs-toggle="tooltip"
+                                                           data-bs-placement="top"
+                                                           title="@doc.RejectionReason"></i>
+                                                    }
                                                 </span>
                                                 break;
                                         }
@@ -151,3 +158,12 @@
 @section Scripts {
     <script src="~/js/documentAdmin.js"></script>
 }
+<script>
+    // Inicializar todos los tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>

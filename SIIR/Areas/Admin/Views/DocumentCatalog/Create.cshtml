@@ -4,11 +4,11 @@
     ViewData["Title"] = "Crear Documento";
 
     // Definir las opciones para el combo box
-    var extensiones = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "pdf", Text = "PDF" },
-        new SelectListItem { Value = "foto", Text = "Foto" }
-    };
+    // var extensiones = new List<SelectListItem>
+    // {
+    //     new SelectListItem { Value = "pdf", Text = "PDF" },
+    //     new SelectListItem { Value = "foto", Text = "Foto" }
+    // };
 }
 
 <br />
@@ -35,7 +35,7 @@
                     <label asp-for="Extension"></label>
                 </div>
                 <div class="col-md-8 col-sm-12">
-                    <select asp-for="Extension" class="form-control" asp-items="ViewBag.Extensiones"></select>
+                    <input asp-for="Extension" class="form-control" value="pdf" readonly />
                     <span asp-validation-for="Extension" class="text-danger"></span>
                 </div>
             </div>

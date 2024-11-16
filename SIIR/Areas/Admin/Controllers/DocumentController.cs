@@ -137,7 +137,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult ChangeStatus(int id, string status)
+        public IActionResult ChangeStatus(int id, string status, string rejectionReason = null)
         {
             var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
             if (document == null)
@@ -147,6 +147,22 @@ namespace SIIR.Areas.Admin.Controllers
 
             // Cambiar el estado del documento al nuevo estado proporcionado
             document.Status = (DocumentStatus)Enum.Parse(typeof(DocumentStatus), status);
+
+            //Si el estado es rechazado, guardamos el motivo
+            if(document.Status == DocumentStatus.Rejected)
+            {
+                // Validar que haya un motivo de rechazo cuando el estado es Rejected
+                if (string.IsNullOrEmpty(rejectionReason))
+                {
+                    return Json(new { success = false, message = "El motivo de rechazo es requerido." });
+                }
+                document.RejectionReason = rejectionReason;
+            }
+            else 
+            {
+                document.RejectionReason = string.Empty;
+            }
+
             _contenedorTrabajo.Document.Update(document);
             _contenedorTrabajo.Save();
 
