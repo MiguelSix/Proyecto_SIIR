@@ -10,11 +10,6 @@
     padding-top: 0.25em;
 }
 
-.action-buttons .btn {
-    margin-right: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
 .card-img-container {
     position: relative;
     padding-top: 100%; /* Ratio 1:1 */

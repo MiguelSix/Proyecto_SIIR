@@ -720,7 +720,8 @@ namespace SIIR.Areas.Admin.Controllers
             // Obtener uniformes según los IDs de estudiantes proporcionados, ordenados
             var uniforms = _contenedorTrabajo.Uniform.GetAll(
                 filter: u => studentIds.Contains(u.StudentId),
-                orderBy: q => q.OrderBy(u => u.StudentId).ThenBy(u => u.Id),
+                orderBy: q => q.OrderBy(u => u.StudentId)
+                .ThenBy(u => u.RepresentativeUniformCatalog.UniformCatalog.Name),
                 includeProperties: "RepresentativeUniformCatalog.UniformCatalog"
             )
             .Select(u => new

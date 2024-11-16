@@ -647,7 +647,7 @@ function downloadUniformInfo() {
         name: student.name,
         lastName: student.lastName,
         secondLastName: student.secondLastName,
-        number: student.number
+        number: student.numberUniform
     }));
 
     $.ajax({
