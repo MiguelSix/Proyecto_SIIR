@@ -1,15 +1,13 @@
 ﻿@model SIIR.Models.ViewModels.DocumentVM
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 <link rel="stylesheet" href="~/css/student/documents.css" />
-
 @{
     ViewData["Title"] = "Documentos";
     var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
-<input type="hidden" name="__RequestVerificationToken" value="@token" />
 
+<input type="hidden" name="__RequestVerificationToken" value="@token" />
 <div class="container info-container">
-    
     @* Encabezado con título y botones principales *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Documentos</h2>
@@ -17,10 +15,8 @@
             <a asp-area="Student" asp-controller="Home" asp-action="Index" class="btn btn-secondary me-2">Regresar</a>
         </div>
     </div>
-
-    @* Formulario para subir documentos *@
-    <form id="documentForm" method="post" enctype="multipart/form-data">
-        @* Iteración sobre la lista de documentos *@
+    @* Lista de documentos *@
+    <div class="documents-list">
         @foreach (var document in Model.ListDocumenCatalog)
         {
             var existingDoc = Model.StudentDocuments?.FirstOrDefault(d => d.DocumentCatalogId.ToString() == document.Value);
@@ -31,58 +27,66 @@
                 DocumentStatus.Rejected => "status-rejected",
                 _ => ""
             };
-
-            @* Tarjeta individual para cada documento *@
             <div class="document-card">
                 <h5 class="document-title">@document.Text</h5>
                 <p class="document-description">@(!string.IsNullOrEmpty(document.Group?.Name) ? document.Group.Name : "Sin descripción disponible")</p>
-               
                 <div class="document-status @statusClass">
                     <i class="fa-solid fa-circle-info me-1"></i>
                     @(existingDoc?.Status switch
                     {
                         DocumentStatus.Pending => "Pendiente",
                         DocumentStatus.Approved => "Aprobado",
-                        DocumentStatus.Rejected => "Rechazado",
+                        DocumentStatus.Rejected => $"Rechazado: {existingDoc.RejectionReason}",
                         _ => "No subido"
                     })
                 </div>
 
-                @* Contenedor para el input de archivo y botones de acción *@
-                <div class="row align-items-center">
-
-                    @* Input para subir archivo *@
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <input type="file" class="form-control" id="file_@document.Value" name="files" />
-                    </div>
-
-                    @* Contenedor de botones de acción *@
-                    <div class="col-md-6">
-                        <div class="actions-container justify-content-md-end">
-                            
-                            <button type="button"
-                                    class="btn btn-primary btn-action btn-save-document"
-                                    data-document-id="@document.Value">
-                                <i class="fa-solid fa-save"></i> Guardar
-                            </button>
-                            <button type="button"
-                                    class="btn btn-outline-success btn-action btn-download-document"
-                                    data-document-id="@document.Value"
-                                    @(existingDoc == null ? "disabled" : "")>
-                                <i class="fa-solid fa-download"></i> Descargar
-                            </button>
-                            <button type="button"
-                                    class="btn btn-outline-danger btn-action btn-delete-document"
-                                    data-document-id="@document.Value"
-                                    @(existingDoc == null ? "disabled" : "")>
-                                <i class="fa-solid fa-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
+                <div class="document-actions">
+                    <button type="button"
+                            class="btn btn-primary"
+                            onclick="openUploadModal('@document.Value', '@document.Text')">
+                        <i class="fa-solid @(existingDoc == null ? "fa-upload" : "fa-pen-to-square") me-1"></i>
+                        @(existingDoc == null ? "Subir" : "Modificar")
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-success btn-download-document ms-2"
+                            onclick="downloadDocument('@document.Value')"
+                            @(existingDoc == null ? "disabled" : "")>
+                        <i class="fa-solid fa-download me-1"></i>
+                        Descargar
+                    </button>
                 </div>
             </div>
         }
-    </form>
+    </div>
+</div>
+
+@* Modal para subir documentos *@
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Subir Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <input type="hidden" id="documentCatalogId" name="documentCatalogId" />
+                    <div class="mb-3">
+                        <label for="documentFile" class="form-label">Seleccionar archivo</label>
+                        <input type="file" class="form-control" id="documentFile" name="file" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveDocument()">
+                    <i class="fa-solid fa-save me-1"></i>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

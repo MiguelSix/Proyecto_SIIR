@@ -25,8 +25,9 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    flex-direction: column;
+    min-height: 200px;
 }
-
 /* Estilos para el título del documento */
 .document-title {
     color: #1a3c6e;
@@ -51,6 +52,12 @@
     margin-bottom: 1rem;
 }
 
+.document-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: auto;
+}
 /* Contenedor para los botones de acción */
 .actions-container {
     display: flex;
