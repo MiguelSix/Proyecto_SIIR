@@ -20,6 +20,7 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
         IDocumentRepository Document { get; }
         IRepresentativeUniformCatalog RepresentativeUniformCatalog { get; }
         IUniformRepository Uniform { get; }
+        INotificationRepository Notification { get; }
         void Save();
     }
 }
