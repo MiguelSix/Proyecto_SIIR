@@ -35,6 +35,12 @@ namespace SIIR.Areas.Admin.Controllers
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
             var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == studentId);
 
+            if (student == null)
+            {
+                TempData["Error"] = "Estudiante no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
             // Get the current user
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -42,30 +48,30 @@ namespace SIIR.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // the user is a student
+            // If the user is a student (captain)
             if (user.StudentId != null)
             {
-                // Get the student
-                student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
-                if (student == null)
+                // Get the captain's data
+                var captain = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (captain == null)
                 {
                     return NotFound();
                 }
 
                 // Check if the student is captain
-                if (!student.IsCaptain)
+                if (!captain.IsCaptain)
+                {
+                    return Forbid();
+                }
+
+                // Verify if the requested student is from the same team as the captain
+                if (student.TeamId != captain.TeamId)
                 {
                     return Forbid();
                 }
             }
 
-            if (student == null)
-            {
-                TempData["Error"] = "Estudiante no encontrado."; // Mensaje de error si no se encuentra el estudiante
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Crear una vista modelo con los documentos del estudiante
+            // Create the view model with the selected student's documents and information
             var documentVM = new DocumentVM
             {
                 StudentDocuments = documents,
@@ -74,7 +80,7 @@ namespace SIIR.Areas.Admin.Controllers
 
             return View(documentVM);
         }
-        
+
         // Acción para mostrar los detalles de un documento
         [HttpGet]
         [Authorize(Roles = "Admin, Coach, Student")]
@@ -137,7 +143,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult ChangeStatus(int id, string status, string rejectionReason = null)
+        public IActionResult ChangeStatus(int id, string status, string rejectionReason)
         {
             var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
             if (document == null)
