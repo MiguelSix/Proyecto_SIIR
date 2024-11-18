@@ -57,7 +57,7 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Apellido Materno")]
             public string SecondLastName { get; set; }
 
-            [Phone]
+            [RegularExpression(@"^\d{10}$", ErrorMessage = "El teléfono debe contener 10 dígitos")]
             [Display(Name = "Teléfono")]
             public string PhoneNumber { get; set; }
 
@@ -121,6 +121,7 @@ namespace SIIR.Areas.Identity.Pages.Account.Manage
                         Input.LastName = student.LastName;
                         Input.SecondLastName = student.SecondLastName;
                         Input.ImageUrl = student.ImageUrl;
+                        Input.PhoneNumber = student.Phone;
                     }
                     break;
             }

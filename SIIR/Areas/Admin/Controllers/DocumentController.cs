@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -16,16 +17,19 @@ namespace SIIR.Areas.Admin.Controllers
         private readonly IContenedorTrabajo _contenedorTrabajo;
         private readonly IWebHostEnvironment _hostingEnvironment; // Entorno de hospedaje para obtener rutas de archivos
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
         public DocumentController(
             IContenedorTrabajo contenedorTrabajo,
             IWebHostEnvironment hostingEnvironment,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IEmailSender emailSender
             )
         {
             _contenedorTrabajo = contenedorTrabajo;
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         [HttpGet]
@@ -143,7 +147,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult ChangeStatus(int id, string status, string rejectionReason)
+        public async Task<IActionResult> ChangeStatus(int id, string status, string rejectionReason)
         {
             var document = _contenedorTrabajo.Document.GetDocumentWithCatalog(id);
             if (document == null)
@@ -175,6 +179,26 @@ namespace SIIR.Areas.Admin.Controllers
                 };
 
                 _contenedorTrabajo.Notification.Add(notification);
+
+                var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == document.StudentId);
+                var user = _contenedorTrabajo.User.GetFirstOrDefault(u => u.StudentId == student.Id);
+
+                if (student != null)
+                {
+                    var emailBody = string.Format(
+                            await System.IO.File.ReadAllTextAsync(Path.Combine(_hostingEnvironment.WebRootPath, "templates", "document-rejected.html")),
+                            student.Name, // {0}
+                            document.DocumentCatalog.Name, // {1}
+                            rejectionReason // {2}
+                        );
+
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Documento Rechazado - Acción Requerida",
+                        emailBody
+                    );
+                }
+
             }
             else 
             {
