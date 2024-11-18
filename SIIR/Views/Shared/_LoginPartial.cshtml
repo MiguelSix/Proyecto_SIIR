@@ -4,6 +4,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext DbContext
+<link rel="stylesheet" href="~/css/student/notification.css" />
 <style>
     .navbar-nav .nav-link.lead,
     .navbar-nav .dropdown-toggle.lead,
@@ -52,6 +53,24 @@
                 <a class="nav-link lead" asp-area="Identity" asp-controller="Account" asp-action="Register">Registrar</a>
             </li>
         }
+        @if (User.IsInRole("Student"))
+        {
+            <li class="notifications-dropdown dropdown">
+                <button class="btn btn-link nav-link dropdown-toggle no-caret p-0" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-bell">
+
+                        <span class="notification-count"></span>
+                    </div>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                    <div class="notifications-container">
+                        <!-- Las notificaciones se cargarán aquí dinámicamente -->
+                    </div>
+                    <div class="dropdown-divider mb-0"></div>
+                </div>
+            </li>
+        }
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle lead" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Hola, @userName!
@@ -71,3 +90,5 @@
         </li>
     }
 </ul>
+
+

@@ -145,7 +145,7 @@ namespace SIIR.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult ChangeStatus(int id, string status, string rejectionReason)
         {
-            var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
+            var document = _contenedorTrabajo.Document.GetDocumentWithCatalog(id);
             if (document == null)
             {
                 return Json(new { success = false, message = "Documento no encontrado." });
@@ -163,6 +163,18 @@ namespace SIIR.Areas.Admin.Controllers
                     return Json(new { success = false, message = "El motivo de rechazo es requerido." });
                 }
                 document.RejectionReason = rejectionReason;
+
+                var notification = new Notification
+                {
+                    StudentId = document.Student.Id,
+                    Message = $"Tu documento '{document.DocumentCatalog.Name}' ha sido rechazado. Razón: {rejectionReason}",
+                    Type = "DocumentRejected",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    DocumentId = document.Id
+                };
+
+                _contenedorTrabajo.Notification.Add(notification);
             }
             else 
             {

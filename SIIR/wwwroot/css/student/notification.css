@@ -1,0 +1,104 @@
+﻿/* notification.css */
+.notifications-dropdown {
+    position: relative;
+    margin-right: 1rem;
+}
+
+    .notifications-dropdown .btn-link {
+        text-decoration: none;
+        color: #1a3c6e;
+        padding: 0;
+    }
+
+.notification-bell {
+    position: relative;
+    display: inline-block;
+    padding: 0.5rem;
+}
+
+    .notification-bell i {
+        font-size: 1.25rem;
+        color: #1a3c6e;
+    }
+
+.notification-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    min-width: 1.2rem;
+    text-align: center;
+    transform: translate(25%, -25%);
+}
+
+.notifications-dropdown .dropdown-menu {
+    width: 350px;
+    padding: 0;
+    margin-top: 0.5rem;
+    right: 0;
+    left: auto;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+.notifications-container {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.notifications-dropdown .dropdown-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+    .notifications-dropdown .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .notifications-dropdown .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+.unread-notification {
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff;
+}
+
+.notification-text {
+    margin-bottom: 0.25rem;
+}
+
+.notification-timestamp {
+    font-size: 0.75rem;
+    color: #6c757d;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Personalización del scrollbar */
+.notifications-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.notifications-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+    .notifications-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+.no-caret::after {
+    display: none !important;
+}
