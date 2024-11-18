@@ -96,6 +96,8 @@ namespace SIIR.Areas.Identity.Pages.Account
             /// </summary>
             [Required(ErrorMessage = "El campo correo es obligatorio")]
             [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido")]
+            [RegularExpression(@"^[^@]+@queretaro\.tecnm\.mx$",
+            ErrorMessage = "Solo se permiten correos con el dominio @queretaro.tecnm.mx")]
             [Display(Name = "Correo")]
             public string Email { get; set; }
 
@@ -202,6 +204,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                             Name = Input.Name,
                             LastName = Input.LastName,
                             SecondLastName = Input.SecondLastName,
+                            Email = Input.Email,
                             TeamId = Input.TeamId.Value,
                             CoachId = team.CoachId,
 						};

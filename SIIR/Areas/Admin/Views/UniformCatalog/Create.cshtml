@@ -29,16 +29,11 @@
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div>
-            <br />
-            <div class="row">
-                <div class="col-12 col-md-6 mb-2 mb-md-0">
-                    <button type="submit" class="btn btn-primary w-100">Crear</button>
-                </div>
-                <div class="col-12 col-md-6">
-                    <a asp-action="Index" class="btn btn-success w-100">Volver atrás</a>
+            <div class="form-group row mt-2">
+                <div class="col-12">
+                    <partial name="_VistaCrearVolver" />
                 </div>
             </div>
-            <br />
         </div>
     </div>
 </form>

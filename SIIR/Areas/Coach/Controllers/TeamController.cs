@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -47,6 +48,11 @@ namespace SIIR.Areas.Coach.Controllers
 
             TeamVM teamVM = new()
             {
+                StudentList = students.Select(s => new SelectListItem
+                {
+                    Text = $"{s.Name} {s.LastName} {s.SecondLastName}",
+                    Value = s.Id.ToString()
+                }),
                 Team = team,
                 Captain = captain
             };

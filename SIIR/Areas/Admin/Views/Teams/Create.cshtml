@@ -1,74 +1,93 @@
 ﻿@model SIIR.Models.ViewModels.TeamVM
-
 @{
     ViewData["Title"] = "Crear Equipo";
 }
-
 <br />
 <br />
 <h2 class="text-center mt-2">Dar de alta nuevo Equipo</h2>
-
 <div class="container-fluid mt-4 border rounded-2">
     <div class="row">
         <div class="col-12">
             <form asp-action="Create" method="post" enctype="multipart/form-data">
                 <div class="row px-2" border>
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
                     <div class="col-12 mt-4">
                         <div class="form-group row mt-2">
                             <div class="col-md-4 col-sm-12">
                                 <label for="Representativo">Representativo</label>
                             </div>
                             <div class="col-md-8 col-sm-12">
-                                @Html.DropDownListFor(m => m.Team.RepresentativeId, Model.RepresentativeList, "Selecciona un Grupo Representativo:", new { @class = "form-control" })
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-users"></i>
+                                    </span>
+                                    @Html.DropDownListFor(m => m.Team.RepresentativeId, Model.RepresentativeList, "Selecciona un Grupo Representativo:", new { @class = "form-control" })
+                                    <span class="input-group-text">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </span>
+                                </div>
                                 <span asp-validation-for="Team.RepresentativeId" class="text-danger"></span>
                             </div>
                         </div>
-
                         <div class="form-group row mt-2">
                             <div class="col-md-4 col-sm-12">
                                 <label asp-for="Team.Category">Categoria</label>
                             </div>
                             <div class="col-md-8 col-sm-12">
-                                <select asp-for="Team.Category" class="form-control">
-                                    <option value="">Seleccione una opción</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                    <option value="Mixto">Mixto</option>
-                                </select>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-layer-group"></i>
+                                    </span>
+                                    <select asp-for="Team.Category" class="form-control">
+                                        <option value="">Seleccione una opción</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                        <option value="Mixto">Mixto</option>
+                                    </select>
+                                    <span class="input-group-text">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </span>
+                                </div>
                                 <span asp-validation-for="Team.Category" class="text-danger"></span>
                             </div>
                         </div>
-
                         <div class="form-group row mt-2">
                             <div class="col-md-4 col-sm-12">
                                 <label asp-for="Team.ImageUrl">Imagen del equipo</label>
                             </div>
                             <div class="col-md-8 col-sm-12">
-                                <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-image"></i>
+                                    </span>
+                                    <input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+                                </div>
                                 <span asp-validation-for="Team.ImageUrl" class="text-danger"></span>
                             </div>
                         </div>
-
                         <div class="form-group row mt-2">
                             <div class="col-md-4 col-sm-12">
                                 <label for="Coach">Coach</label>
                             </div>
                             <div class="col-md-8 col-sm-12">
-                                @Html.DropDownListFor(m => m.Team.CoachId, Model.CoachList, "Selecciona un Coach:", new { @class = "form-control" })
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user-tie"></i>
+                                    </span>
+                                    @Html.DropDownListFor(m => m.Team.CoachId, Model.CoachList, "Selecciona un Coach:", new { @class = "form-control" })
+                                    <span class="input-group-text">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </span>
+                                </div>
                                 <span asp-validation-for="Team.CoachId" class="text-danger"></span>
                             </div>
                         </div>
-
                         <div class="form-group row mt-2">
                             <div class="col-12">
                                 <partial name="_VistaCrearVolver" />
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </form>
         </div>
