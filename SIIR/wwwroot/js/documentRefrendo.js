@@ -22,6 +22,9 @@
     // Configurar toastr al inicio
     toastrConfiguration();
 
+    // Obtener el token antiforgery
+    var token = $('input[name="__RequestVerificationToken"]').val();
+
     // Manejar el checkbox "Seleccionar todos"
     $('#selectAll').change(function () {
         $('.document-checkbox').prop('checked', $(this).prop('checked'));
@@ -33,20 +36,27 @@
             url: '/Admin/DocumentCatalog/GetAll',
             type: 'GET',
             success: function (response) {
+                console.log('Respuesta GetAll:', response); // Debug
                 var tbody = $('#documentosRefrendo tbody');
                 tbody.empty();
                 response.data.forEach(function (doc) {
+                    console.log('Procesando documento:', doc); // Debug
                     tbody.append(`
                         <tr>
                             <td>
                                 <input type="checkbox" class="form-check-input document-checkbox" 
-                                       value="${doc.id}" data-name="${doc.name}">
+                                       value="${doc.id}" data-name="${doc.name}"
+                                       id="doc-${doc.id}">
                             </td>
                             <td>${doc.name}</td>
                             <td>${doc.description || ''}</td>
                         </tr>
                     `);
                 });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar documentos:', error);
+                toastr.error('Error al cargar los documentos');
             }
         });
     }
@@ -61,11 +71,12 @@
     $('#btnRefrendarDocumentos').click(function () {
         var documentosSeleccionados = [];
         $('.document-checkbox:checked').each(function () {
-            documentosSeleccionados.push({
-                id: $(this).val(),
-                name: $(this).data('name')
-            });
+            var id = parseInt($(this).val());
+            console.log('Checkbox seleccionado - valor:', $(this).val(), 'convertido a:', id); // Debug
+            documentosSeleccionados.push(id);
         });
+
+        console.log('Documentos seleccionados:', documentosSeleccionados);
 
         if (documentosSeleccionados.length === 0) {
             swal({
@@ -83,24 +94,41 @@
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Sí, refrendar!",
-            closeOnConfirm: true
-        }, function () {
-            $.ajax({
-                url: '/Admin/DocumentCatalog/RefrendoDocumentos',
-                type: 'POST',
-                data: { documentIds: documentosSeleccionados.map(d => d.id) },
-                success: function (response) {
-                    if (response.success) {
-                        toastr.success('Refrendo exitoso. Se enviará una notificación a los estudiantes.');
-                        $('#refrendoModal').modal('hide');
-                    } else {
-                        toastr.error(response.message || 'Ha ocurrido un error al procesar la solicitud');
+            cancelButtonText: "Cancelar",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                $.ajax({
+                    url: '/Admin/DocumentCatalog/RefrendoDocumentos',
+                    type: 'POST',
+                    data: JSON.stringify(documentosSeleccionados),
+                    contentType: 'application/json',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    success: function (response) {
+                        console.log('Respuesta del servidor:', response); // Debug
+                        if (response.success) {
+                            toastr.success('Refrendo exitoso. Se enviará una notificación a los estudiantes.');
+                            $('#refrendoModal').modal('hide');
+                            if (typeof documentosTable !== 'undefined') {
+                                documentosTable.ajax.reload();
+                            }
+                        } else {
+                            toastr.error(response.message || 'Ha ocurrido un error al procesar la solicitud');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error en la petición:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        toastr.error('Ha ocurrido un error al procesar la solicitud');
                     }
-                },
-                error: function () {
-                    toastr.error('Ha ocurrido un error al procesar la solicitud');
-                }
-            });
+                });
+            }
         });
     });
 });

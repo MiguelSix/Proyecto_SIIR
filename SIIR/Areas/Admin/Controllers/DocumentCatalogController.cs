@@ -110,7 +110,67 @@ namespace SIIR.Areas.Admin.Controllers
             // Pasar las extensiones a la vista a través de ViewBag
             ViewBag.Extensiones = extensiones;
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public IActionResult RefrendoDocumentos([FromBody] List<int> documentIds)
+        {
+            try
+            {
+                // Log para debugging
+                //System.Diagnostics.Debug.WriteLine($"Documentos recibidos: {string.Join(", ", documentIds ?? new List<int>())}");
 
+                if (documentIds == null || !documentIds.Any())
+                {
+                    return Json(new { success = false, message = "No se han seleccionado documentos" });
+                }
+
+                // Obtener todos los estudiantes activos
+                var estudiantes = _contenedorTrabajo.Student.GetAll();
+
+                foreach (var estudiante in estudiantes)
+                {
+                    foreach (var documentId in documentIds)
+                    {
+                        // Obtener el documento del catálogo
+                        var documentoCatalogo = _contenedorTrabajo.DocumentCatalog.GetById(documentId);
+                        if (documentoCatalogo == null) continue;
+
+                        // Buscar si existe un documento actual
+                        var documentoExistente = _contenedorTrabajo.Document
+                            .GetFirstOrDefault(d => d.StudentId == estudiante.Id &&
+                                                  d.DocumentCatalogId == documentId);
+
+                        if (documentoExistente != null)
+                        {
+                            documentoExistente.Status = DocumentStatus.RequiresRenewal;
+                        
+
+                            // Crear notificación para el estudiante
+                            var notification = new Notification
+                            {
+                                StudentId = estudiante.Id,
+                                Message = $"El documento '{documentoCatalogo.Name}' debe actualizarse/refrendarse, favor de subir nuevamente el documento",
+                                Type = "DocumentRefrendo",
+                                IsRead = false,
+                                CreatedAt = DateTime.Now,
+                                DocumentId = documentoExistente.Id
+                            };
+
+                            _contenedorTrabajo.Notification.Add(notification);
+                        }
+                    }
+                }
+
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true, message = "Documentos marcados para refrendo exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error al procesar el refrendo: {ex.Message}" });
+            }
+        }
         #region Llamadas a la API
         [HttpGet]
         public IActionResult GetAll()

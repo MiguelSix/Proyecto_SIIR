@@ -12,7 +12,8 @@ namespace SIIR.Models
     {
         Pending = 'P',
         Approved = 'A',
-        Rejected = 'R'
+        Rejected = 'R',
+        RequiresRenewal = 'U'
     }
     public class Document
     {

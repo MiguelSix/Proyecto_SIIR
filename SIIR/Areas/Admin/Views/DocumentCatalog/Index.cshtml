@@ -1,13 +1,19 @@
 ﻿@{
     ViewData["Title"] = "Lista de Documentos";
 }
+@Html.AntiForgeryToken()
 <div class="container-fluid mt-4">
     <div class="row">
         <div class="col-8">
             <h1 class="display-4">Lista de Documentos</h1>
         </div>
-        <div class="col-4 d-flex justify-content-end align-items-center">
-            <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Crear Nuevo Documento</a>
+        <div class="col-6">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear Nuevo Documento
+            </a>
+            <button id="btnAbrirRefrendo" class="btn btn-warning">
+                <i class="fas fa-sync"></i> Refrendar Documentos
+            </button>
         </div>
     </div>
 
@@ -27,7 +33,41 @@
         </table>
     </div>
 </div>
-
+<div class="modal fade" id="refrendoModal" tabindex="-1" aria-labelledby="refrendoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="refrendoModalLabel">Refrendo de Documentos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    Seleccione los documentos que requieren refrendo. Se notificará a los estudiantes para que los vuelvan a subir.
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="documentosRefrendo">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>Documento</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnRefrendarDocumentos">Refrendar Documentos</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script src="~/js/documentsCatalog.js"></script>
+    <script src="~/js/documentRefrendo.js"></script>
 }

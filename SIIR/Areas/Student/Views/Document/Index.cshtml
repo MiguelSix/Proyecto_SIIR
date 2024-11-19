@@ -25,6 +25,7 @@
                 DocumentStatus.Pending => "status-pending",
                 DocumentStatus.Approved => "status-approved",
                 DocumentStatus.Rejected => "status-rejected",
+                DocumentStatus.RequiresRenewal => "status-renewal",
                 _ => ""
             };
             <div class="document-card">
@@ -37,6 +38,7 @@
                         DocumentStatus.Pending => "Pendiente",
                         DocumentStatus.Approved => "Aprobado",
                         DocumentStatus.Rejected => $"Rechazado: {existingDoc.RejectionReason}",
+                        DocumentStatus.RequiresRenewal => "Necesita refrendo",
                         _ => "No subido"
                     })
                 </div>
