@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
+using SIIR.Utilities;
 
 namespace SIIR.Areas.Admin.Controllers
 {
@@ -11,9 +14,17 @@ namespace SIIR.Areas.Admin.Controllers
     public class DocumentCatalogController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
-        public DocumentCatalogController(IContenedorTrabajo contenedorTrabajo)
+        private readonly IEmailSender _emailSender;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public DocumentCatalogController(
+            IContenedorTrabajo contenedorTrabajo,
+            IEmailSender emailSender,
+            IWebHostEnvironment hostingEnvironment
+            )
         {
             _contenedorTrabajo = contenedorTrabajo;
+            _emailSender = emailSender;
+            _hostingEnvironment = hostingEnvironment;
         }
         [HttpGet]
         public IActionResult Index()
@@ -64,8 +75,6 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-
-
             return View(documentCatalog);
         }
 
@@ -77,14 +86,11 @@ namespace SIIR.Areas.Admin.Controllers
             var existDocument = _contenedorTrabajo.DocumentCatalog.GetAll()
                                     .Any(d => d.Name.ToLower() == documentCatalog.Name.ToLower()
                                            && d.Id != documentCatalog.Id); // Excluir el documento actual por ID
-
-
             if (existDocument)
             {
                 // Si existe un documento con el mismo nombre, agregar un error al ModelState
                 ModelState.AddModelError("Nombre", "Ya existe un documento con este nombre.");
             }
-
 
             if (ModelState.IsValid)
             {
@@ -113,7 +119,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult RefrendoDocumentos([FromBody] List<int> documentIds)
+        public async Task<IActionResult> RefrendoDocumentos([FromBody] List<int> documentIds)
         {
             try
             {
@@ -124,7 +130,6 @@ namespace SIIR.Areas.Admin.Controllers
                     return Json(new { success = false, message = "No se han seleccionado documentos" });
                 }
 
-                // Obtener todos los estudiantes activos
                 var estudiantes = _contenedorTrabajo.Student.GetAll();
 
                 foreach (var estudiante in estudiantes)
@@ -152,15 +157,32 @@ namespace SIIR.Areas.Admin.Controllers
                                 Message = $"El documento '{documentoCatalogo.Name}' debe actualizarse/refrendarse, favor de subir nuevamente el documento",
                                 Type = "DocumentRefrendo",
                                 IsRead = false,
-                                CreatedAt = DateTime.Now,
+                                CreatedAt = DateTime.Now.AddHours(-6),
                                 DocumentId = documentoExistente.Id
                             };
 
                             _contenedorTrabajo.Notification.Add(notification);
+
+                            // Enviar correo electrónico al estudiante
+                            var student = estudiante;
+                            var user = _contenedorTrabajo.User.GetFirstOrDefault(u => u.StudentId == student.Id);
+                            if (user != null)
+                            {
+                                var emailBody = string.Format(
+                                    await System.IO.File.ReadAllTextAsync(Path.Combine(_hostingEnvironment.WebRootPath, "templates", "document-renewal.html")),
+                                    estudiante.Name, // {0}
+                                    documentoCatalogo.Name // {1}
+                                );
+
+                                await _emailSender.SendEmailAsync(
+                                    user.Email,
+                                    "Actualización de Documento Requerida",
+                                    emailBody
+                                );
+                            }
                         }
                     }
                 }
-
                 _contenedorTrabajo.Save();
 
                 return Json(new { success = true, message = "Documentos marcados para refrendo exitosamente" });
@@ -170,6 +192,77 @@ namespace SIIR.Areas.Admin.Controllers
                 return Json(new { success = false, message = $"Error al procesar el refrendo: {ex.Message}" });
             }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SendReminders()
+        {
+            try
+            {
+                var estudiantes = _contenedorTrabajo.Student.GetAll();
+                var documentosCatalogo = _contenedorTrabajo.DocumentCatalog.GetAll().ToList();
+                int recordatoriosEnviados = 0;
+
+                foreach (var estudiante in estudiantes)
+                {
+                    var documentosEstudiante = _contenedorTrabajo.Document
+                        .GetAll(d => d.StudentId == estudiante.Id)
+                        .Select(d => d.DocumentCatalogId)
+                        .ToList();
+
+                    var documentosFaltantes = documentosCatalogo
+                        .Where(dc => !documentosEstudiante.Contains(dc.Id))
+                        .ToList();
+
+                    if (documentosFaltantes.Any())
+                    {
+                        var user = _contenedorTrabajo.User.GetFirstOrDefault(u => u.StudentId == estudiante.Id);
+                        if (user != null)
+                        {
+                            var listaDocumentos = string.Join("\n",
+                                documentosFaltantes.Select(d => $"<li style=\"margin-bottom: 5px;\">{d.Name}</li>"));
+
+                            var emailBody = string.Format(
+                                await System.IO.File.ReadAllTextAsync(
+                                    Path.Combine(_hostingEnvironment.WebRootPath, "templates", "document-reminder.html")),
+                                estudiante.Name,
+                                listaDocumentos
+                            );
+
+                            await _emailSender.SendEmailAsync(
+                                user.Email,
+                                "Recordatorio: Documentos Pendientes",
+                                emailBody
+                            );
+
+                            var notification = new Notification
+                            {
+                                StudentId = estudiante.Id,
+                                Message = "Tienes documentos pendientes por subir. Por favor, revisa tu correo electrónico.",
+                                Type = "DocumentReminder",
+                                IsRead = false,
+                                CreatedAt = DateTime.Now.AddHours(-6)
+                            };
+
+                            _contenedorTrabajo.Notification.Add(notification);
+                            recordatoriosEnviados++;
+                        }
+                    }
+                }
+                _contenedorTrabajo.Save();
+                return Json(new
+                {
+                    success = true,
+                    message = $"Se han enviado recordatorios a {recordatoriosEnviados} estudiantes con documentos pendientes."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error al enviar recordatorios: {ex.Message}" });
+            }
+        }
+
         #region Llamadas a la API
         [HttpGet]
         public IActionResult GetAll()
