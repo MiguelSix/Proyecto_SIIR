@@ -117,8 +117,7 @@ namespace SIIR.Areas.Admin.Controllers
         {
             try
             {
-                // Log para debugging
-                //System.Diagnostics.Debug.WriteLine($"Documentos recibidos: {string.Join(", ", documentIds ?? new List<int>())}");
+                
 
                 if (documentIds == null || !documentIds.Any())
                 {

@@ -1,106 +1,103 @@
-﻿$(document).ready(function () {
-    // Configuración de toastr
-    function toastrConfiguration() {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-    }
+﻿var dataTable;
 
-    // Configurar toastr al inicio
-    toastrConfiguration();
+$(document).ready(function () {
+    cargarDatatable();
+});
 
-    // Manejar el checkbox "Seleccionar todos"
-    $('#selectAll').change(function () {
-        $('.document-checkbox').prop('checked', $(this).prop('checked'));
+function cargarDatatable() {
+    dataTable = $("#tblDocumentCatalog").DataTable({
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRow
+            }
+        },
+        "ajax": {
+            "url": "/Admin/DocumentCatalog/GetAll",
+            "type": "GET",
+            "datatype": "json"
+        },
+        "columns": [
+            {
+                "data": "name",
+                "width": "20%",
+                "responsivePriority": 1
+            },
+            {
+                "data": "extension",
+                "width": "10%",
+                "responsivePriority": 2
+            },
+            {
+                "data": "description",
+                "width": "40%",
+                "responsivePriority": 4,
+                "render": function (data) {
+                    return `<div class="text-wrap" style="max-width: 300px; white-space: normal;">${data}</div>`;
+                }
+            },
+            {
+                "data": "id",
+                "width": "40%",
+                "responsivePriority": 1,
+                "render": function (data) {
+                    return `<div class="d-flex justify-content-center gap-2">
+                                <a href="/Admin/DocumentCatalog/Edit/${data}" class="btn btn-success btn-sm text-white">
+                                    <i class="far fa-edit"></i> Editar
+                                </a>
+                                <a onclick=Delete("/Admin/DocumentCatalog/Delete/${data}") class="btn btn-danger btn-sm text-white">
+                                    <i class="far fa-trash-alt"></i> Borrar
+                                </a>
+                           </div>`;
+                }
+            }
+        ],
+        "language": {
+            "decimal": "",
+            "emptyTable": "No hay registros",
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+            "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+            "thousands": ",",
+            "lengthMenu": "Mostrar _MENU_ Entradas",
+            "loadingRecords": "Cargando...",
+            "processing": "Procesando...",
+            "search": "Buscar:",
+            "zeroRecords": "Sin resultados encontrados",
+            "paginate": {
+                "first": "Primero",
+                "last": "Ultimo",
+                "next": "Siguiente",
+                "previous": "Anterior"
+            }
+        },
+        "order": [[0, "desc"]],
+        "pageLength": 10,
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+        "width": "100%"
     });
+}
 
-    // Cargar documentos en el modal
-    function cargarDocumentosRefrendo() {
+function Delete(url) {
+    swal({
+        title: "¿Está seguro de borrar?",
+        text: "¡Este contenido no se puede recuperar!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Sí, borrar!",
+        closeOnconfirm: true
+    }, function () {
         $.ajax({
-            url: '/Admin/DocumentCatalog/GetAll',
-            type: 'GET',
-            success: function (response) {
-                var tbody = $('#documentosRefrendo tbody');
-                tbody.empty();
-                response.data.forEach(function (doc) {
-                    tbody.append(`
-                        <tr>
-                            <td>
-                                <input type="checkbox" class="form-check-input document-checkbox" 
-                                       value="${doc.id}" data-name="${doc.name}">
-                            </td>
-                            <td>${doc.name}</td>
-                            <td>${doc.description || ''}</td>
-                        </tr>
-                    `);
-                });
+            type: 'DELETE',
+            url: url,
+            success: function (data) {
+                if (data.success) {
+                    toastr.success(data.message);
+                    dataTable.ajax.reload();
+                } else {
+                    toastr.error(data.message);
+                }
             }
         });
-    }
-
-    // Abrir modal y cargar documentos
-    $(document).on('click', '#btnAbrirRefrendo', function () {
-        cargarDocumentosRefrendo();
-        $('#refrendoModal').modal('show');
     });
-
-    // Manejar el refrendo de documentos
-    $('#btnRefrendarDocumentos').click(function () {
-        var documentosSeleccionados = [];
-        $('.document-checkbox:checked').each(function () {
-            documentosSeleccionados.push({
-                id: $(this).val(),
-                name: $(this).data('name')
-            });
-        });
-
-        if (documentosSeleccionados.length === 0) {
-            swal({
-                title: "Atención",
-                text: "Debe seleccionar al menos un documento para refrendar",
-                type: "warning"
-            });
-            return;
-        }
-
-        swal({
-            title: "¿Está seguro?",
-            text: "Se notificará a todos los estudiantes que deben volver a subir los documentos seleccionados",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Sí, refrendar!",
-            closeOnConfirm: true
-        }, function () {
-            $.ajax({
-                url: '/Admin/DocumentCatalog/RefrendoDocumentos',
-                type: 'POST',
-                data: { documentIds: documentosSeleccionados.map(d => d.id) },
-                success: function (response) {
-                    if (response.success) {
-                        toastr.success('Refrendo exitoso. Se enviará una notificación a los estudiantes.');
-                        $('#refrendoModal').modal('hide');
-                    } else {
-                        toastr.error(response.message || 'Ha ocurrido un error al procesar la solicitud');
-                    }
-                },
-                error: function () {
-                    toastr.error('Ha ocurrido un error al procesar la solicitud');
-                }
-            });
-        });
-    });
-});
+}
