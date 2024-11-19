@@ -3,6 +3,7 @@
         function loadNotifications() {
             $.get('/Student/Notification/GetNotifications', function (notifications) {
                 $('.notifications-container').empty();
+
                 if (notifications.length === 0) {
                     $('.notifications-container').append(
                         '<div class="dropdown-item text-muted text-center">No hay notificaciones</div>'
@@ -12,7 +13,13 @@
                         var notificationHtml = `
                             <div class="dropdown-item ${!notification.isRead ? 'unread-notification' : ''}" 
                                  data-notification-id="${notification.id}">
-                                <div>${notification.message}</div>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="notification-message">${notification.message}</div>
+                                    <button class="btn btn-sm text-danger delete-notification" 
+                                            data-notification-id="${notification.id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
                                 <small class="notification-timestamp">
                                     ${new Date(notification.createdAt).toLocaleString()}
                                 </small>
@@ -44,7 +51,12 @@
         }, 30000);
 
         // Marcar como leída al hacer clic
-        $(document).on('click', '.notifications-container .dropdown-item', function () {
+        $(document).on('click', '.notifications-container .dropdown-item', function (e) {
+            // Evitar que se ejecute si se hizo clic en el botón de eliminar
+            if ($(e.target).closest('.delete-notification').length > 0) {
+                return;
+            }
+
             var notificationId = $(this).data('notification-id');
             var $notificationItem = $(this);
 
@@ -55,5 +67,29 @@
                 }
             });
         });
+
+        // Eliminar notificación
+        $(document).on('click', '.delete-notification, .delete-notification *', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var notificationId = $(this).closest('.delete-notification').data('notification-id');
+            var $notificationItem = $(this).closest('.dropdown-item');
+
+            $.post('/Student/Notification/Delete/' + notificationId, function (response) {
+                if (response.success) {
+                    $notificationItem.fadeOut(300, function () {
+                        $(this).remove();
+                        updateNotificationCount();
+                        // Verificar si quedan notificaciones
+                        if ($('.notifications-container .dropdown-item').length === 0) {
+                            $('.notifications-container').append(
+                                '<div class="dropdown-item text-muted text-center">No hay notificaciones</div>'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
     }
 });

@@ -7,13 +7,14 @@
         <div class="col-8">
             <h1 class="display-4">Lista de Documentos</h1>
         </div>
-        <div class="col-6">
+        <div class="col-12 d-flex gap-2">
             <a asp-action="Create" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Crear Nuevo Documento
             </a>
             <button id="btnAbrirRefrendo" class="btn btn-warning">
                 <i class="fas fa-sync"></i> Refrendar Documentos
             </button>
+
             <button id="btnEnviarRecordatorios" class="btn btn-info">
                 <i class="fas fa-bell"></i> Enviar Recordatorios
             </button>
@@ -73,4 +74,5 @@
 @section Scripts {
     <script src="~/js/documentsCatalog.js"></script>
     <script src="~/js/documentRefrendo.js"></script>
+    <script src="~/js/documentReminder.js"></script>
 }

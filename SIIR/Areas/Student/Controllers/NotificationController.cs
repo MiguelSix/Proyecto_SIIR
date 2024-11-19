@@ -104,5 +104,38 @@ namespace SIIR.Areas.Student.Controllers
 
             return View(new List<Notification>());
         }
+
+        [HttpPost]
+        public async Task<JsonResult> Delete(int id)
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null || !user.StudentId.HasValue)
+                {
+                    return Json(new { success = false, message = "Usuario no autorizado" });
+                }
+
+                // Buscar la notificación asegurándonos que pertenece al estudiante actual
+                var notification = _contenedorTrabajo.Notification
+                    .GetFirstOrDefault(n => n.Id == id && n.StudentId == user.StudentId);
+
+                if (notification == null)
+                {
+                    return Json(new { success = false, message = "Notificación no encontrada" });
+                }
+
+                // Eliminar la notificación
+                _contenedorTrabajo.Notification.Remove(notification);
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Podrías agregar logging aquí si lo tienes configurado
+                return Json(new { success = false, message = "Error al eliminar la notificación" });
+            }
+        }
     }
 }

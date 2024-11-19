@@ -17,7 +17,7 @@ namespace SIIR.Models
         [ForeignKey("StudentId")]
         public Student Student { get; set; }
 
-        public int DocumentId {  get; set; }
+        public int? DocumentId {  get; set; }
         [ForeignKey("DocumentId")]
         public Document Document { get; set; }
         [Required]

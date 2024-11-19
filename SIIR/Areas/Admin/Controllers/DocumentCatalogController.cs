@@ -204,13 +204,18 @@ namespace SIIR.Areas.Admin.Controllers
                 var documentosCatalogo = _contenedorTrabajo.DocumentCatalog.GetAll().ToList();
                 int recordatoriosEnviados = 0;
 
+                // Crear una lista para almacenar todas las notificaciones
+                var notificacionesParaAgregar = new List<Notification>();
+
                 foreach (var estudiante in estudiantes)
                 {
+                    // Obtener documentos del estudiante
                     var documentosEstudiante = _contenedorTrabajo.Document
                         .GetAll(d => d.StudentId == estudiante.Id)
                         .Select(d => d.DocumentCatalogId)
                         .ToList();
 
+                    // Encontrar documentos faltantes
                     var documentosFaltantes = documentosCatalogo
                         .Where(dc => !documentosEstudiante.Contains(dc.Id))
                         .ToList();
@@ -220,37 +225,58 @@ namespace SIIR.Areas.Admin.Controllers
                         var user = _contenedorTrabajo.User.GetFirstOrDefault(u => u.StudentId == estudiante.Id);
                         if (user != null)
                         {
-                            var listaDocumentos = string.Join("\n",
-                                documentosFaltantes.Select(d => $"<li style=\"margin-bottom: 5px;\">{d.Name}</li>"));
-
-                            var emailBody = string.Format(
-                                await System.IO.File.ReadAllTextAsync(
-                                    Path.Combine(_hostingEnvironment.WebRootPath, "templates", "document-reminder.html")),
-                                estudiante.Name,
-                                listaDocumentos
-                            );
-
-                            await _emailSender.SendEmailAsync(
-                                user.Email,
-                                "Recordatorio: Documentos Pendientes",
-                                emailBody
-                            );
-
-                            var notification = new Notification
+                            try
                             {
-                                StudentId = estudiante.Id,
-                                Message = "Tienes documentos pendientes por subir. Por favor, revisa tu correo electrónico.",
-                                Type = "DocumentReminder",
-                                IsRead = false,
-                                CreatedAt = DateTime.Now.AddHours(-6)
-                            };
+                                // Crear el listado de documentos para el correo
+                                var listaDocumentos = string.Join("\n",
+                                    documentosFaltantes.Select(d => $"<li style=\"margin-bottom: 5px;\">{d.Name}</li>"));
 
-                            _contenedorTrabajo.Notification.Add(notification);
-                            recordatoriosEnviados++;
+                                var emailBody = string.Format(
+                                    await System.IO.File.ReadAllTextAsync(
+                                        Path.Combine(_hostingEnvironment.WebRootPath, "templates", "document-reminder.html")),
+                                    estudiante.Name,
+                                    listaDocumentos
+                                );
+
+                                // Enviar el correo
+                                await _emailSender.SendEmailAsync(
+                                    user.Email,
+                                    "Recordatorio: Documentos Pendientes",
+                                    emailBody
+                                );
+
+                                // Crear una notificación por cada documento faltante
+                                var notification = new Notification
+                                {
+                                    StudentId = estudiante.Id,
+                                    DocumentId = null,
+                                    Message = $"Tienes {documentosFaltantes.Count} documento(s) pendiente(s) por subir. Por favor, revisa tu correo electrónico.",
+                                    Type = "DocumentReminder",
+                                    IsRead = false,
+                                    CreatedAt = DateTime.UtcNow.AddHours(-6)
+                                };
+
+                                notificacionesParaAgregar.Add(notification);
+                                recordatoriosEnviados++;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error al procesar estudiante {estudiante.Id}: {ex.Message}");
+                                continue;
+                            }
                         }
                     }
                 }
+
+                // Agregar todas las notificaciones
+                foreach (var notificacion in notificacionesParaAgregar)
+                {
+                    _contenedorTrabajo.Notification.Add(notificacion);
+                }
+
+                // Guardar todos los cambios
                 _contenedorTrabajo.Save();
+
                 return Json(new
                 {
                     success = true,
@@ -259,7 +285,12 @@ namespace SIIR.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error al enviar recordatorios: {ex.Message}" });
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error al enviar recordatorios: {ex.Message}",
+                    details = ex.InnerException?.Message
+                });
             }
         }
 
