@@ -53,10 +53,22 @@ $(document).ready(function () {
         loadStudentsForCertificate();
     });
 
+    $("#btn-generar-credencial").click(function () {
+        generateCredentials();
+    });
+
     //Generar cedula
     $("#btn-generar-cedula").click(function () {
         generateCertificate();
     });
+
+    if (category != CATEGORY_ALLOWED) {
+        // Ocultar botón si la categoría no es "Deportivo"
+        $("#btn-generar-credencial").hide();
+    } else {
+        // Mostrar botón si la categoría es "Deportivo"
+        $("#btn-generar-credencial").show();
+    }
 });
 
 function loadStudentsForCaptainSelection() {
@@ -564,6 +576,49 @@ function generateCertificate() {
         }
     });
 } 
+
+
+function generateCredentials() {
+    toastrConfiguration();
+
+    // Filtra los estudiantes seleccionados a partir de la lista completa almacenada
+    const selectedStudents = allStudents.filter(student =>
+        $(`#checkbox${student.id}`).is(':checked')
+    );
+
+    if (selectedStudents.length === 0) {
+        toastr.error('No hay estudiantes seleccionados');
+        return;
+    }
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
+    const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    const formattedTeamName = teamName.replace(/\s+/g, '_');
+
+    // Envía los objetos de estudiantes seleccionados al controlador
+    toastr.info("Preparando descarga...");
+    $.ajax({
+        url: `/Admin/Teams/GenerateCredentials?teamName=${encodeURIComponent(teamName)}`, 
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(selectedStudents),
+        xhrFields: { responseType: 'blob' },
+        success: function (blob) {
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Credenciales_${formattedTeamName}_${formattedDate}.pdf`;
+            link.click();
+            toastr.success('Credenciales generadas');
+        },
+        error: function (error) {
+            toastr.error('Error al generar las credenciales');
+        }
+    });
+}
+
 
 function descargarDocsEquipo() {
     toastrConfiguration();
