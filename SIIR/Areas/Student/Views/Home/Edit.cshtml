@@ -213,6 +213,7 @@
 					<div class="col-md-8">
 						<div class="mb-3">
 							<label asp-for="student.ImageUrl" class="form-label fw-bold">Imagen del estudiante</label>
+							<small class="d-block text-muted mb-2">La fotografía debe ser tipo cedula: fondo blanco, vista frontal desde el pecho hacia arriba</small>
 							<input type="file"
 								   class="form-control"
 								   name="archivos"
@@ -222,6 +223,7 @@
 							<span asp-validation-for="student.ImageUrl" class="text-danger"></span>
 						</div>
 					</div>
+
 					<div class="col-md-4">
 						<div class="mb-3">
 							<label class="form-label fw-bold">Vista previa de la imagen</label>
