@@ -76,7 +76,7 @@ namespace SIIR.Models
         [Display(Name = "Alergias")]
         public string? Allergies { get; set; }
 
-        [StringLength(10, ErrorMessage = "El NSS no puede exceder los 15 caracteres.")]
+        [StringLength(11, ErrorMessage = "El NSS no puede exceder los 15 caracteres.")]
         [Display(Name = "NSS")]
         public string? Nss { get; set; }
 
