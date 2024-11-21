@@ -20,9 +20,6 @@
                                         <i class="fas fa-users"></i>
                                     </span>
                                     @Html.DropDownListFor(m => m.Team.RepresentativeId, Model.RepresentativeList, "Selecciona un Grupo Representativo:", new { @class = "form-select" })
-                                    <span class="input-group-text">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </span>
                                 </div>
                                 <span asp-validation-for="Team.RepresentativeId" class="text-danger"></span>
                             </div>
@@ -38,9 +35,6 @@
                                         <option value="Femenino">Femenino</option>
                                         <option value="Mixto">Mixto</option>
                                     </select>
-                                    <span class="input-group-text">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </span>
                                 </div>
                                 <span asp-validation-for="Team.Category" class="text-danger"></span>
                             </div>
@@ -61,9 +55,6 @@
                                         <i class="fas fa-user-tie"></i>
                                     </span>
                                     @Html.DropDownListFor(m => m.Team.CoachId, Model.CoachList, "Selecciona un Coach:", new { @class = "form-select" })
-                                    <span class="input-group-text">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </span>
                                 </div>
                                 <span asp-validation-for="Team.CoachId" class="text-danger"></span>
                             </div>

@@ -213,14 +213,26 @@
 					<div class="col-md-8">
 						<div class="mb-3">
 							<label asp-for="student.ImageUrl" class="form-label fw-bold">Imagen del estudiante</label>
-							<input type="file" class="form-control" name="archivos" id="subidaArchivo" />
+							<input type="file"
+								   class="form-control"
+								   name="archivos"
+								   id="subidaArchivo"
+								   accept="image/*"
+								   onchange="previewImage(this);" />
 							<span asp-validation-for="student.ImageUrl" class="text-danger"></span>
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="mb-3">
 							<label class="form-label fw-bold">Vista previa de la imagen</label>
-							<img src="@Model.student.ImageUrl" class="img-fluid rounded border p-2" alt="Vista previa" />
+							<div class="d-flex justify-content-center">
+								<img id="imagenVistaPreviaEstudiante"
+									 src="@Model.student.ImageUrl"
+									 class="img-fluid rounded border p-2"
+									 style="max-width: 300px; width: 100%; object-fit: contain;"
+									 alt="Vista previa"
+									 onerror="this.src='/images/zorro_default.png';" />
+							</div>
 						</div>
 					</div>
 
@@ -316,6 +328,17 @@
 		function updateDropdownText(selectedText)
 		{
 			document.getElementById('dropdownMenuLink').innerText = selectedText;
+		}
+
+		function previewImage(input) {
+			var preview = document.getElementById('imagenVistaPreviaEstudiante');
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					preview.src = e.target.result;
+				}
+				reader.readAsDataURL(input.files[0]);
+			}
 		}
 	</script>
 }
