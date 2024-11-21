@@ -18,12 +18,16 @@ namespace SIIR.Areas.Admin.Controllers
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public StudentsController(IContenedorTrabajo contenedorTrabajo,
-            IWebHostEnvironment hostingEnvironment)
+        public StudentsController(
+            IContenedorTrabajo contenedorTrabajo,
+            IWebHostEnvironment hostingEnvironment,
+            UserManager<ApplicationUser> userManager)
         {
             _contenedorTrabajo = contenedorTrabajo;
             _hostingEnvironment = hostingEnvironment;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -97,43 +101,146 @@ namespace SIIR.Areas.Admin.Controllers
             return View(studentVM);
         }
 
-        // Método para generar el PDF de un solo estudiante
-        [HttpPost]
-        public IActionResult GenerateStudentCertificate(int id)
+        #region API CALLS
+
+        [HttpGet]
+        public IActionResult GetAll()
         {
-            // Obtener el estudiante por su ID
-            var student = _contenedorTrabajo.Student.GetById(id);
-            if (student == null)
+            return Json(new { data = _contenedorTrabajo.Student.GetAll(includeProperties: "Team,Coach") });
+        }
+
+        [HttpDelete]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
             {
-                return NotFound("Estudiante no encontrado");
+                var objFromDb = _contenedorTrabajo.Student.GetById(id);
+                if (objFromDb == null)
+                {
+                    return Json(new { success = false, message = "Estudiante no encontrado." });
+                }
+
+                // Find the user associated with the student
+                var user = _contenedorTrabajo.User.GetAll(u => u.StudentId == id).FirstOrDefault();
+
+                // Delete related notifications first
+                var notifications = _contenedorTrabajo.Notification.GetAll(n => n.StudentId == id).ToList();
+                foreach (var notification in notifications)
+                {
+                    _contenedorTrabajo.Notification.Remove(notification);
+                }
+
+                // Handle image deletion safely
+                if (!string.IsNullOrEmpty(objFromDb.ImageUrl))
+                {
+                    string webRootPath = _hostingEnvironment.WebRootPath;
+                    var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+
+                // Delete Identity user if exists
+                if (user != null)
+                {
+                    var identityUser = await _userManager.FindByIdAsync(user.Id);
+                    if (identityUser != null)
+                    {
+                        var result = await _userManager.DeleteAsync(identityUser);
+                        if (!result.Succeeded)
+                        {
+                            return Json(new { success = false, message = "Error al borrar la cuenta." });
+                        }
+                    }
+                }
+
+                // Remove student from repository
+                _contenedorTrabajo.Student.Remove(objFromDb);
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true, message = "Estudiante borrado exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                // Log the full exception details
+                return Json(new { success = false, message = $"Error al borrar: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetCareers()
+        {
+            var careers = Careers.CareerList;
+
+            // Return only the careers that have students in the database
+            var studentsCareers = _contenedorTrabajo.Student.GetAll().Select(s => s.Career).Distinct();
+            careers = careers.Where(c => studentsCareers.Contains(c)).ToList();
+
+            return Json(careers);
+        }
+
+        private void ChangeUniforms(int studentId, Team team)
+        {
+            var representativeUniformCatalog = _contenedorTrabajo.RepresentativeUniformCatalog.GetAll(ruc => ruc.RepresentativeId == team.RepresentativeId);
+
+            var deleteUniforms = _contenedorTrabajo.Uniform.GetAll(u => u.StudentId == studentId);
+
+            foreach (var deleteUniform in deleteUniforms)
+            {
+                _contenedorTrabajo.Uniform.Remove(deleteUniform);
             }
 
-            var team = _contenedorTrabajo.Team.GetById(student.TeamId);
-            var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
-
-            // Formato de fecha
-            var date = DateTime.Now.ToString("yyyy-MM-dd");
-            var studentName = student.Name.Replace(" ", "_"); // Reemplaza espacios por guiones bajos
-            var studentControlNumber = student.ControlNumber;
-            var fileName = $"Informacion_{studentName}_{studentControlNumber}_{date}.pdf";
-
-            // Crear el documento PDF usando QuestPDF
-            var document = QuestPDF.Fluent.Document.Create(container =>
+            foreach (var ruc in representativeUniformCatalog)
             {
-                container.Page(page =>
+                var uniform = new Uniform();
+                uniform.StudentId = studentId;
+                uniform.RepresentativeId = ruc.RepresentativeId;
+                uniform.UniformCatalogId = ruc.UniformCatalogId;
+                _contenedorTrabajo.Uniform.Add(uniform);
+            }
+            _contenedorTrabajo.Save();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult ChangeTeam(int studentId, int teamId)
+        {
+            try
+            {
+                var student = _contenedorTrabajo.Student.GetById(studentId);
+                if (student.TeamId == teamId)
                 {
-                    page.Size(PageSizes.A4);
-                    page.Margin(1, Unit.Centimetre);
-                    page.Content().Element(c => CreateStudentCell(c, student, coach, team));
-                    page.Footer().Text(text => text.CurrentPageNumber());
-                });
-            });
+                    return Json(new { success = false, message = "El estudiante ya se encuentra en este equipo" });
+                }
 
-            byte[] pdfBytes = document.GeneratePdf();
+                var team = _contenedorTrabajo.Team.GetById(teamId);
+                if (team == null)
+                {
+                    return Json(new { success = false, message = "Equipo no encontrado." });
+                }
 
-            // Configurar el encabezado Content-Disposition con el nombre personalizado
-            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
-            return File(pdfBytes, "application/pdf");
+                if (student.IsCaptain)
+                {
+                    return Json(new { success = false, message = "No se puede cambiar de equipo al capitán. Primero cambie de capitán en el equipo actual" });
+                }
+
+                student.TeamId = teamId;
+                student.numberUniform = null;
+                _contenedorTrabajo.Student.Update(student);
+                ChangeUniforms(student.Id, team);
+
+                _contenedorTrabajo.Save();
+
+                return Json(new { success = true, message = "Equipo actualizado exitosamente." });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al actualizar el equipo: " + ex.Message });
+            }
         }
 
         [HttpPost]
@@ -240,108 +347,41 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public IActionResult ChangeTeam(int studentId, int teamId)
+        public IActionResult GenerateStudentCertificate(int id)
         {
-            try
+            // Obtener el estudiante por su ID
+            var student = _contenedorTrabajo.Student.GetById(id);
+            if (student == null)
             {
-                var student = _contenedorTrabajo.Student.GetById(studentId);
-                if (student.TeamId == teamId)
+                return NotFound("Estudiante no encontrado");
+            }
+
+            var team = _contenedorTrabajo.Team.GetById(student.TeamId);
+            var coach = _contenedorTrabajo.Coach.GetById(team.CoachId);
+
+            // Formato de fecha
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var studentName = student.Name.Replace(" ", "_"); // Reemplaza espacios por guiones bajos
+            var studentControlNumber = student.ControlNumber;
+            var fileName = $"Informacion_{studentName}_{studentControlNumber}_{date}.pdf";
+
+            // Crear el documento PDF usando QuestPDF
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
                 {
-                    return Json(new { success = false, message = "El estudiante ya se encuentra en este equipo" });
-                }
-                
-                var team = _contenedorTrabajo.Team.GetById(teamId);
-                if (team == null)
-                {
-                    return Json(new { success = false, message = "Equipo no encontrado." });
-                }
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+                    page.Content().Element(c => CreateStudentCell(c, student, coach, team));
+                    page.Footer().Text(text => text.CurrentPageNumber());
+                });
+            });
 
-                if (student.IsCaptain)
-                {
-                    return Json(new { success = false, message = "No se puede cambiar de equipo al capitán. Primero cambie de capitán en el equipo actual" });
-                }
+            byte[] pdfBytes = document.GeneratePdf();
 
-                student.TeamId = teamId;
-                student.numberUniform = null;
-                _contenedorTrabajo.Student.Update(student);
-                ChangeUniforms(student.Id, team);
-
-                _contenedorTrabajo.Save();
-
-                return Json(new { success = true, message = "Equipo actualizado exitosamente." });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "Error al actualizar el equipo: " + ex.Message });
-            }
-        }
-
-        private void ChangeUniforms(int studentId, Team team)
-        {
-            var representativeUniformCatalog = _contenedorTrabajo.RepresentativeUniformCatalog.GetAll(ruc => ruc.RepresentativeId == team.RepresentativeId);
-
-            var deleteUniforms = _contenedorTrabajo.Uniform.GetAll(u => u.StudentId == studentId);
-
-            foreach (var deleteUniform in deleteUniforms)
-            {
-                _contenedorTrabajo.Uniform.Remove(deleteUniform);
-            }
-
-            foreach (var ruc in representativeUniformCatalog)
-            {
-                var uniform = new Uniform();
-                uniform.StudentId = studentId;
-                uniform.RepresentativeId = ruc.RepresentativeId;
-                uniform.UniformCatalogId = ruc.UniformCatalogId;
-                _contenedorTrabajo.Uniform.Add(uniform);
-            }
-            _contenedorTrabajo.Save();
-        }
-
-        [HttpGet]
-        public IActionResult GetCareers()
-        {
-            var careers = Careers.CareerList;
-
-            // Return only the careers that have students in the database
-            var studentsCareers = _contenedorTrabajo.Student.GetAll().Select(s => s.Career).Distinct();
-            careers = careers.Where(c => studentsCareers.Contains(c)).ToList();
-
-            return Json(careers);
-        }
-
-        #region API CALLS
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            return Json(new { data = _contenedorTrabajo.Student.GetAll(includeProperties: "Team,Coach") });
-        }
-
-        [HttpDelete]
-        public IActionResult Delete(int id)
-        {
-            var objFromDb = _contenedorTrabajo.Student.GetById(id);
-            var user = _contenedorTrabajo.User.GetAll(u => u.StudentId == id).FirstOrDefault();
-
-            string webRootPath = _hostingEnvironment.WebRootPath;
-            var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
-
-            if (System.IO.File.Exists(imagePath))
-            {
-                System.IO.File.Delete(imagePath);
-            }
-
-            if (objFromDb == null)
-            {
-                return Json(new { success = false, message = "Error while deleting." });
-            }
-
-            _contenedorTrabajo.User.Remove(user);
-            _contenedorTrabajo.Student.Remove(objFromDb);
-            _contenedorTrabajo.Save();
-            return Json(new { success = true, message = "Delete successful." });
+            // Configurar el encabezado Content-Disposition con el nombre personalizado
+            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+            return File(pdfBytes, "application/pdf");
         }
 
         #endregion

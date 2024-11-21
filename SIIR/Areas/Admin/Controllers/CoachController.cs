@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,16 @@ namespace SIIR.Areas.Admin.Controllers
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CoachController(IContenedorTrabajo contenedorTrabajo, IWebHostEnvironment hostingEnvironment)
+        public CoachController(
+            IContenedorTrabajo contenedorTrabajo, 
+            IWebHostEnvironment hostingEnvironment,
+            UserManager<ApplicationUser> userManager)
         {
             _contenedorTrabajo = contenedorTrabajo;
             _hostingEnvironment = hostingEnvironment;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -49,16 +55,10 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var objFromDb = _contenedorTrabajo.Coach.GetById(id);
-
             var user = _contenedorTrabajo.User.GetAll(u => u.CoachId == id).FirstOrDefault();
-
-            if (user != null)
-            {
-                _contenedorTrabajo.User.Remove(user);
-            }
 
             if (objFromDb == null)
             {
@@ -66,6 +66,20 @@ namespace SIIR.Areas.Admin.Controllers
             }
 
             _contenedorTrabajo.Coach.Remove(objFromDb);
+
+            // Delete Identity user if exists
+            if (user != null)
+            {
+                var identityUser = await _userManager.FindByIdAsync(user.Id);
+                if (identityUser != null)
+                {
+                    var result = await _userManager.DeleteAsync(identityUser);
+                    if (!result.Succeeded)
+                    {
+                        return Json(new { success = false, message = "Error al borrar la cuenta del usuario." });
+                    }
+                }
+            }
 
             try
             {

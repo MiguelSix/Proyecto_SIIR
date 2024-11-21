@@ -50,11 +50,13 @@ namespace SIIR.Data
 		        .WithMany()
 		        .HasForeignKey(u => new { u.RepresentativeId, u.UniformCatalogId })
 		        .OnDelete(DeleteBehavior.Cascade);
+
+
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.Student)
                 .WithMany()
                 .HasForeignKey(n => n.StudentId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Cascade); 
 
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.Document)
