@@ -315,10 +315,9 @@ namespace SIIR.Areas.Admin.Controllers
                     container.Page(page =>
                     {
                         page.Size(PageSizes.A4);
-                        page.Margin(1, Unit.Centimetre);
+                        HeaderPdf(page);
 
                         page.Content().Element(c => CreateStudentCell(c, student, coach, team));
-                        page.Footer().Text(text => text.CurrentPageNumber());
                     });
                 }
             });
@@ -358,7 +357,7 @@ namespace SIIR.Areas.Admin.Controllers
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Margin(1, Unit.Centimetre);
+                    HeaderPdf(page);
                     page.Content().Element(c => CreateStudentCell(c, student, coach, team));
                     page.Footer().Text(text => text.CurrentPageNumber());
                 });
@@ -389,9 +388,6 @@ namespace SIIR.Areas.Admin.Controllers
             imageBytes = System.IO.File.ReadAllBytes(imageUrl);
 
             container.Padding(2)
-                .Border(1)
-                .BorderColor(Colors.Black)
-                .Background(Colors.Grey.Lighten4)
                 .DefaultTextStyle(x => x.FontSize(14).LineHeight(1.5f))
                 .Column(column =>
                 {
