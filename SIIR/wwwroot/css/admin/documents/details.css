@@ -105,6 +105,10 @@
     background-color: #dc3545;
     color: #fff;
 }
+.status-renewal {
+    background-color: #ff8c00;
+    color: #fff;
+}
 
 .preview-frame {
     width: 100%;

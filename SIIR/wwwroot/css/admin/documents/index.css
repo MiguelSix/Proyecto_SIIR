@@ -22,6 +22,10 @@
     background-color: #dc3545;
     color: #fff;
 }
+.badge-renewal {
+    background-color: #ff8c00;
+    color: #fff;
+}
 /* Ajustes de tabla y tarjetas */
 .table td {
     vertical-align: middle;

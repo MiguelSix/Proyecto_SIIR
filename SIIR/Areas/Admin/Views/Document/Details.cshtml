@@ -33,7 +33,8 @@
                                 DocumentStatus.Pending => "status-pending",
                                 DocumentStatus.Approved => "status-approved",
                                 DocumentStatus.Rejected => "status-rejected",
-                                _ => ""
+                                DocumentStatus.RequiresRenewal => "status-renewal",
+                                        _ => ""
                             };
 
                             var statusText = Model.Document.Status switch
@@ -41,6 +42,7 @@
                                 DocumentStatus.Pending => "Pendiente",
                                 DocumentStatus.Approved => "Aprobado",
                                 DocumentStatus.Rejected => "Rechazado",
+                                DocumentStatus.RequiresRenewal => "Necesita Refrendo",
                                 _ => "Desconocido"
                             };
 
@@ -49,6 +51,7 @@
                                 DocumentStatus.Pending => "clock",
                                 DocumentStatus.Approved => "check",
                                 DocumentStatus.Rejected => "times",
+                                DocumentStatus.RequiresRenewal => "clock",
                                 _ => "question"
                             };
                         }
