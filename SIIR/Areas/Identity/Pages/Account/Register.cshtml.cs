@@ -5,7 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
@@ -141,7 +143,18 @@ namespace SIIR.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            TeamList = _teamRepository.GetListaTeams();
+            if (User.IsInRole("Coach"))
+            {
+                var userCoachId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                ApplicationUser userCoach = await _userManager.FindByIdAsync(userCoachId);
+
+                TeamList = _teamRepository.GetListaTeams(userCoach.CoachId);
+            }
+            else
+            {
+                TeamList = _teamRepository.GetListaTeams();
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -187,7 +200,19 @@ namespace SIIR.Areas.Identity.Pages.Account
                         if (!Input.TeamId.HasValue)
                         {
                             ModelState.AddModelError(string.Empty, "Debe seleccionar un equipo para el estudiante.");
-                            TeamList = _teamRepository.GetListaTeams();
+                            if (User.IsInRole("Coach"))
+                            {
+                                var userCoachId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                                ApplicationUser userCoach = await _userManager.FindByIdAsync(userCoachId);
+
+                                TeamList = _teamRepository.GetListaTeams(userCoach.CoachId);
+                            }
+                            else
+                            {
+                                TeamList = _teamRepository.GetListaTeams();
+                            }
+
                             return Page();
                         }
 
@@ -241,7 +266,18 @@ namespace SIIR.Areas.Identity.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form
-            TeamList = _teamRepository.GetListaTeams();
+            if (User.IsInRole("Coach"))
+            {
+                var userCoachId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                ApplicationUser userCoach = await _userManager.FindByIdAsync(userCoachId);
+
+                TeamList = _teamRepository.GetListaTeams(userCoach.CoachId);
+            }
+            else
+            {
+                TeamList = _teamRepository.GetListaTeams();
+            }
             return Page();
         }
 

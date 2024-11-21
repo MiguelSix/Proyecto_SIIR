@@ -46,14 +46,22 @@ namespace SIIR.DataAccess.Data.Repository
             });
         }
 
-        public IEnumerable<SelectListItem> GetListaTeams()
+        public IEnumerable<SelectListItem> GetListaTeams(int? coachId = null)
         {
-            return _db.Teams.Select(i => new SelectListItem
+            var query = _db.Teams.AsQueryable();
+
+            if (coachId != null)
+            {
+                query = query.Where(i => i.CoachId == coachId);
+            }
+
+            return query.Select(i => new SelectListItem
             {
                 Text = i.Name,
                 Value = i.Id.ToString()
-            });
+            }).ToList();
         }
+
 
         public void Update(Team team)
         {

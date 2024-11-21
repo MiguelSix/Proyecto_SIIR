@@ -18,6 +18,6 @@ namespace SIIR.DataAccess.Data.Repository.IRepository
         // Para el capitan
         IEnumerable<SelectListItem> GetListaStudents();
 
-        IEnumerable<SelectListItem> GetListaTeams();
+        IEnumerable<SelectListItem> GetListaTeams(int? coachId = null);
     }
 }
