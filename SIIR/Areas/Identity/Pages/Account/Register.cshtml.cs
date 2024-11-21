@@ -337,6 +337,8 @@ namespace SIIR.Areas.Identity.Pages.Account
                         emailTemplate);
 
                     // Redirigir al listado de usuarios
+                    if (User.IsInRole("Coach"))
+                        return RedirectToAction("Index", "Home", new { area = "Coach" });
                     return RedirectToAction("Index", "Users", new { area = "Admin" });
                 }
                 foreach (var error in result.Errors)
