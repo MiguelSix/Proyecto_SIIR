@@ -273,6 +273,8 @@
 
         const teamName = "@Model.Team.Name"; 
         const coachTeam = @Html.Raw(Json.Serialize(Model.Team.Coach));
+        const category = "@Model.Team.Representative.Category";
+        const CATEGORY_ALLOWED = "@SIIR.Utilities.Categorys.Deportivo";
         var userRole = '@ViewBag.UserRole';
     </script>
 }

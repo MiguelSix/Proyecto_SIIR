@@ -46,6 +46,7 @@ namespace SIIR.Areas.Coach.Controllers
             var students = _contenedorTrabajo.Student.GetAll(s => s.TeamId == id.Value && users.Contains(s.Id)).ToList();
             var captain = students.FirstOrDefault(s => s.IsCaptain);
 
+            team.Representative = _contenedorTrabajo.Representative.GetById(team.RepresentativeId);
             TeamVM teamVM = new()
             {
                 StudentList = students.Select(s => new SelectListItem

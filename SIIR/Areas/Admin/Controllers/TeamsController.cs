@@ -1002,7 +1002,178 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
 
-    [HttpDelete]
+        //Credenciales
+        [HttpPost]
+        [Authorize(Roles = "Admin, Coach, Student")]
+        public IActionResult GenerateCredentials([FromBody] List<Models.Student> request, [FromQuery] string teamName)
+        {
+
+            // Crear el documento PDF
+            var document = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.MarginVertical(1.5f, Unit.Centimetre);
+                    page.MarginHorizontal(3.5f, Unit.Centimetre);
+
+                    page.Content().Column(column =>
+                    {
+                        foreach (var student in request)
+                        {
+                            column.Item().ShowEntire().Padding(1).Element(c => CreateStudentCredential(c, student, teamName));
+                        }
+                    });
+
+                    page.Footer().Text(text =>
+                    {
+                        text.CurrentPageNumber();
+                    });
+                });
+            });
+
+            // Generar y devolver el PDF
+            using var stream = new MemoryStream();
+            document.GeneratePdf(stream);
+            stream.Position = 0;
+
+            return File(stream.ToArray(), "application/pdf", "Credenciales.pdf");
+        }
+
+        private static void CreateStudentCredential(IContainer container, Models.Student student, String teamName)
+        {
+            string imageUrl = student.ImageUrl != null && student.ImageUrl.StartsWith("/")
+                ? student.ImageUrl.Substring(1)
+                : student.ImageUrl ?? "";
+
+            imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('\\'));
+
+            if (!System.IO.File.Exists(imageUrl))
+            {
+                imageUrl = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "zorro_default.png");
+            }
+
+            byte[] imageBytes = System.IO.File.ReadAllBytes(imageUrl);
+
+            container
+                .Padding(10)
+                .Border(0.5f)
+                .BorderColor(Colors.Black)
+                .Background(Colors.White)
+                .Column(column =>
+                {
+                    column.Item().Background("#1A3C6E").AlignCenter().Text("Instituto Tecnológico de Querétaro").FontSize(10).FontColor(White);
+
+                    // Caja principal
+                    column.Item().Padding(5).Row(row =>
+                    {
+                        // Foto
+                        row.ConstantItem(4f, Unit.Centimetre)
+                            .Height(4f, Unit.Centimetre)
+                            .Width(4f, Unit.Centimetre)
+                            .Element(container =>
+                            {
+                                container
+                                    .AlignMiddle()
+                                    .AlignCenter()
+                                    .Padding(5) // Ajusta el padding según sea necesario
+                                    .Element(innerContainer =>
+                                    {
+                                        innerContainer
+                                            .AlignMiddle()
+                                            .AlignCenter()
+                                            .Image(imageBytes)
+                                            .FitArea();
+                                    });
+                            });
+
+
+                        // Información del estudiante
+                        row.RelativeItem().AlignMiddle().Column(col =>
+                        {
+                            var lineHeight = 1.8f; // Ajusta este valor según necesites
+                            var fontSize = 8;
+
+                            var name = $"{student.Name ?? ""} {student.LastName ?? ""} {student.SecondLastName ?? ""}";
+                            col.Item().Text($"{name.ToUpper() ?? "Nombre sin actualizar"}")
+                                        .FontSize(fontSize)
+                                        .LineHeight(lineHeight)
+                                        .AlignCenter();
+                            col.Item().Text($"{teamName ?? "Equipo no identificado"}")
+                                .FontSize(fontSize)
+                                .LineHeight(lineHeight)
+                                .AlignCenter();
+
+
+                            // Fila para el resto de la información y el número alineado al centro
+                            col.Item().Row(innerRow =>
+                            {
+                                // Información del estudiante alineada a la izquierda
+                                innerRow.RelativeItem().Column(infoCol =>
+                                {
+                                    infoCol.Item().Text(text =>
+                                    {
+                                        text.Span("Carrera: ").FontSize(fontSize).LineHeight(lineHeight);
+                                        text.Span(student.Career ?? "sin actualizar").Bold().FontSize(fontSize).LineHeight(lineHeight);
+                                    });
+
+                                    infoCol.Item().Text(text =>
+                                    {
+                                        text.Span("Semestre: ").FontSize(fontSize).LineHeight(lineHeight);
+                                        text.Span(student.Semester ?? "sin actualizar").Bold().FontSize(fontSize).LineHeight(lineHeight);
+                                    });
+
+                                    infoCol.Item().Text(text =>
+                                    {
+                                        text.Span("Tipo de sangre: ").FontSize(fontSize).LineHeight(lineHeight);
+                                        text.Span(student.BloodType ?? "sin actualizar").Bold().FontSize(fontSize).LineHeight(lineHeight);
+                                    });
+
+                                    infoCol.Item().Text(text =>
+                                    {
+                                        text.Span("NSS: ").FontSize(fontSize).LineHeight(lineHeight);
+                                        text.Span(student.Nss ?? "sin actualizar").Bold().FontSize(fontSize).LineHeight(lineHeight);
+                                    });
+
+                                    infoCol.Item().Text(text =>
+                                    {
+                                        text.Span("Tel. Emergencia: ").FontSize(fontSize).LineHeight(lineHeight);
+                                        text.Span(student.emergencyPhone ?? "sin actualizar").Bold().FontSize(fontSize).LineHeight(lineHeight);
+                                    });
+                                });
+
+
+
+                                // Número del uniforme alineado al centro
+                                innerRow.ConstantItem(3, Unit.Centimetre) // Tamaño fijo para la columna del número
+                                    .AlignCenter()
+                                    .AlignMiddle()
+                                    .Text($"#{(string.IsNullOrEmpty(student.numberUniform.ToString()) ? "?" : student.numberUniform.ToString())}")
+                                    .FontSize(30);
+                            });
+                        });
+
+
+                    });
+
+                    // Información adicional
+                    column.Item().PaddingLeft(10).Text("Alergias y padecimientos").FontSize(10);
+                    column.Item().PaddingLeft(10).Text(student.Allergies ?? "Ninguno").FontSize(10).Bold();
+
+                    // Footer con categorías
+                    column.Item().AlignRight().Padding(5).PaddingRight(20).Row(row =>
+                    {
+                        row.ConstantItem(3, Unit.Centimetre).BorderTop(0.5f).AlignCenter().Text("Pre-Nacional").FontSize(10);
+                        row.ConstantItem(1, Unit.Centimetre).Text("");
+                        row.ConstantItem(2.5f, Unit.Centimetre).BorderTop(0.5f).AlignCenter().Text("Nacional").FontSize(10);
+                    });
+
+                });
+        }
+
+
+
+        [HttpDelete]
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
