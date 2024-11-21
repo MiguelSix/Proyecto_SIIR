@@ -39,6 +39,7 @@ namespace SIIR.DataAccess.Data.Repository
         {
             return _db.Document
                 .Include(d => d.DocumentCatalog)
+                .Include(d => d.Student)
                 .FirstOrDefault(d => d.Id == id);
         }
 
@@ -52,6 +53,7 @@ namespace SIIR.DataAccess.Data.Repository
                 objDesdeDb.UploadDate = document.UploadDate;
                 objDesdeDb.Url = document.Url;
                 objDesdeDb.Status = document.Status;
+                objDesdeDb.RejectionReason = document.RejectionReason;
             }
         }
 

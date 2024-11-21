@@ -4,6 +4,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext DbContext
+<link rel="stylesheet" href="~/css/student/notification.css" />
 <style>
     .navbar-nav .nav-link.lead,
     .navbar-nav .dropdown-toggle.lead,
@@ -14,15 +15,51 @@
         padding: 0.5rem 1rem;
     }
 
-        .navbar-nav .dropdown-item.lead:hover,
-        .navbar-nav .dropdown-item.lead:focus {
-            background-color: #f8f9fa;
-        }
+    .navbar-nav .dropdown-item.lead:hover,
+    .navbar-nav .dropdown-item.lead:focus {
+        background-color: #f8f9fa;
+    }
 
     .navbar-nav {
         align-items: center;
     }
+
+    .navbar-nav .d-flex {
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* Ajustes específicos para mobile */
+    @@media (max-width: 767.98px) {
+        .navbar-nav .d-flex {
+            margin-left: auto;
+        }
+        
+        .notifications-dropdown {
+            position: static !important; /* Sobrescribe la posición relativa */
+        }
+        
+        .notifications-dropdown .dropdown-menu {
+            position: absolute;
+            right: 10px !important;
+            left: auto !important;
+            width: calc(100vw - 20px) !important; /* Ancho adaptativo con margen */
+            max-width: 350px; /* Mantiene el ancho máximo del diseño original */
+            transform: none !important;
+        }
+
+        .notifications-container {
+            max-height: 60vh; /* Altura adaptativa en viewport height */
+        }
+        
+        /* Mejora el comportamiento táctil */
+        .dropdown-menu.show {
+            touch-action: pan-y pinch-zoom;
+            -webkit-overflow-scrolling: touch;
+        }
+    }
 </style>
+
 <ul class="navbar-nav ms-auto">
     @if (SignInManager.IsSignedIn(User))
     {
@@ -46,28 +83,49 @@
                 userName = admin?.Name ?? "Administrador";
             }
         }
+
         @if (!User.IsInRole("Student"))
         {
             <li class="nav-item">
                 <a class="nav-link lead" asp-area="Identity" asp-controller="Account" asp-action="Register">Registrar</a>
             </li>
         }
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle lead" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Hola, @userName!
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
 
-                <li><a class="dropdown-item lead" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Mi Perfil</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                        <button type="submit" class="dropdown-item lead w-100 text-start">
-                            Cerrar sesión
-                        </button>
-                    </form>
+        <div class="d-flex align-items-center">
+            @if (User.IsInRole("Student"))
+            {
+                <li class="notifications-dropdown dropdown">
+                    <button class="btn btn-link nav-link dropdown-toggle no-caret p-0" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-bell">
+                            <span class="notification-count"></span>
+                        </div>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                        <div class="notifications-container">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
+                        </div>
+                        <div class="dropdown-divider mb-0"></div>
+                    </div>
                 </li>
-            </ul>
-        </li>
+            }
+            
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle lead" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Hola, @userName!
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item lead" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Mi Perfil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button type="submit" class="dropdown-item lead w-100 text-start">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </div>
     }
 </ul>

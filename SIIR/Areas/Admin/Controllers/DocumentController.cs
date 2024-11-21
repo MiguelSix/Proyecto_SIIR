@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using SIIR.DataAccess.Data.Repository.IRepository;
 using SIIR.Models;
@@ -16,16 +17,19 @@ namespace SIIR.Areas.Admin.Controllers
         private readonly IContenedorTrabajo _contenedorTrabajo;
         private readonly IWebHostEnvironment _hostingEnvironment; // Entorno de hospedaje para obtener rutas de archivos
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
         public DocumentController(
             IContenedorTrabajo contenedorTrabajo,
             IWebHostEnvironment hostingEnvironment,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IEmailSender emailSender
             )
         {
             _contenedorTrabajo = contenedorTrabajo;
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         [HttpGet]
@@ -35,6 +39,12 @@ namespace SIIR.Areas.Admin.Controllers
             var documents = _contenedorTrabajo.Document.GetDocumentsByStudent(studentId);
             var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == studentId);
 
+            if (student == null)
+            {
+                TempData["Error"] = "Estudiante no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
             // Get the current user
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -42,30 +52,30 @@ namespace SIIR.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // the user is a student
+            // If the user is a student (captain)
             if (user.StudentId != null)
             {
-                // Get the student
-                student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
-                if (student == null)
+                // Get the captain's data
+                var captain = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == user.StudentId);
+                if (captain == null)
                 {
                     return NotFound();
                 }
 
                 // Check if the student is captain
-                if (!student.IsCaptain)
+                if (!captain.IsCaptain)
+                {
+                    return Forbid();
+                }
+
+                // Verify if the requested student is from the same team as the captain
+                if (student.TeamId != captain.TeamId)
                 {
                     return Forbid();
                 }
             }
 
-            if (student == null)
-            {
-                TempData["Error"] = "Estudiante no encontrado."; // Mensaje de error si no se encuentra el estudiante
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Crear una vista modelo con los documentos del estudiante
+            // Create the view model with the selected student's documents and information
             var documentVM = new DocumentVM
             {
                 StudentDocuments = documents,
@@ -74,7 +84,7 @@ namespace SIIR.Areas.Admin.Controllers
 
             return View(documentVM);
         }
-        
+
         // Acción para mostrar los detalles de un documento
         [HttpGet]
         [Authorize(Roles = "Admin, Coach, Student")]
@@ -137,9 +147,9 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult ChangeStatus(int id, string status)
+        public async Task<IActionResult> ChangeStatus(int id, string status, string rejectionReason)
         {
-            var document = _contenedorTrabajo.Document.GetFirstOrDefault(d => d.Id == id);
+            var document = _contenedorTrabajo.Document.GetDocumentWithCatalog(id);
             if (document == null)
             {
                 return Json(new { success = false, message = "Documento no encontrado." });
@@ -147,6 +157,54 @@ namespace SIIR.Areas.Admin.Controllers
 
             // Cambiar el estado del documento al nuevo estado proporcionado
             document.Status = (DocumentStatus)Enum.Parse(typeof(DocumentStatus), status);
+
+            //Si el estado es rechazado, guardamos el motivo
+            if(document.Status == DocumentStatus.Rejected)
+            {
+                // Validar que haya un motivo de rechazo cuando el estado es Rejected
+                if (string.IsNullOrEmpty(rejectionReason))
+                {
+                    return Json(new { success = false, message = "El motivo de rechazo es requerido." });
+                }
+                document.RejectionReason = rejectionReason;
+
+                var notification = new Notification
+                {
+                    StudentId = document.Student.Id,
+                    Message = $"Tu documento '{document.DocumentCatalog.Name}' ha sido rechazado. Razón: {rejectionReason}",
+                    Type = "DocumentRejected",
+                    IsRead = false,
+                    CreatedAt = DateTime.Now.AddHours(-6),
+                    DocumentId = document.Id
+                };
+
+                _contenedorTrabajo.Notification.Add(notification);
+
+                var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == document.StudentId);
+                var user = _contenedorTrabajo.User.GetFirstOrDefault(u => u.StudentId == student.Id);
+
+                if (student != null)
+                {
+                    var emailBody = string.Format(
+                            await System.IO.File.ReadAllTextAsync(Path.Combine(_hostingEnvironment.WebRootPath, "templates", "document-rejected.html")),
+                            student.Name, // {0}
+                            document.DocumentCatalog.Name, // {1}
+                            rejectionReason // {2}
+                        );
+
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Documento Rechazado - Acción Requerida",
+                        emailBody
+                    );
+                }
+
+            }
+            else 
+            {
+                document.RejectionReason = string.Empty;
+            }
+
             _contenedorTrabajo.Document.Update(document);
             _contenedorTrabajo.Save();
 

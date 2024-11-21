@@ -2,9 +2,6 @@
 $(document).ready(function () {
     loadCareers();
     cargarDatatable();
-    $('#careerFilter, #semesterFilter').on('change', function () {
-        dataTable.ajax.reload();
-    });
 });
 
 function loadCareers() {
@@ -12,13 +9,37 @@ function loadCareers() {
         url: '/admin/students/GetCareers',
         type: 'GET',
         success: function (careers) {
+            // Actualizar el select original
             var select = $('#careerFilter');
             careers.forEach(function (career) {
                 select.append(new Option(career, career));
             });
+
+            // Actualizar el contenedor de múltiple selección
+            const $optionsList = $('.multi-select-container:eq(0) .multi-select-options');
+            $optionsList.empty(); // Limpiar opciones existentes
+
+            // Agregar las nuevas opciones como checkboxes
+            careers.forEach(function (career) {
+                const $option = $('<label/>', {
+                    class: 'multi-select-option',
+                    html: `<input type="checkbox" value="${career}"> 
+                           <span>${career}</span>`
+                });
+                $optionsList.append($option);
+            });
+
+            // Reconfigurar los event listeners
+            $optionsList.find('input[type="checkbox"]').on('change', function () {
+                updateActiveFilters();
+                if (window.dataTable) {
+                    window.dataTable.ajax.reload();
+                }
+            });
         },
         error: function (error) {
             toastr.error("Error al cargar las carreras");
+            console.error("Error loading careers:", error);
         }
     });
 }
@@ -35,11 +56,12 @@ function cargarDatatable() {
             "type": "GET",
             "datatype": "json",
             "dataSrc": function (json) {
-                var careerFilter = $('#careerFilter').val();
-                var semesterFilter = $('#semesterFilter').val();
+                const selectedFilters = window.selectedFilters || { careers: [], semesters: [] };
                 return json.data.filter(function (item) {
-                    var matchesCareer = !careerFilter || item.career === careerFilter;
-                    var matchesSemester = !semesterFilter || item.semester === semesterFilter;
+                    const matchesCareer = selectedFilters.careers.length === 0 ||
+                        selectedFilters.careers.includes(item.career);
+                    const matchesSemester = selectedFilters.semesters.length === 0 ||
+                        selectedFilters.semesters.includes(item.semester);
                     return matchesCareer && matchesSemester;
                 });
             }
@@ -48,7 +70,6 @@ function cargarDatatable() {
             {
                 "data": "name",
                 "responsivePriority": 1,
-                
             },
             {
                 "data": "lastName",
@@ -68,7 +89,7 @@ function cargarDatatable() {
             {
                 "data": "team",
                 "render": function (data) {
-                    return data ? `${data.name}  ${data.category}` : 'N/A';
+                    return data ? `${data.name}` : 'N/A';
                 },
                 "responsivePriority": 3
             },
@@ -80,21 +101,21 @@ function cargarDatatable() {
                     }
                     return 'N/A';
                 },
-                "responsivePriority": 5
+                "responsivePriority": 6
             },
             {
                 "data": "career",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
-                "responsivePriority": 5
+                "responsivePriority": 6
             },
             {
                 "data": "semester",
                 "render": function (data) {
                     return data || 'Sin actualizar';
                 },
-                "responsivePriority": 5
+                "responsivePriority": 6
             },
             {
                 "data": "id",
@@ -179,11 +200,10 @@ function downloadInfo(url) {
     $.ajax({
         url: url,
         type: 'POST',
-        xhrFields: { responseType: 'blob' }, // Configura la respuesta para manejar blobs
+        xhrFields: { responseType: 'blob' },
         success: function (blob, status, xhr) {
-            // Obtener el nombre del archivo desde el encabezado 'Content-Disposition'
             const disposition = xhr.getResponseHeader('Content-Disposition');
-            let fileName = "Informacion_Estudiantes.pdf"; // Nombre por defecto
+            let fileName = "Informacion_Estudiantes.pdf";
 
             if (disposition && disposition.includes('filename=')) {
                 const filenameRegex = /filename[^;=\n]*=(['"]?)([^'"\n]*)\1/;
@@ -193,10 +213,9 @@ function downloadInfo(url) {
                 }
             }
 
-            // Crear un enlace temporal para descargar el archivo
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = fileName; // Usa el nombre del archivo extraído
+            link.download = fileName;
             link.click();
             window.URL.revokeObjectURL(link.href);
 

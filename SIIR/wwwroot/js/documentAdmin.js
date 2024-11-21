@@ -75,3 +75,11 @@ function changeStatus(id, status) {
     document.getElementById('documentStatus').value = status;
     document.getElementById('statusForm').submit();
 }
+
+// Inicializar todos los tooltips
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});

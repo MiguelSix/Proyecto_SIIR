@@ -2,7 +2,8 @@
 @{
     ViewData["Title"] = "Editar Grupo Representativo";
 }
-<br /><br />
+<br />
+<br />
 <h2 class="text-center mn-3">Editar un grupo representativo</h2>
 <form id="representative-form" method="POST" asp-action="Edit">
     <div class="row px-2 mx-3 border rounded-2">
@@ -14,7 +15,12 @@
                     <label asp-for="Representative.Name"></label>
                 </div>
                 <div class="col-8">
-                    <input asp-for="Representative.Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo" />
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        <input asp-for="Representative.Name" class="form-control" placeholder="Ingresa el nombre del grupo representativo" />
+                    </div>
                     <span asp-validation-for="Representative.Name" class="text-danger"></span>
                 </div>
             </div>
@@ -24,11 +30,19 @@
                     <label asp-for="Representative.Category"></label>
                 </div>
                 <div class="col-8">
-                    <select asp-for="Representative.Category" class="form-control">
-                        <option value="">Seleccione una opción</option>
-                        <option value="Deportivo">Deportivo</option>
-                        <option value="Cultural">Cultural</option>
-                    </select>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-layer-group"></i>
+                        </span>
+                        <select asp-for="Representative.Category" class="form-select">
+                            <option value="">Seleccione una opción</option>
+                            <option value="Deportivo">Deportivo</option>
+                            <option value="Cultural">Cultural</option>
+                        </select>
+                        <span class="input-group-text">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                    </div>
                     <span asp-validation-for="Representative.Category" class="text-danger"></span>
                 </div>
             </div>
@@ -47,13 +61,21 @@
                                     <label for="UniformCatalog">Uniforme</label>
                                 </div>
                                 <div class="col-8">
-                                    <select name="SelectedUniformCatalogIds[@index]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
-                                        <option value="">Selecciona una prenda:</option>
-                                        @foreach (var item in Model.UniformCatalogList)
-                                        {
-                                            <!option value="@item.Value" @(item.Value == uniformCatalogId.ToString() ? "selected" : "")>@item.Text</!option>
-                                        }
-                                    </select>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-tshirt"></i>
+                                        </span>
+                                        <select name="SelectedUniformCatalogIds[@index]" class="form-select" required data-msg-required="Por favor selecciona un uniforme.">
+                                            <option value="">Selecciona una prenda:</option>
+                                            @foreach (var item in Model.UniformCatalogList)
+                                            {
+                                                <!option value="@item.Value" @(item.Value == uniformCatalogId.ToString() ? "selected" : "")>@item.Text</!option>
+                                            }
+                                        </select>
+                                        <span class="input-group-text">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </span>
+                                    </div>
                                     <span asp-validation-for="SelectedUniformCatalogIds[@index]" class="text-danger"></span>
                                 </div>
                                 <div class="col-12 mt-2 text-end">
@@ -104,27 +126,35 @@
             // Añadir nuevo uniforme
             $('#addUniformBtn').click(function () {
                 var newUniform = `
-                    <div class="form-group row mt-2 uniform-item">
-                        <div class="col-4">
-                            <label for="UniformCatalog">Uniforme</label>
-                        </div>
-                        <div class="col-8">
-                            <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-control" required data-msg-required="Por favor selecciona un uniforme.">
-                                <option value="">Selecciona una prenda:</option>
+                            <div class="form-group row mt-2 uniform-item">
+                                <div class="col-4">
+                                    <label for="UniformCatalog">Uniforme</label>
+                                </div>
+                                <div class="col-8">
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-tshirt"></i>
+                                        </span>
+                                        <select name="SelectedUniformCatalogIds[` + uniformIndex + `]" class="form-select" required data-msg-required="Por favor selecciona un uniforme.">
+                                            <option value="">Selecciona una prenda:</option>
         @foreach (var item in Model.UniformCatalogList)
         {
                                                     <option value="@item.Value">@item.Text</option>
         }
-                            </select>
-                            <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
-                        </div>
-                        <div class="col-12 mt-2 text-end">
-                            <button type="button" class="btn btn-danger remove-uniform-btn">
-                                <i class="fas fa-trash-alt"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                `;
+                                        </select>
+                                        <span class="input-group-text">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </span>
+                                    </div>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="SelectedUniformCatalogIds[` + uniformIndex + `]" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="col-12 mt-2 text-end">
+                                    <button type="button" class="btn btn-danger remove-uniform-btn">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
                 $('#uniformsContainer').append(newUniform);
                 uniformIndex++;
                 reindexUniforms();
@@ -145,7 +175,7 @@
             function reindexUniforms() {
                 $('#uniformsContainer .uniform-item').each(function (index) {
                     var select = $(this).find('select');
-                    var span = $(this).find('span');
+                    var span = $(this).find('span.text-danger');
                     // Actualizar el atributo 'name' del select
                     select.attr('name', 'SelectedUniformCatalogIds[' + index + ']');
                     // Actualizar el asp-validation-for del span

@@ -12,7 +12,8 @@ namespace SIIR.Models
     {
         Pending = 'P',
         Approved = 'A',
-        Rejected = 'R'
+        Rejected = 'R',
+        RequiresRenewal = 'U'
     }
     public class Document
     {
@@ -30,6 +31,9 @@ namespace SIIR.Models
         public string Url{ get; set; }
 
         public DocumentStatus Status { get; set; } = DocumentStatus.Pending;
+
+        [Display(Name ="Motivo de Rechazo")]
+        public string RejectionReason {  get; set; } = string.Empty;
 
     }
 }

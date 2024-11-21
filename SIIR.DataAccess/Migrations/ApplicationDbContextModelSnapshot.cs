@@ -296,6 +296,10 @@ namespace SIIR.DataAccess.Migrations
                     b.Property<int>("DocumentCatalogId")
                         .HasColumnType("int");
 
+                    b.Property<string>("RejectionReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -343,6 +347,44 @@ namespace SIIR.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DocumentCatalog");
+                });
+
+            modelBuilder.Entity("SIIR.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("SIIR.Models.Representative", b =>
@@ -661,6 +703,24 @@ namespace SIIR.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("DocumentCatalog");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SIIR.Models.Notification", b =>
+                {
+                    b.HasOne("SIIR.Models.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SIIR.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Document");
 
                     b.Navigation("Student");
                 });

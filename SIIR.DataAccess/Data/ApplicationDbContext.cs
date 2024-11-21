@@ -23,6 +23,7 @@ namespace SIIR.Data
         public DbSet<Document> Document { get; set; }
         public DbSet<RepresentativeUniformCatalog> RepresentativeUniformCatalogs { get; set; }
         public DbSet<Uniform> Uniform { get; set; }
+        public DbSet<Notification> Notification { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,17 @@ namespace SIIR.Data
 		        .WithMany()
 		        .HasForeignKey(u => new { u.RepresentativeId, u.UniformCatalogId })
 		        .OnDelete(DeleteBehavior.Cascade);
-		}
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Student)
+                .WithMany()
+                .HasForeignKey(n => n.StudentId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Document)
+                .WithMany()
+                .HasForeignKey(n => n.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }

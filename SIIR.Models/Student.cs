@@ -47,7 +47,7 @@ namespace SIIR.Models
         [Display(Name = "Semestre")]
         public string? Semester { get; set; }
 
-        [Phone(ErrorMessage = "El número de teléfono no es válido.")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "El teléfono debe contener 10 dígitos")]
         [Display(Name = "Teléfono")]
         public string? Phone { get; set; }
 
@@ -94,7 +94,7 @@ namespace SIIR.Models
         [StringLength(50, ErrorMessage = "El nombre del contacto de emergencia no puede exceder los 50 caracteres.")]
         public string? emergencyContact { get; set; }
 
-        [Phone(ErrorMessage = "El número de teléfono de emergencia no es válido.")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "El número de teléfono de emergencia no es válido.")]
         [Display(Name = "Teléfono de emergencia")]
         public string? emergencyPhone { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using SIIR.Data;
 using SIIR.DataAccess.Data.Repository;
 using SIIR.DataAccess.Data.Repository.IRepository;
+using SIIR.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace SIIR.DataAccess.Data.Repository
             Document = new DocumentRepository(_db);
             RepresentativeUniformCatalog = new RepresentativeUniformCatalogRepository(_db);
             Uniform = new UniformRepository(_db);
+            Notification = new NotificationRepository(_db);
         }
 
         public IUserRepository User { get; private set; }
@@ -41,7 +43,7 @@ namespace SIIR.DataAccess.Data.Repository
         public IUniformRepository Uniform { get; private set; }
 
         public IAdminRepository Admin { get; private set; }
-
+        public INotificationRepository Notification { get; private set; }
         public void Dispose()
         {
             _db.Dispose();
