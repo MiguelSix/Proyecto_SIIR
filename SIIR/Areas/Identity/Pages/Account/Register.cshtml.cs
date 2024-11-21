@@ -285,7 +285,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                         <body>
                             <div class='container'>
                                 <div class='header'>
-                                    <h1>Bienvenido al Sistema</h1>
+                                    <h1>Bienvenido al SIIR</h1>
                                 </div>
                                 <div class='content'>
                                     <p>Hola {Input.Name},</p>
@@ -296,7 +296,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                                         <p>Por favor, cambia tu contraseña lo antes posible después de tu primer inicio de sesión.</p>
                                         <a href='{Url.Page("/Account/Login", pageHandler: null, values: null, protocol: Request.Scheme)}' class='button'>Iniciar Sesión</a>
                                     </div>
-                                    <p>Si no has solicitado esta cuenta, por favor contacta con el administrador.</p>
+                                    <p>Si no has solicitado esta cuenta, por favor contacta con el Departamento de Extraescolares.</p>
                                 </div>
                                 <div class='footer'>
                                     <p>Este es un correo electrónico automático, por favor no responda a este mensaje.</p>
