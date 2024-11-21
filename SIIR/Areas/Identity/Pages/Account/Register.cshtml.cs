@@ -231,8 +231,88 @@ namespace SIIR.Areas.Identity.Pages.Account
                     {
                         CreateUniformStudent(user.Student.Id, user.Student.Team.RepresentativeId);
                     }
-						// Redirigir al listado de usuarios
-						return RedirectToAction("Index", "Users", new { area = "Admin" });
+
+                    var emailTemplate = $@"
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset='UTF-8'>
+                            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                            <title>Bienvenido al Sistema</title>
+                            <style>
+                                body {{
+                                    font-family: Arial, sans-serif;
+                                    line-height: 1.6;
+                                    color: #333333;
+                                    margin: 0;
+                                    padding: 0;
+                                }}
+                                .container {{
+                                    max-width: 600px;
+                                    margin: 0 auto;
+                                    padding: 20px;
+                                }}
+                                .header {{
+                                    background-color: #1a73e8;
+                                    color: white;
+                                    padding: 20px;
+                                    text-align: center;
+                                    border-radius: 5px 5px 0 0;
+                                }}
+                                .content {{
+                                    background-color: #ffffff;
+                                    padding: 20px;
+                                    border: 1px solid #dddddd;
+                                    border-radius: 0 0 5px 5px;
+                                }}
+                                .button {{
+                                    display: inline-block;
+                                    padding: 12px 24px;
+                                    background-color: #1a73e8;
+                                    color: white !important;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    margin: 20px 0;
+                                }}
+                                .footer {{
+                                    text-align: center;
+                                    margin-top: 20px;
+                                    color: #666666;
+                                    font-size: 12px;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class='container'>
+                                <div class='header'>
+                                    <h1>Bienvenido al Sistema</h1>
+                                </div>
+                                <div class='content'>
+                                    <p>Hola {Input.Name},</p>
+                                    <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales de acceso:</p>
+                                    <p><strong>Correo electrónico:</strong> {Input.Email}</p>
+                                    <p><strong>Contraseña:</strong> {Input.Password}</p>
+                                    <div style='text-align: center;'>
+                                        <p>Por favor, cambia tu contraseña lo antes posible después de tu primer inicio de sesión.</p>
+                                        <a href='{Url.Page("/Account/Login", pageHandler: null, values: null, protocol: Request.Scheme)}' class='button'>Iniciar Sesión</a>
+                                    </div>
+                                    <p>Si no has solicitado esta cuenta, por favor contacta con el administrador.</p>
+                                </div>
+                                <div class='footer'>
+                                    <p>Este es un correo electrónico automático, por favor no responda a este mensaje.</p>
+                                    <p>© {DateTime.Now.Year} SIIR. Todos los derechos reservados.</p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>";
+
+                    await _emailSender.SendEmailAsync(
+                        Input.Email,
+                        "Bienvenido al Sistema",
+                        emailTemplate);
+
+                    // Redirigir al listado de usuarios
+                    return RedirectToAction("Index", "Users", new { area = "Admin" });
                 }
                 foreach (var error in result.Errors)
                 {
