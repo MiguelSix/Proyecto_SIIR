@@ -550,7 +550,8 @@ function generateCertificate() {
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
     const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
     const formattedDate = `${year}-${month}-${day}`;
-    const formattedTeamName = teamName.replace(/\s+/g, '_');
+    const decodedTeamName = decodeHtmlEntities(teamName);
+    const formattedTeamName = decodedTeamName.replace(/\s+/g, '_');
 
     // Envía los objetos de estudiantes seleccionados al controlador
     toastr.info("Preparando descarga...");
@@ -596,7 +597,8 @@ function generateCredentials() {
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
     const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
     const formattedDate = `${year}-${month}-${day}`;
-    const formattedTeamName = teamName.replace(/\s+/g, '_');
+    const decodedTeamName = decodeHtmlEntities(teamName);
+    const formattedTeamName = decodedTeamName.replace(/\s+/g, '_');
 
     // Envía los objetos de estudiantes seleccionados al controlador
     toastr.info("Preparando descarga...");
@@ -685,7 +687,8 @@ function downloadUniformInfo() {
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
     const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
     const formattedDate = `${year}-${month}-${day}`;
-    const formattedTeamName = teamName.replace(/\s+/g, '_');
+    const decodedTeamName = decodeHtmlEntities(teamName);
+    const formattedTeamName = decodedTeamName.replace(/\s+/g, '_');
 
     if (!allStudents || allStudents.length === 0)
     {
@@ -736,7 +739,8 @@ function downloadListStudents() {
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 'MM'
     const day = String(today.getDate()).padStart(2, '0'); // Día en formato 'DD'
     const formattedDate = `${year}-${month}-${day}`;
-    const formattedTeamName = teamName.replace(/\s+/g, '_');
+    const decodedTeamName = decodeHtmlEntities(teamName);
+    const formattedTeamName = decodedTeamName.replace(/\s+/g, '_');
 
     if (!allStudents || allStudents.length === 0) {
         toastr.error("No hay estudiantes en el equipo");
@@ -769,4 +773,10 @@ function toastrConfiguration() {
     toastr.options = {
         newestOnTop: false
     };
+}
+
+function decodeHtmlEntities(str) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = str;
+    return txt.value;
 }

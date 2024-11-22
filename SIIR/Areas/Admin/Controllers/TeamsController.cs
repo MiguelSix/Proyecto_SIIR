@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,6 +16,7 @@ using SIIR.Models.ViewModels;
 using SIIR.Utilities;
 using System.Drawing;
 using System.Security.Policy;
+using System.Web;
 using static QuestPDF.Helpers.Colors;
 
 namespace SIIR.Areas.Admin.Controllers
@@ -302,7 +304,8 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var teamName = team.Name.Replace(" ", "_"); // Reemplaza espacios por guiones bajos para evitar problemas en el nombre del archivo
+            var teamName = team.Name.Replace(" ", "_");
+            teamName = HttpUtility.HtmlDecode(teamName);
             var date = DateTime.Now.ToString("yyyy-MM-dd");
             var fileName = $"Informacion_{teamName}_{date}.pdf";
 
@@ -478,6 +481,8 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return BadRequest("No se han seleccionado estudiantes.");
             }
+
+            request.Team = HttpUtility.HtmlDecode(request.Team);
 
             // Crear el documento PDF usando QuestPDF y agregar la información de los estudiantes
             var document = QuestPDF.Fluent.Document.Create(container =>
@@ -724,6 +729,8 @@ namespace SIIR.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult GenerateUniformInfoPdf([FromBody] List<StudentInfo> students, [FromQuery] string category, [FromQuery] string teamName)
         {
+            teamName = HttpUtility.HtmlDecode(teamName);
+
             // IDs de los estudiantes
             var studentIds = students.Select(s => s.Id).ToList();
 
@@ -1003,6 +1010,7 @@ namespace SIIR.Areas.Admin.Controllers
         [Authorize(Roles = "Admin, Coach, Student")]
         public IActionResult GenerateCredentials([FromBody] List<Models.Student> request, [FromQuery] string teamName)
         {
+            teamName = HttpUtility.HtmlDecode(teamName);
 
             // Crear el documento PDF
             var document = QuestPDF.Fluent.Document.Create(container =>
