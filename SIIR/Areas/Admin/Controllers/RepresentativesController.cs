@@ -97,10 +97,35 @@ namespace SIIR.Areas.Admin.Controllers
                 _contenedorTrabajo.Representative.Update(representativeVM.Representative);
                 _contenedorTrabajo.Save();
                 UpdateRepresentativeUniformCatalog(representativeVM);
+                UpdateNameTeam(representativeVM.Representative.Id, representativeVM.Representative.Name);
                 return RedirectToAction(nameof(Index));
             }
             representativeVM.UniformCatalogList = _contenedorTrabajo.UniformCatalog.GetUniformCatalogList();
             return View(representativeVM);
+        }
+
+        private void UpdateNameTeam(int representativeId, string representativeName)
+        {
+            var teams = _contenedorTrabajo.Team
+                .GetAll(t => t.RepresentativeId == representativeId)
+                .ToList();
+
+            if (teams == null)
+                return;
+
+            foreach (var team in teams)
+            {
+                if (team.Category.ToUpper() == "MIXTO")
+                {
+                    team.Name = representativeName;
+                }
+                else
+                {
+                    team.Name = representativeName + " " + team.Category;
+                }
+                _contenedorTrabajo.Team.Update(team);
+            }
+            _contenedorTrabajo.Save();
         }
 
         private void UpdateRepresentativeUniformCatalog(RepresentativeVM representativeVM)
