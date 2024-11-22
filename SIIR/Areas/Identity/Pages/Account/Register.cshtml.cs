@@ -92,10 +92,6 @@ namespace SIIR.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required(ErrorMessage = "El campo correo es obligatorio")]
             [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido")]
             [RegularExpression(@"^[^@]+@queretaro\.tecnm\.mx$",
@@ -103,43 +99,50 @@ namespace SIIR.Areas.Identity.Pages.Account
             [Display(Name = "Correo")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required(ErrorMessage = "El campo Contraseña es obligatorio")]
-            [StringLength(100, ErrorMessage = "La {0} debe tener al menos {2} y un máximo de {1} caracteres de longitud.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            [Display(Name = "Contraseña")]
-            public string Password { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirmar contraseña")]
-            [Compare("Password", ErrorMessage = "Las contraseñas no coinciden.")]
-            public string ConfirmPassword { get; set; }
-
-            [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+			[Required(ErrorMessage = "El nombre es obligatorio.")]
+			[StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
             [Display(Name = "Nombre")]
             public string Name { get; set; }
 
-            [StringLength(50, ErrorMessage = "El apellido paterno no puede exceder los 50 caracteres.")]
+			[Required(ErrorMessage = "El apellido paterno es obligatorio.")]
+			[StringLength(50, ErrorMessage = "El apellido paterno no puede exceder los 50 caracteres.")]
             [Display(Name = "Apellido Paterno")]
             public string LastName { get; set; }
 
-            [StringLength(50, ErrorMessage = "El apellido materno no puede exceder los 50 caracteres.")]
+			[Required(ErrorMessage = "El apellido materno es obligatorio.")]
+			[StringLength(50, ErrorMessage = "El apellido materno no puede exceder los 50 caracteres.")]
             [Display(Name = "Apellido Materno")]
             public string SecondLastName { get; set; }
             [Display(Name = "Equipo")]
             public int? TeamId { get; set; }
 
         }
+		private string GenerateSecurePassword()
+		{
+			const string uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			const string lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+			const string numericChars = "0123456789";
+			const string specialChars = "!@#$%^&*";
+
+			var random = new Random();
+			var password = new StringBuilder();
+
+			password.Append(uppercaseChars[random.Next(uppercaseChars.Length)]);
+			password.Append(lowercaseChars[random.Next(lowercaseChars.Length)]);
+			password.Append(numericChars[random.Next(numericChars.Length)]);
+			password.Append(specialChars[random.Next(specialChars.Length)]);
+
+			const string allChars = uppercaseChars + lowercaseChars + numericChars + specialChars;
+			while (password.Length < 12)
+			{
+				password.Append(allChars[random.Next(allChars.Length)]);
+			}
+
+			return new string(password.ToString().ToCharArray().OrderBy(x => random.Next()).ToArray());
+		}
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+		public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -167,8 +170,9 @@ namespace SIIR.Areas.Identity.Pages.Account
             if (ModelState.IsValid && !string.IsNullOrEmpty(selectedRole))
             {
                 var user = CreateUser();
+                var password = GenerateSecurePassword();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+				await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 // Ensure roles exist
@@ -238,16 +242,16 @@ namespace SIIR.Areas.Identity.Pages.Account
 
 						break;
                     default:
-                        ModelState.AddModelError(string.Empty, "Invalid role selection");
+                        ModelState.AddModelError(string.Empty, "Seleccion de Rol invalida");
                         return Page();
                 }
 
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                var result = await _userManager.CreateAsync(user, password);
 
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, selectedRole);
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("Nueva cuenta creada");
 
                     TempData["Message"] = $"Usuario {Input.Email} registrado exitosamente como {selectedRole}";
 					TempData["Type"] = "success";
@@ -257,7 +261,15 @@ namespace SIIR.Areas.Identity.Pages.Account
                         CreateUniformStudent(user.Student.Id, user.Student.Team.RepresentativeId);
                     }
 
-                    var emailTemplate = $@"
+					// Configura el token para forzar el cambio de contraseña en el primer inicio de sesión
+					var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+					var callbackUrl = Url.Page(
+						"/Account/ResetPassword",
+						pageHandler: null,
+						values: new { area = "Identity", code },
+						protocol: Request.Scheme);
+
+					var emailTemplate = $@"
                         <!DOCTYPE html>
                         <html>
                         <head>
@@ -316,9 +328,10 @@ namespace SIIR.Areas.Identity.Pages.Account
                                     <p>Hola {Input.Name},</p>
                                     <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales de acceso:</p>
                                     <p><strong>Correo electrónico:</strong> {Input.Email}</p>
-                                    <p><strong>Contraseña:</strong> {Input.Password}</p>
+                                    <p><strong>Contraseña:</strong> {password}</p>
                                     <div style='text-align: center;'>
                                         <p>Por favor, cambia tu contraseña lo antes posible después de tu primer inicio de sesión.</p>
+                                        <p>De no hacerlo, estas comprometiendo la integridad de tu información.</p>
                                         <a href='{Url.Page("/Account/Login", pageHandler: null, values: null, protocol: Request.Scheme)}' class='button'>Iniciar Sesión</a>
                                     </div>
                                     <p>Si no has solicitado esta cuenta, por favor contacta con el Departamento de Extraescolares.</p>
