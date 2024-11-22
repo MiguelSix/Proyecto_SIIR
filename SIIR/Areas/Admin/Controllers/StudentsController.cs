@@ -54,21 +54,28 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int id)
+		[Authorize(Roles = "Admin, Coach")]
+		public IActionResult Details(int id)
         {
-            // Obtener el estudiante con sus relaciones básicas usando Include
             var student = _contenedorTrabajo.Student
                 .GetFirstOrDefault(
                     s => s.Id == id,
                     includeProperties: "Team,Coach"
                 );
 
-            if (student.Team != null)
-                student.Team.Representative = _contenedorTrabajo.Representative.GetFirstOrDefault(r => r.Id == student.Team.RepresentativeId);
+			// Verificamos Team antes de acceder a sus propiedades
+			if (student.Team != null)
+			{
+				var representative = _contenedorTrabajo.Representative
+					.GetFirstOrDefault(r => r.Id == student.Team.RepresentativeId);
+				if (representative != null)
+				{
+					student.Team.Representative = representative;
+				}
+			}
 
-
-            // Obtener los uniformes del estudiante
-            var uniforms = _contenedorTrabajo.Uniform
+			// Obtener los uniformes del estudiante
+			var uniforms = _contenedorTrabajo.Uniform
                 .GetAll(u => u.StudentId == student.Id)
                 .ToList();
 

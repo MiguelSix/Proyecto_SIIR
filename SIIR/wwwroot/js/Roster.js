@@ -182,6 +182,9 @@ function initializeDataTable(teamId) {
                         return `
                             <div class="d-flex justify-content-center align-items-center">
                                 <div class="btn-group gap-2" role="group">
+                                    <a href="/Admin/Students/Details/${data.id}" class="btn btn-success btn-sm text-white" style="cursor:pointer">
+                                        <i class="fas fa-eye"></i><span class="d-none d-sm-inline"></span>
+                                    </a>
                                     <a onclick=Lock("/Admin/Students/Lock/${data.id}") class="btn btn-danger btn-sm" style="cursor:pointer;">
                                         <i class="fas fa-user-minus"></i>
                                     </a>
@@ -267,6 +270,12 @@ function generarTarjetas(teamId) {
                         buttons = `
                             <div class="d-flex justify-content-center mt-3">
                                 <div class="btn-group gap-2" role="group">
+                                    <a href="/Admin/Students/Details/${student.id}" 
+                                       class="btn btn-success btn-sm" 
+                                       style="cursor:pointer;"
+                                       title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <a onclick="Lock('/Admin/Students/Lock/${student.id}')" 
                                        class="btn btn-danger btn-sm" 
                                        style="cursor:pointer;"
@@ -318,7 +327,7 @@ function generarTarjetas(teamId) {
                                      style="height: 200px; object-fit: scale-down; background-color: #f8f9fa;"
                                      onerror="this.onerror=null; this.src='/images/zorro_default.png';">
                                 <div class="card-body">
-                                    <h5 class="card-title">${fullName}</h5>
+                                    <h5 class="card-title text-center">${fullName}</h5>
                                     <p class="card-text">
                                         <strong>No. Control:</strong> ${student.controlNumber || 'Sin actualizar'}<br>
                                         <strong>Carrera:</strong> ${student.career || 'Sin actualizar'}
