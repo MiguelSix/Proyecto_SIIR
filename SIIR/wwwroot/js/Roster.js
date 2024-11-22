@@ -399,11 +399,16 @@ function downloadInfo(url) {
             const disposition = xhr.getResponseHeader('Content-Disposition');
             let fileName = "Informacion_Estudiantes.pdf"; // Nombre por defecto
 
-            if (disposition && disposition.includes('filename=')) {
-                const filenameRegex = /filename[^;=\n]*=(['"]?)([^'"\n]*)\1/;
-                const matches = filenameRegex.exec(disposition);
-                if (matches != null && matches[2]) {
-                    fileName = matches[2];
+            if (disposition) {
+                // Extraer solo el nombre del archivo, ignorando la parte de UTF-8
+                const fileNameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (fileNameMatch && fileNameMatch[1]) {
+                    fileName = fileNameMatch[1].replace(/['"]/g, '') // Remover comillas si existen
+                        .replace(/filename\*?=(.+)/i, '$1') // Remover 'filename=' si existe
+                        .replace(/UTF-8''/i, '') // Remover 'UTF-8'' si existe
+                        .replace(/^['"]*|['"]*$/g, ''); // Remover comillas extras
+
+                    fileName = decodeURIComponent(fileName);
                 }
             }
 
@@ -435,11 +440,16 @@ function downloadAllInfo() {
             const disposition = xhr.getResponseHeader('Content-Disposition');
             let fileName = "Informacion_Estudiantes.pdf"; // Nombre por defecto
 
-            if (disposition && disposition.includes('filename=')) {
-                const filenameRegex = /filename[^;=\n]*=(['"]?)([^'"\n]*)\1/;
-                const matches = filenameRegex.exec(disposition);
-                if (matches != null && matches[2]) {
-                    fileName = matches[2];
+            if (disposition) {
+                // Extraer solo el nombre del archivo, ignorando la parte de UTF-8
+                const fileNameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (fileNameMatch && fileNameMatch[1]) {
+                    fileName = fileNameMatch[1].replace(/['"]/g, '') // Remover comillas si existen
+                        .replace(/filename\*?=(.+)/i, '$1') // Remover 'filename=' si existe
+                        .replace(/UTF-8''/i, '') // Remover 'UTF-8'' si existe
+                        .replace(/^['"]*|['"]*$/g, ''); // Remover comillas extras
+
+                    fileName = decodeURIComponent(fileName);
                 }
             }
 
@@ -643,6 +653,8 @@ function descargarDocsEquipo() {
                         .replace(/filename\*?=(.+)/i, '$1') // Remover 'filename=' si existe
                         .replace(/UTF-8''/i, '') // Remover 'UTF-8'' si existe
                         .replace(/^['"]*|['"]*$/g, ''); // Remover comillas extras
+
+                    fileName = decodeURIComponent(fileName);
                 }
             }
 

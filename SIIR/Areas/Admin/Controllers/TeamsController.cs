@@ -318,7 +318,10 @@ namespace SIIR.Areas.Admin.Controllers
                     container.Page(page =>
                     {
                         page.Size(PageSizes.A4);
+                        page.MarginHorizontal(1.5f, Unit.Centimetre);
+                        page.MarginVertical(1f, Unit.Centimetre);
                         HeaderPdf(page);
+                        page.Footer().Text(text => text.CurrentPageNumber());
 
                         page.Content().Element(c => CreateStudentCell(c, student, coach, team));
                     });
@@ -327,9 +330,7 @@ namespace SIIR.Areas.Admin.Controllers
 
             byte[] pdfBytes = document.GeneratePdf();
 
-            // Configurar el encabezado Content-Disposition con el nombre personalizado
-            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
-            return File(pdfBytes, "application/pdf");
+            return File(pdfBytes, "application/pdf", Uri.EscapeDataString(fileName));
         }
 
 
@@ -360,6 +361,8 @@ namespace SIIR.Areas.Admin.Controllers
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
+                    page.MarginHorizontal(1.5f, Unit.Centimetre);
+                    page.MarginVertical(1f, Unit.Centimetre);
                     HeaderPdf(page);
                     page.Content().Element(c => CreateStudentCell(c, student, coach, team));
                     page.Footer().Text(text => text.CurrentPageNumber());
@@ -368,9 +371,7 @@ namespace SIIR.Areas.Admin.Controllers
 
             byte[] pdfBytes = document.GeneratePdf();
 
-            // Configurar el encabezado Content-Disposition con el nombre personalizado
-            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
-            return File(pdfBytes, "application/pdf");
+            return File(pdfBytes, "application/pdf", Uri.EscapeDataString(fileName));
         }
 
         private static void CreateStudentCell(IContainer container, Models.Student student,  Models.Coach coach, Models.Team team)
@@ -415,7 +416,7 @@ namespace SIIR.Areas.Admin.Controllers
                     // Two-column layout for the rest of the information
                     column.Item().PaddingLeft(10).PaddingBottom(5).Row(row =>
                     {
-                        row.RelativeItem().Column(leftColumn =>
+                        row.RelativeItem().PaddingRight(10).Column(leftColumn =>
                         {
                             leftColumn.Item().Text("Número de control").Bold();
                             leftColumn.Item().Text(student.ControlNumber ?? "Sin Actualizar");
