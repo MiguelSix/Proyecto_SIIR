@@ -82,7 +82,14 @@ function cargarDatatable() {
             {
                 "data": "imageUrl",
                 "render": function (imageUrl) {
-                    return `<img src="${imageUrl}" alt="Foto del estudiante" class="img-fluid d-block mx-auto" style="max-width: 120px; max-height: 50px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
+                    return `<img src="${imageUrl}" 
+                            alt="Foto del estudiante" 
+                            class="img-fluid d-block mx-auto" 
+                            style="width: 120px; 
+                                   height: 50px; 
+                                   object-fit: cover;
+                                   object-position: center;" 
+                            onerror="this.onerror=null; this.src='/images/zorro_default.png';" />`;
                 },
                 "responsivePriority": 4
             },

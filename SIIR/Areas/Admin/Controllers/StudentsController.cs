@@ -13,7 +13,6 @@ using SIIR.Utilities;
 namespace SIIR.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
     public class StudentsController : Controller
     {
         private readonly IContenedorTrabajo _contenedorTrabajo;
@@ -31,13 +30,15 @@ namespace SIIR.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+		[Authorize(Roles = "Admin")]
+		public IActionResult Index()
         {
             return View();
         }
 
         [HttpGet]
-        public IActionResult Lock(int id)
+		[Authorize(Roles = "Admin")]
+		public IActionResult Lock(int id)
         {
             var student = _contenedorTrabajo.Student.GetFirstOrDefault(s => s.Id == id);
             if(student.IsCaptain)
