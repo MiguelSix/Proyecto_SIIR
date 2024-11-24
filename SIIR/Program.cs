@@ -34,6 +34,24 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
     .AddDefaultTokenProviders()
     .AddErrorDescriber<SpanishIdentityErrorDescriber>();
 
+// sessions must expire after 15 minutes of inactivity
+builder.Services.AddSession(options =>
+{
+	options.IdleTimeout = TimeSpan.FromMinutes(30);
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+});
+
+// authentication must be done using cookies
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+	options.LoginPath = "/Identity/Account/Login";
+	options.LogoutPath = "/Identity/Account/Logout";
+	options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+	options.SlidingExpiration = true;
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 builder.Services.AddTransient<IEmailSender, EmailSender>(i =>
@@ -71,6 +89,8 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 
 app.UseStaticFiles();
+
+app.UseSession();
 
 app.UseRouting();
 
