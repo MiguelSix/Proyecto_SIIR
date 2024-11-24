@@ -42,7 +42,15 @@ namespace SIIR.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            return View(coach);
+
+			// Obtener el usuario asociado al coach
+			var user = _contenedorTrabajo.User.GetAll(u => u.CoachId == id).FirstOrDefault();
+
+			// Guardar email y teléfono en ViewBag
+			ViewBag.UserEmail = user?.Email ?? "No disponible";
+			ViewBag.UserPhone = user?.PhoneNumber ?? "No disponible";
+
+			return View(coach);
         }
 
 

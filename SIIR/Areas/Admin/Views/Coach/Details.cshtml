@@ -21,6 +21,14 @@
                             <label class="form-label fw-bold">Apellido Materno</label>
                             <input class="form-control" value="@Model.SecondLastName" readonly />
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Correo Electrónico</label>
+                            <input class="form-control" value="@ViewBag.UserEmail" readonly />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Teléfono</label>
+                            <input class="form-control" value="@ViewBag.UserPhone" readonly />
+                        </div>
                         @if (!string.IsNullOrEmpty(Model.CVUrl))
                         {
                             <div class="mb-3">
