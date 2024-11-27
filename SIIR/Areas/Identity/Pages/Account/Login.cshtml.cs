@@ -137,7 +137,7 @@ namespace SIIR.Areas.Identity.Pages.Account
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Intento de Inicio de Sesión Fallido!!");
+                    ModelState.AddModelError(string.Empty, "¡¡¡Intento de Inicio de Sesión Fallido!!!");
                     return Page();
                 }
 
@@ -168,7 +168,11 @@ namespace SIIR.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Intento de Inicio de Sesión Fallido!!");
+                    var failedAttempts = await _userManager.GetAccessFailedCountAsync(user);
+                    var maxFailedAttempts = _userManager.Options.Lockout.MaxFailedAccessAttempts;
+                    var remainingAttempts = maxFailedAttempts - failedAttempts;
+
+                    ModelState.AddModelError(string.Empty, $"¡¡¡Intento de Inicio de Sesión Fallido, intentos disponibles {remainingAttempts}!!!");
                     return Page();
                 }
             }
