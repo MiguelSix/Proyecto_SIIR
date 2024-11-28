@@ -95,7 +95,6 @@
         color: #1a3c6e;
     }
 
-    /* Estilo para el listado de uniformes */
     .uniform-item {
         padding: 0.5rem 0;
         border-bottom: 1px solid #dee2e6;
@@ -172,6 +171,16 @@
                         <label class="form-label">Carrera</label>
                         <div class="info-text">@(Model.student.Career ?? "No especificado")</div>
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Contacto de emergencia</label>
+                        <div class="info-text">@(Model.student.emergencyContact ?? "No especificado")</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Teléfono de emergencia</label>
+                        <div class="info-text">@(Model.student.emergencyPhone ?? "No especificado")</div>
+                    </div>
                 </div>
 
                 <div class="row tournament-registration form">
@@ -189,7 +198,7 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Semestre actual</label>
-                        <div class="info-text">@(Model.student.Semester?.ToString() ?? "No especificado")</div>
+                        <div class="info-text">@(Model.student.Semester ?? "No especificado")</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -216,6 +225,11 @@
                         <label class="form-label">Alergias</label>
                         <div class="info-text">@(Model.student.Allergies ?? "No especificado")</div>
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Año de ingreso al Representativo</label>
+                        <div class="info-text">@(Model.student.enrollmentData?.ToString() ?? "No especificado")</div>
+                    </div>
                 </div>
 
                 <div class="row mb-4">
@@ -231,7 +245,38 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
+                <div class="info-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Uniformes</h6>
+                        <div class="d-flex align-items-center">
+                            @if (Model.student.Team?.Representative?.Category == "Deportivo")
+                            {
+                                <span class="me-2">Número:</span>
+                                <span class="number-display">@(Model.student.numberUniform?.ToString() ?? "No especificado")</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.uniforms != null && Model.uniforms.Any())
+                    {
+                        <div class="uniform-item">
+                            @for (int i = 0; i < Model.uniforms.Count; i++)
+                            {
+                                <div class="d-flex justify-content-between">
+                                    <span>@Model.namesUniform[i]</span>
+                                    <span class="uniform-size">Talla: @(Model.uniforms[i].size?.ToString() ?? "No especificada")</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay uniformes registrados</p>
+                    }
+                </div>
             </div>
 
             <div class="tab-pane fade" id="coach" role="tabpanel" aria-labelledby="coach-tab">
@@ -266,44 +311,9 @@
                         </div>
                     </div>
                 }
-
             </div>
-
-            <div class="tab-pane fade" id="uniform" role="tabpanel" aria-labelledby="uniform-tab">
-                <div class="info-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Uniformes</h6>
-                        <div class="d-flex align-items-center">
-                            @if (@Model.student.Team?.Representative?.Category == "Deportivo")
-                            {
-                                <span class="me-2">Número:</span>
-                                <span class="number-display">@(Model.student.numberUniform?.ToString() ?? "No especificado")</span>
-                            }
-                        </div>
-                    </div>
-
-                    @if (Model.uniforms != null && Model.uniforms.Any())
-                    {
-                        <div class="uniform-item">
-                            @for (int i = 0; i < Model.uniforms.Count; i++)
-                            {
-                                <div class="d-flex justify-content-between">
-                                    <span>@Model.namesUniform[i]</span>
-                                    <span class="uniform-size">Talla: @(Model.uniforms[i].size?.ToString() ?? "No especificada")</span>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No hay uniformes registrados</p>
-                    }
-                </div>
-            </div>
-
         </div>
 
-        <!-- Botón de volver movido fuera de las pestañas -->
         <div class="row">
             <div class="col-12">
                 <a asp-action="Index" class="btn btn-secondary w-100">
