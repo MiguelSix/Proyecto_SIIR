@@ -78,7 +78,12 @@
 
 						<div class="col-md-6 mb-3">
 							<label asp-for="student.ControlNumber" class="form-label">Número de control</label>
-							<input asp-for="student.ControlNumber" class="form-control" placeholder="Introduce tu número de control" />
+							<input asp-for="student.ControlNumber"
+								   class="form-control"
+								   placeholder="Introduce tu número de control"
+								   pattern="[A-Z0-9]+"
+								   oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
+								   maxlength="20" />
 							<span asp-validation-for="student.ControlNumber" class="text-danger"></span>
 						</div>
 
@@ -108,7 +113,7 @@
 						</div>
 
 						<div class="col-md-6 mb-3">
-							<label asp-for="student.emergencyContact" class="form-label">Contacto de emergencia</label>
+							<label asp-for="student.emergencyContact" class="form-label">Contacto de emergencia (Nombre)</label>
 							<input asp-for="student.emergencyContact" class="form-control" placeholder="Nombre del contacto de emergencia" />
 							<span asp-validation-for="student.emergencyContact" class="text-danger"></span>
 						</div>
@@ -132,7 +137,18 @@
 
 						<div class="col-md-6 mb-3">
 							<label asp-for="student.BloodType" class="form-label">Tipo de sangre</label>
-							<input asp-for="student.BloodType" class="form-control" placeholder="Introduce tu tipo de sangre" />
+							<div class="input-group">
+								<span class="input-group-text">
+									<i class="fas fa-tint"></i>
+								</span>
+								<select asp-for="student.BloodType" class="form-select">
+									<option value="">Selecciona un tipo de sangre</option>
+									@foreach (var bloodType in new[] { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" })
+									{
+										<option value="@bloodType">@bloodType</option>
+									}
+								</select>
+							</div>
 							<span asp-validation-for="student.BloodType" class="text-danger"></span>
 						</div>
 
@@ -203,8 +219,22 @@
 						</div>
 
 						<div class="col-md-6 mb-3">
-							<label asp-for="student.enrollmentData" class="form-label">Fecha de ingreso</label>
-							<input asp-for="student.enrollmentData" class="form-control" placeholder="Introduce tu fecha de ingreso" />
+							<label asp-for="student.enrollmentData" class="form-label">Año de ingreso al Representativo</label>
+							<div class="input-group">
+								<span class="input-group-text">
+									<i class="fas fa-calendar-alt"></i>
+								</span>
+								<select asp-for="student.enrollmentData" class="form-select">
+									<option value="">Selecciona el año de ingreso</option>
+									@{
+										int currentYear = DateTime.Now.Year;
+										for (int year = currentYear; year >= 2000; year--)
+										{
+											<option value="@year">@year</option>
+										}
+									}
+								</select>
+							</div>
 							<span asp-validation-for="student.enrollmentData" class="text-danger"></span>
 						</div>
 
@@ -342,5 +372,14 @@
 				reader.readAsDataURL(input.files[0]);
 			}
 		}
+	</script>
+
+	<script>
+		document.querySelector('[name="student.ControlNumber"]').addEventListener('keypress', function (e) {
+			var char = String.fromCharCode(e.keyCode || e.which);
+			if (!/[A-Z0-9]/.test(char.toUpperCase())) {
+				e.preventDefault();
+			}
+		});
 	</script>
 }

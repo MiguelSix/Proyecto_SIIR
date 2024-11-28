@@ -20,7 +20,8 @@ namespace SIIR.Utilities
             "Ingeniería en Materiales",
             "Ingeniería en Mecatrónica",
             "Ingeniería Eléctrica",
-            "Ingeniería en Logística"
+            "Ingeniería en Logística",
+            "Ingeniería en Ciencia de Datos"
         };
     }
 }

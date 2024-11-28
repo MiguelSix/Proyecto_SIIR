@@ -31,6 +31,7 @@ namespace SIIR.Models
 
 
         [StringLength(8, ErrorMessage = "El número de control no puede exceder los 8 caracteres.")]
+        [RegularExpression(@"^[A-Z0-9]+$", ErrorMessage = "Solo se permiten letras mayúsculas y números")]
         [Display(Name = "Número de Control")]
         public string? ControlNumber { get; set; }
 
