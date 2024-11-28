@@ -943,6 +943,7 @@ namespace SIIR.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult GenerateListStudentPdf([FromBody] List<Models.Student> students, [FromQuery] string teamName)
         {
+            teamName = HttpUtility.HtmlDecode(teamName);
 
             var date = DateTime.Now.ToString("yyyy-MM-dd");
             var fileName = $"Lista_Estudiantes_{date}.pdf";
